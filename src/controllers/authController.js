@@ -28,15 +28,22 @@ exports.loginUser = async (req, res) => {
 
         // Genera el token JWT
         const token = jwt.sign(
-            { userId: user.id_empleado, usuario: user.usuario },
+            { userId: user.UsuarioID, usuario: user.Email },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRES_IN }
         );
 
+        // Establece el token en una cookie segura
+        res.cookie('jwt', token, {
+            httpOnly: true,     // evita acceso desde JavaScript del cliente
+            secure: process.env.NODE_ENV === 'production',  // solo en HTTPS en producción
+            sameSite: 'strict', // previene el envío en solicitudes cruzadas
+            maxAge: 24 * 60 * 60 * 1000 // opcional: tiempo de expiración en milisegundos
+        });
+
         res.json({
             exito: true,
-            mensaje: 'Acceso exitoso',
-            datos: token
+            mensaje: 'Acceso exitoso'
         });
     } catch (error) {
         res.status(500).json({
@@ -45,4 +52,16 @@ exports.loginUser = async (req, res) => {
             error: error.message
         });
     }
+};
+
+exports.logoutUser = (req, res) => {
+    res.clearCookie('jwt', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict'
+    });
+    res.json({
+        exito: true,
+        mensaje: 'Cierre de sesión exitoso'
+    });
 };
