@@ -10,10 +10,10 @@ exports.loginUser = async (req, res) => {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const { cedula, password } = req.body;
+        const { email, password } = req.body;
 
         // Verifica si el usuario existe en la base de datos
-        const usuario = await UserModel.getUserByCedula(cedula);
+        const usuario = await UserModel.getUserByCorreo(email);
         if (usuario.length === 0) {
             return res.status(400).json({ exito: false, mensaje: 'Usuario no encontrado' });
         }
