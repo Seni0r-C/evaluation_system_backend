@@ -9,3 +9,15 @@ exports.getUserByCorreo = async (email) => {
         throw error;
     }
 };
+
+// Actualizar contraseña
+exports.updateUser = async (id, password) => {
+    try {
+        const usuario = await Usuario.findOne({ where: { UsuarioID: id } });
+        usuario.Contrasenia = password;
+        await usuario.save();
+        return usuario;
+    } catch (error) {
+        throw error;
+    }
+};

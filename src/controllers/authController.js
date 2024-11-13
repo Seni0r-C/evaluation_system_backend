@@ -14,14 +14,14 @@ exports.loginUser = async (req, res) => {
 
         // Verifica si el usuario existe en la base de datos
         const usuario = await userController.getUserByCorreo(email);
-        if (usuario.length === 0) {
+        if (!usuario) {
             return res.status(400).json({ exito: false, mensaje: 'Usuario no encontrado' });
         }
 
-        const user = usuario[0];
-
+        const user = usuario.dataValues;
+        
         // Compara la contraseña
-        const isMatch = await bcrypt.compare(password, user.password_hash);
+        const isMatch = await bcrypt.compare(password, user.Contrasenia);
         if (!isMatch) {
             return res.status(400).json({ exito: false, mensaje: 'Contraseña incorrecta' });
         }
@@ -64,4 +64,39 @@ exports.logoutUser = (req, res) => {
         exito: true,
         mensaje: 'Cierre de sesión exitoso'
     });
+};
+
+exports.restablecerPassword = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        const { email, password } = req.body;
+
+        // Verifica si el usuario existe en la base de datos
+        const usuario = await userController.getUserByCorreo(email);
+        if (!usuario) {
+            return res.status(400).json({ exito: false, mensaje: 'Usuario no encontrado' });
+        }
+
+        const user = usuario.dataValues;
+
+        // Cambia la contraseña
+        const salt = await bcrypt.genSalt(10);
+        const newPassword = await bcrypt.hash(password, salt);
+        await userController.updateUser(user.UsuarioID, newPassword);
+
+        res.json({
+            exito: true,
+            mensaje: 'Contraseña cambiada exitosamente'
+        });
+    } catch (error) {
+        res.status(500).json({
+            exito: false,
+            mensaje: 'Error del servidor',
+            error: error.message
+        });
+    }
 };
