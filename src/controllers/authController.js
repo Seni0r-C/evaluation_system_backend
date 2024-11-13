@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const UserModel = require('../models/userModel');
+const userController = require('../controllers/userController');
 
 exports.loginUser = async (req, res) => {
     try {
@@ -13,7 +13,7 @@ exports.loginUser = async (req, res) => {
         const { email, password } = req.body;
 
         // Verifica si el usuario existe en la base de datos
-        const usuario = await UserModel.getUserByCorreo(email);
+        const usuario = await userController.getUserByCorreo(email);
         if (usuario.length === 0) {
             return res.status(400).json({ exito: false, mensaje: 'Usuario no encontrado' });
         }
