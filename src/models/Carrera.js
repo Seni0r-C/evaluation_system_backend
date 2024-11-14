@@ -1,8 +1,9 @@
-// models/ModalidadTitulacion.js
+// models/Carrera.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
+const Facultad = require('./Facultad');
 
-const ModalidadTitulacion = sequelize.define('ModalidadTitulacion', {
+const Carrera = sequelize.define('Carrera', {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -12,13 +13,15 @@ const ModalidadTitulacion = sequelize.define('ModalidadTitulacion', {
         type: DataTypes.STRING(100),
         allowNull: false,
     },
-    descripcion: {
-        type: DataTypes.TEXT,
-        allowNull: true,
+    id_facultad: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
     }
 }, {
-    tableName: 'modalidad_titulacion',
+    tableName: 'carrera',
     timestamps: false,
 });
 
-module.exports = ModalidadTitulacion;
+Carrera.belongsTo(Facultad, { foreignKey: 'id_facultad' });
+
+module.exports = Carrera;

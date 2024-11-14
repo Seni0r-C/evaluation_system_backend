@@ -1,28 +1,20 @@
-// models/facultad.js
-const { Sequelize, DataTypes } = require('sequelize');
-const { sequelize } = require('../config/db');
+// models/Facultad.js
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
 const Facultad = sequelize.define('Facultad', {
-    FacultadID: {
+    id: {
         type: DataTypes.INTEGER,
-        primaryKey: true,
         autoIncrement: true,
+        primaryKey: true,
     },
-    NombreFacultad: {
+    nombre: {
         type: DataTypes.STRING(100),
         allowNull: false,
-    },
-    Descripcion: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-    },
-    FechaCreacion: {
-        type: DataTypes.DATEONLY,
-        allowNull: false,
-    },
+    }
 }, {
-    timestamps: false, // No usar timestamps de Sequelize (createdAt, updatedAt)
-    tableName: 'Facultad',
+    tableName: 'facultad',
+    timestamps: false,
 });
 
 module.exports = Facultad;

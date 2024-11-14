@@ -54,18 +54,6 @@ exports.loginUser = async (req, res) => {
     }
 };
 
-exports.logoutUser = (req, res) => {
-    res.clearCookie('jwt', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict'
-    });
-    res.json({
-        exito: true,
-        mensaje: 'Cierre de sesión exitoso'
-    });
-};
-
 exports.restablecerPassword = async (req, res) => {
     try {
         const errors = validationResult(req);
