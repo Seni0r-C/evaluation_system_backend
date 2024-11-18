@@ -1,50 +1,39 @@
-const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userController = require('../controllers/userController');
+const db = require('../config/db');
 
 exports.loginUser = async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-
         const { email, password } = req.body;
 
         // Verifica si el usuario existe en la base de datos
-        const usuario = await userController.getUserByCorreo(email);
-        if (!usuario) {
+        const sql = "SELECT * FROM Usuario WHERE Email = '?'";
+        const usuario = await db.query(sql, [email]);
+
+        if (usuario.length === 0) {
             return res.status(400).json({ exito: false, mensaje: 'Usuario no encontrado' });
         }
-
-        const user = usuario.dataValues;
-        
+        const user = usuario[0];
         // Compara la contraseña
-        const isMatch = await bcrypt.compare(password, user.Contrasenia);
+        const isMatch = await bcrypt.compare(password, user.contrasenia);
         if (!isMatch) {
             return res.status(400).json({ exito: false, mensaje: 'Contraseña incorrecta' });
         }
 
         // Genera el token JWT
         const token = jwt.sign(
-            { userId: user.UsuarioID, usuario: user.Email },
+            { userId: user.id, usuario: user.email },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRES_IN }
         );
 
-        // Establece el token en una cookie segura
-        res.cookie('jwt', token, {
-            httpOnly: true,     // evita acceso desde JavaScript del cliente
-            secure: process.env.NODE_ENV === 'production',  // solo en HTTPS en producción
-            sameSite: 'strict', // previene el envío en solicitudes cruzadas
-            maxAge: 24 * 60 * 60 * 1000 // opcional: tiempo de expiración en milisegundos
+        res.status(200).json({
+            exito: true,
+            mensaje: 'Acceso exitoso',
+            datos: token
         });
 
-        res.json({
-            exito: true,
-            mensaje: 'Acceso exitoso'
-        });
     } catch (error) {
         res.status(500).json({
             exito: false,
@@ -56,11 +45,6 @@ exports.loginUser = async (req, res) => {
 
 exports.restablecerPassword = async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-
         const { email, password } = req.body;
 
         // Verifica si el usuario existe en la base de datos
