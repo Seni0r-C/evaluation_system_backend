@@ -1,6 +1,5 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const userController = require('../controllers/userController');
 const db = require('../config/db');
 
 exports.loginUser = async (req, res) => {
@@ -48,17 +47,19 @@ exports.restablecerPassword = async (req, res) => {
         const { email, password } = req.body;
 
         // Verifica si el usuario existe en la base de datos
-        const usuario = await userController.getUserByCorreo(email);
-        if (!usuario) {
+        let sql = "SELECT * FROM Usuario WHERE Email = '?'";
+        const usuario = await db.query(sql, [email]);
+
+        if (usuario.length === 0) {
             return res.status(400).json({ exito: false, mensaje: 'Usuario no encontrado' });
         }
-
-        const user = usuario.dataValues;
+        const user = usuario[0];
 
         // Cambia la contraseña
         const salt = await bcrypt.genSalt(10);
         const newPassword = await bcrypt.hash(password, salt);
-        await userController.updateUser(user.UsuarioID, newPassword);
+        sql = "UPDATE Usuario SET Contrasenia = ? WHERE Email = ?";
+        const result = await db.query(sql, [newPassword, user.email]);
 
         res.json({
             exito: true,
