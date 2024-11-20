@@ -18,7 +18,7 @@ const getCarreras = async (req, res) => {
 const createCarrera = (req, res) => {
     const { nombre, id_facultad } = req.body;
     const query = 'INSERT INTO carrera (nombre, id_facultad) VALUES (?, ?)';
-    const results = db.query(query, [nombre, id_facultad]);
+    const [results] = db.query(query, [nombre, id_facultad]);
     res.status(201).json({
         exito: true,
         mensaje: 'Carrera creada',
@@ -31,7 +31,8 @@ const updateCarrera = (req, res) => {
     const { id } = req.params;
     const { nombre, id_facultad } = req.body;
     const query = 'UPDATE carrera SET nombre = ?, id_facultad = ? WHERE id = ?';
-    const results = db.query(query, [nombre, id_facultad, id]);
+    const [results] = db.query(query, [nombre, id_facultad, id]);
+
     res.status(200).json({
         exito: true,
         mensaje: 'Carrera actualizada',
@@ -42,7 +43,10 @@ const updateCarrera = (req, res) => {
 const deleteCarrera = (req, res) => {
     const { id } = req.params;
     const query = 'DELETE FROM carrera WHERE id = ?';
-    const results = db.query(query, [id]);
+    const [results] = db.query(query, [id]);
+    if (results.affectedRows === 0) {
+        return res.status(404).json({ exito: false, mensaje: 'Carrera no encontrada' });
+    }
     res.status(200).json({
         exito: true,
         mensaje: 'Carrera eliminada',
