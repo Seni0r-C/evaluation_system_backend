@@ -10,7 +10,7 @@ const getCarreras = async (req, res) => {
             datos: results,
         });
     } catch (error) {
-        res.status(500).json({ error });
+        res.status(500).json({ exito: false, mensaje: 'Error al obtener las carreras', error: error.message });
     }
 };
 
