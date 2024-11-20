@@ -8,12 +8,12 @@ exports.loginUser = async (req, res) => {
 
         // Verifica si el usuario existe en la base de datos
         const sql = "SELECT * FROM Usuario WHERE Email = ?";
-        const usuario = await db.query(sql, [email]);
+        const [usuario] = await db.query(sql, [email]);
 
-        if (usuario[0].length === 0) {
+        if (usuario.length === 0) {
             return res.status(400).json({ exito: false, mensaje: 'Usuario no encontrado' });
         }
-        const user = usuario[0][0];
+        const user = usuario[0];
         // Compara la contraseña
         const isMatch = await bcrypt.compare(password, user.contrasenia);
         if (!isMatch) {
@@ -48,12 +48,12 @@ exports.restablecerPassword = async (req, res) => {
 
         // Verifica si el usuario existe en la base de datos
         let sql = "SELECT * FROM Usuario WHERE Email = ?";
-        const usuario = await db.query(sql, [email]);
+        const [usuario] = await db.query(sql, [email]);
 
-        if (usuario[0].length === 0) {
+        if (usuario.length === 0) {
             return res.status(400).json({ exito: false, mensaje: 'Usuario no encontrado' });
         }
-        const user = usuario[0][0];
+        const user = usuario[0];
 
         // Cambia la contraseña
         const salt = await bcrypt.genSalt(10);
