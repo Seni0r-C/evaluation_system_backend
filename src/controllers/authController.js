@@ -59,9 +59,9 @@ exports.restablecerPassword = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const newPassword = await bcrypt.hash(password, salt);
         sql = "UPDATE usuario SET contrasenia = ? WHERE email = ?";
-        const result = await db.query(sql, [newPassword, user.email]);
+        const [result] = await db.query(sql, [newPassword, user.email]);
 
-        if (result[0].affectedRows === 0) {
+        if (result.affectedRows === 0) {
             return res.status(400).json({ exito: false, mensaje: 'Error al cambiar la contraseña' });
         }
 
