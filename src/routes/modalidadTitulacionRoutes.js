@@ -18,7 +18,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /crear:
+ * /modalidad-titulacion/crear:
  *   post:
  *     summary: Crear una nueva modalidad de titulación
  *     tags:
@@ -56,7 +56,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /listar:
+ * /modalidad-titulacion/listar:
  *   get:
  *     summary: Listar todas las modalidades de titulación
  *     tags:
@@ -83,7 +83,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /obtener/{id}:
+ * /modalidad-titulacion/obtener/{id}:
  *   get:
  *     summary: Obtener una modalidad específica por su ID
  *     tags:
@@ -117,7 +117,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /actualizar/{id}:
+ * /modalidad-titulacion/actualizar/{id}:
  *   put:
  *     summary: Actualizar una modalidad de titulación
  *     tags:
@@ -153,7 +153,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /eliminar/{id}:
+ * /modalidad-titulacion/eliminar/{id}:
  *   delete:
  *     summary: Eliminar una modalidad de titulación
  *     tags:
@@ -176,7 +176,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /asociar:
+ * /modalidad-titulacion/asociar:
  *   post:
  *     summary: Asociar una modalidad de titulación a una carrera
  *     tags:
@@ -203,7 +203,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /desasociar:
+ * /modalidad-titulacion/desasociar:
  *   delete:
  *     summary: Desasociar una modalidad de titulación de una carrera
  *     tags:
@@ -232,7 +232,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /listarPorCarrera/{id_carrera}:
+ * /modalidad-titulacion/listarPorCarrera/{id_carrera}:
  *   get:
  *     summary: Listar modalidades de titulación por carrera
  *     tags:
