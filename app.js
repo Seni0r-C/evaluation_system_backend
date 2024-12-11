@@ -7,7 +7,7 @@ app.use(cors());
 app.use(express.json());
 
 // Swagger
-const setupSwaggerDocs = require('./swagger');
+const setupSwaggerDocs = require('./src/config/swagger');
 setupSwaggerDocs(app);
 
 // Rutas de la API

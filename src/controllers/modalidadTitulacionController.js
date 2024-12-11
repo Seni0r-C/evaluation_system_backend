@@ -1,5 +1,5 @@
 
-const db = require('./db'); // Configuración de conexión a la base de datos
+const db = require('../config/db'); // Configuración de conexión a la base de datos
 
 // Crear una nueva modalidad de titulación
 exports.crearModalidad = async (req, res) => {
