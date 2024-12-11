@@ -6,6 +6,10 @@ require('dotenv').config();
 app.use(cors());
 app.use(express.json());
 
+// Swagger
+const setupSwaggerDocs = require('./swagger');
+setupSwaggerDocs(app);
+
 // Rutas de la API
 const authRoutes = require('./src/routes/authRoutes');
 const carrerasRoutes = require('./src/routes/carrerasControllers');
