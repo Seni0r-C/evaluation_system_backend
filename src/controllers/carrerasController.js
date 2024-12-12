@@ -1,9 +1,9 @@
 const db = require('../config/db');
 
 // Obtener todas las carreras
-const getCarreras = async (req, res) => {
+exports.getCarreras = async (req, res) => {
     try {
-        const [results] = await db.query('SELECT * FROM carrera');
+        const [results] = await db.query('SELECT * FROM utm.carrera');
         res.status(200).json({
             exito: true,
             mensaje: 'Carreras obtenidas',
@@ -14,10 +14,24 @@ const getCarreras = async (req, res) => {
     }
 };
 
+exports.getCarreraById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [results] = await db.query('SELECT * FROM utm.carrera WHERE id = ?', [id]);
+        res.status(200).json({
+            exito: true,
+            mensaje: 'Carrera obtenida',
+            datos: results,
+        });
+    } catch (error) {
+        res.status(500).json({ exito: false, mensaje: 'Error al obtener la carrera', error: error.message });
+    }
+};
+
 // Crear una nueva carrera
-const createCarrera = (req, res) => {
+exports.createCarrera = (req, res) => {
     const { nombre, id_facultad } = req.body;
-    const query = 'INSERT INTO carrera (nombre, id_facultad) VALUES (?, ?)';
+    const query = 'INSERT INTO utm.carrera (nombre, id_facultad) VALUES (?, ?)';
     const [results] = db.query(query, [nombre, id_facultad]);
     res.status(201).json({
         exito: true,
@@ -27,10 +41,10 @@ const createCarrera = (req, res) => {
 };
 
 // Actualizar una carrera
-const updateCarrera = (req, res) => {
+exports.updateCarrera = (req, res) => {
     const { id } = req.params;
     const { nombre, id_facultad } = req.body;
-    const query = 'UPDATE carrera SET nombre = ?, id_facultad = ? WHERE id = ?';
+    const query = 'UPDATE utm.carrera SET nombre = ?, id_facultad = ? WHERE id = ?';
     const [results] = db.query(query, [nombre, id_facultad, id]);
 
     res.status(200).json({
@@ -40,9 +54,9 @@ const updateCarrera = (req, res) => {
 };
 
 // Eliminar una carrera
-const deleteCarrera = (req, res) => {
+exports.deleteCarrera = (req, res) => {
     const { id } = req.params;
-    const query = 'DELETE FROM carrera WHERE id = ?';
+    const query = 'DELETE FROM utm.carrera WHERE id = ?';
     const [results] = db.query(query, [id]);
     if (results.affectedRows === 0) {
         return res.status(404).json({ exito: false, mensaje: 'Carrera no encontrada' });
@@ -52,5 +66,3 @@ const deleteCarrera = (req, res) => {
         mensaje: 'Carrera eliminada',
     });
 };
-
-module.exports = { getCarreras, createCarrera, updateCarrera, deleteCarrera };

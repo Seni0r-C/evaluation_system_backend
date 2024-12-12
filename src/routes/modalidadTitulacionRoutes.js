@@ -14,48 +14,7 @@ router.post('/asociar', modalidadController.asociarModalidadCarrera);
 router.delete('/desasociar', modalidadController.desasociarModalidadCarrera);
 router.get('/listarPorCarrera/:id_carrera', modalidadController.listarModalidadesPorCarrera);
 
-// Carreras
-router.get('/listarCarreras', modalidadController.getCarreras);
-
 module.exports = router;
-
-/**
- * @swagger
- * /modalidad-titulacion/listarCarreras:
- *   get:
- *     summary: Lista todas las carreras disponibles
- *     tags:
- *       - Carrera
- *     responses:
- *       200:
- *         description: Lista de carreras obtenida exitosamente
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     description: ID único de la carrera
- *                     example: 1
- *                   nombre:
- *                     type: string
- *                     description: Nombre de la carrera
- *                     example: "Ingeniería en Sistemas Computacionales"
- *       500:
- *         description: Error interno del servidor
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Mensaje de error
- *                   example: "Error al obtener las carreras"
- */
 
 /**
  * @swagger

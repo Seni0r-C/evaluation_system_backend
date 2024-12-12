@@ -16,7 +16,7 @@ const carrerasRoutes = require('./src/routes/carrerasControllers');
 const modalidadTitulacionRoutes = require('./src/routes/modalidadTitulacionRoutes');
 
 app.use('/auth', authRoutes);
-app.use('/carreras', carrerasRoutes);
+app.use('/carrera', carrerasRoutes);
 app.use('/modalidad-titulacion', modalidadTitulacionRoutes);
 
 const PORT = process.env.PORT || 3000;
