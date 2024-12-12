@@ -14,10 +14,12 @@ setupSwaggerDocs(app);
 const authRoutes = require('./src/routes/authRoutes');
 const carrerasRoutes = require('./src/routes/carrerasControllers');
 const modalidadTitulacionRoutes = require('./src/routes/modalidadTitulacionRoutes');
+const trabajoTitulacionRoutes = require('./src/routes/trabajoTitulacionRoutes');
 
 app.use('/auth', authRoutes);
 app.use('/carrera', carrerasRoutes);
 app.use('/modalidad-titulacion', modalidadTitulacionRoutes);
+app.use('/trabajo-titulacion', trabajoTitulacionRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
