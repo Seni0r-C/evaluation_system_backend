@@ -4,7 +4,7 @@ const authController = require('../controllers/authController');
 // Ruta de login con validación
 router.post("/login", authController.loginUser);
 router.post('/register', authController.registerUser);
-// router.get('/me', authController.getAuthenticatedUser);
+router.get('/me', authController.getAuthenticatedUser);
 router.post('/reset-password', authController.restablecerPassword);
 
 module.exports = router;

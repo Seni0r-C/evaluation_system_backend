@@ -112,26 +112,25 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-// exports.getAuthenticatedUser = async (req, res) => {
-//     try {
+exports.getAuthenticatedUser = async (req, res) => {
+    try {
+        const { userId } = req.user;
+        const sql = "SELECT * FROM utm.Usuario WHERE id = ?";
+        const [user] = await db.query(sql, [userId]);
+        if (user.length === 0) {
+            return res.status(404).json({ exito: false, mensaje: 'Usuario no encontrado' });
+        }
+        res.status(200).json({
+            exito: true,
+            mensaje: 'Datos del usuario',
+            datos: user[0]
+        });
 
-//         // Busca al usuario en la base de datos
-//         const sql = "SELECT id, nombre, apellido, email, id_rol FROM utm.Usuario WHERE id = ?";
-//         const [usuario] = await db.query(sql, [decoded.userId]);
-
-//         if (usuario.length === 0) {
-//             return res.status(404).json({ exito: false, mensaje: 'Usuario no encontrado' });
-//         }
-
-//         res.json({
-//             exito: true,
-//             usuario: usuario[0]
-//         });
-//     } catch (error) {
-//         res.status(500).json({
-//             exito: false,
-//             mensaje: 'Error del servidor',
-//             error: error.message
-//         });
-//     }
-// };
+    } catch (error) {
+        res.status(500).json({
+            exito: false,
+            mensaje: 'Error del servidor',
+            error: error.message
+        });
+    }
+};
