@@ -42,16 +42,16 @@ module.exports = router;
 /**
  * @swagger
  * tags:
- *   - name: Tipo Evaluacion
+ *   - name: Calificación - Tipo Evaluación
  *     description: Operaciones relacionadas con los tipos de evaluación
  */
 
 /**
  * @swagger
- * /tipo-evaluacion:
+ * /calificacion/tipo-evaluacion:
  *   post:
  *     summary: Crear un nuevo tipo de evaluación
- *     tags: [Tipo Evaluacion]
+ *     tags: [Calificación - Tipo Evaluación]
  *     requestBody:
  *       required: true
  *       content:
@@ -71,10 +71,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /tipo-evaluacion/{id}:
+ * /calificacion/tipo-evaluacion/{id}:
  *   get:
  *     summary: Obtener un tipo de evaluación por ID
- *     tags: [Tipo Evaluacion]
+ *     tags: [Calificación - Tipo Evaluación]
  *     parameters:
  *       - in: path
  *         name: id
@@ -97,10 +97,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /tipo-evaluacion/{id}:
+ * /calificacion/tipo-evaluacion/{id}:
  *   put:
  *     summary: Actualizar un tipo de evaluación por ID
- *     tags: [Tipo Evaluacion]
+ *     tags: [Calificación - Tipo Evaluación]
  *     parameters:
  *       - in: path
  *         name: id
@@ -129,10 +129,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /tipo-evaluacion/{id}:
+ * /calificacion/tipo-evaluacion/{id}:
  *   delete:
  *     summary: Eliminar un tipo de evaluación por ID
- *     tags: [Tipo Evaluacion]
+ *     tags: [Calificación - Tipo Evaluación]
  *     parameters:
  *       - in: path
  *         name: id
@@ -153,16 +153,16 @@ module.exports = router;
 /**
  * @swagger
  * tags:
- *   - name: Rubrica
+ *   - name: Calificación - Rubrica
  *     description: Operaciones relacionadas con las rubricas
  */
 
 /**
  * @swagger
- * /rubrica:
+ * /calificacion/rubrica:
  *   post:
  *     summary: Crear una nueva rubrica
- *     tags: [Rubrica]
+ *     tags: [Calificación - Rubrica]
  *     requestBody:
  *       required: true
  *       content:
@@ -182,10 +182,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica:
+ * /calificacion/rubrica:
  *   get:
  *     summary: Obtener todas las rubricas
- *     tags: [Rubrica]
+ *     tags: [Calificación - Rubrica]
  *     responses:
  *       200:
  *         description: Lista de rubricas
@@ -201,10 +201,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica/{id}:
+ * /calificacion/rubrica/{id}:
  *   get:
  *     summary: Obtener una rubrica por ID
- *     tags: [Rubrica]
+ *     tags: [Calificación - Rubrica]
  *     parameters:
  *       - in: path
  *         name: id
@@ -227,10 +227,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica/{id}:
+ * /calificacion/rubrica/{id}:
  *   put:
  *     summary: Actualizar una rubrica por ID
- *     tags: [Rubrica]
+ *     tags: [Calificación - Rubrica]
  *     parameters:
  *       - in: path
  *         name: id
@@ -259,10 +259,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica/{id}:
+ * /calificacion/rubrica/{id}:
  *   delete:
  *     summary: Eliminar una rubrica por ID
- *     tags: [Rubrica]
+ *     tags: [Calificación - Rubrica]
  *     parameters:
  *       - in: path
  *         name: id
@@ -283,16 +283,16 @@ module.exports = router;
 /**
  * @swagger
  * tags:
- *   - name: Rubrica Criterio
+ *   - name: Calificación - Rubrica Criterio
  *     description: Operaciones relacionadas con los criterios de rubricas
  */
 
 /**
  * @swagger
- * /rubrica-criterio:
+ * /calificacion/rubrica-criterio:
  *   post:
  *     summary: Crear un nuevo criterio de rubrica
- *     tags: [Rubrica Criterio]
+ *     tags: [Calificación - Rubrica Criterio]
  *     requestBody:
  *       required: true
  *       content:
@@ -312,10 +312,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica-criterio:
+ * /calificacion/rubrica-criterio:
  *   get:
  *     summary: Obtener todas los criterios de rubrica
- *     tags: [Rubrica Criterio]
+ *     tags: [Calificación - Rubrica Criterio]
  *     responses:
  *       200:
  *         description: Lista de criterios de rubrica
@@ -331,10 +331,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica-criterio/{id}:
+ * /calificacion/rubrica-criterio/{id}:
  *   get:
  *     summary: Obtener un criterio de rubrica por ID
- *     tags: [Rubrica Criterio]
+ *     tags: [Calificación - Rubrica Criterio]
  *     parameters:
  *       - in: path
  *         name: id
@@ -357,10 +357,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica-criterio/{id}:
+ * /calificacion/rubrica-criterio/{id}:
  *   put:
  *     summary: Actualizar un criterio de rubrica por ID
- *     tags: [Rubrica Criterio]
+ *     tags: [Calificación - Rubrica Criterio]
  *     parameters:
  *       - in: path
  *         name: id
@@ -389,10 +389,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica-criterio/{id}:
+ * /calificacion/rubrica-criterio/{id}:
  *   delete:
  *     summary: Eliminar un criterio de rubrica
- *     tags: [Rubrica Criterio]
+ *     tags: [Calificación - Rubrica Criterio]
  *     parameters:
  *       - in: path
  *         name: id
@@ -413,16 +413,16 @@ module.exports = router;
 /**
  * @swagger
  * tags:
- *   - name: Rubrica Nivel
+ *   - name: Calificación - Rubrica Nivel
  *     description: Operaciones relacionadas con los niveles de una rubrica
  */
 
 /**
  * @swagger
- * /rubrica-nivel:
+ * /calificacion/rubrica-nivel:
  *   post:
  *     summary: Crear un nuevo nivel de una rubrica
- *     tags: [Rubrica Nivel]
+ *     tags: [Calificación - Rubrica Nivel]
  *     requestBody:
  *       required: true
  *       content:
@@ -442,10 +442,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica-nivel:
+ * /calificacion/rubrica-nivel:
  *   get:
  *     summary: Obtener todas los niveles de una rubrica
- *     tags: [Rubrica Nivel]
+ *     tags: [Calificación - Rubrica Nivel]
  *     responses:
  *       200:
  *         description: Lista de niveles de rubrica
@@ -461,10 +461,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica-nivel/{id}:
+ * /calificacion/rubrica-nivel/{id}:
  *   get:
  *     summary: Obtener un nivel de una rubrica por ID
- *     tags: [Rubrica Nivel]
+ *     tags: [Calificación - Rubrica Nivel]
  *     parameters:
  *       - in: path
  *         name: id
@@ -487,10 +487,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica-nivel/{id}:
+ * /calificacion/rubrica-nivel/{id}:
  *   put:
  *     summary: Actualizar un nivel de una rubrica por ID
- *     tags: [Rubrica Nivel]
+ *     tags: [Calificación - Rubrica Nivel]
  *     parameters:
  *       - in: path
  *         name: id
@@ -519,10 +519,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica-nivel/{id}:
+ * /calificacion/rubrica-nivel/{id}:
  *   delete:
  *     summary: Eliminar un nivel de una rubrica por ID
- *     tags: [Rubrica Nivel]
+ *     tags: [Calificación - Rubrica Nivel]
  *     parameters:
  *       - in: path
  *         name: id
@@ -543,16 +543,16 @@ module.exports = router;
 /**
  * @swagger
  * tags:
- *   - name: Rubrica Evaluacion
+ *   - name: Calificación - Rubrica Evaluacion
  *     description: Operaciones relacionadas con las evaluaciones de una rubrica
  */
 
 /**
  * @swagger
- * /rubrica-evaluacion:
+ * /calificacion/rubrica-evaluacion:
  *   post:
  *     summary: Crear una nueva evaluación de una rubrica
- *     tags: [Rubrica Evaluacion]
+ *     tags: [Calificación - Rubrica Evaluacion]
  *     requestBody:
  *       required: true
  *       content:
@@ -572,10 +572,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica-evaluacion:
+ * /calificacion/rubrica-evaluacion:
  *   get:
  *     summary: Obtener todas las evaluaciones de rubrica
- *     tags: [Rubrica Evaluacion]
+ *     tags: [Calificación - Rubrica Evaluacion]
  *     responses:
  *       200:
  *         description: Lista de evaluaciones de rubrica
@@ -591,10 +591,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica-evaluacion/{id}:
+ * /calificacion/rubrica-evaluacion/{id}:
  *   get:
  *     summary: Obtener una evaluación de rubrica por ID
- *     tags: [Rubrica Evaluacion]
+ *     tags: [Calificación - Rubrica Evaluacion]
  *     parameters:
  *       - in: path
  *         name: id
@@ -617,10 +617,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica-evaluacion/{id}:
+ * /calificacion/rubrica-evaluacion/{id}:
  *   put:
  *     summary: Actualizar una evaluación de rubrica por ID
- *     tags: [Rubrica Evaluacion]
+ *     tags: [Calificación - Rubrica Evaluacion]
  *     parameters:
  *       - in: path
  *         name: id
@@ -649,10 +649,10 @@ module.exports = router;
 
 /**
  * @swagger
- * /rubrica-evaluacion/{id}:
+ * /calificacion/rubrica-evaluacion/{id}:
  *   delete:
  *     summary: Eliminar una evaluación de rubrica por ID
- *     tags: [Rubrica Evaluacion]
+ *     tags: [Calificación - Rubrica Evaluacion]
  *     parameters:
  *       - in: path
  *         name: id
