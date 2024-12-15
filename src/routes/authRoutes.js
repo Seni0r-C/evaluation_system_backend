@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
+const verifyToken = require('../middlewares/authMiddleware');
+
 // Ruta de login con validación
 router.post("/login", authController.loginUser);
 router.post('/register', authController.registerUser);
-router.get('/me', authController.getAuthenticatedUser);
+router.get('/me',verifyToken, authController.getAuthenticatedUser);
 router.post('/reset-password', authController.restablecerPassword);
 
 module.exports = router;
