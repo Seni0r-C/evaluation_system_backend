@@ -23,7 +23,7 @@ exports.crearUsuario = async (req, res) => {
  * @returns {Promise<void>} Responde con un array de usuarios o un mensaje de error.
  */
 exports.obtenerUsuarios = async (req, res) => {
-  const { nombre, apellido, email } = req.query; // Obtener parámetros de búsqueda de la query string
+  const { nombre, email, rol } = req.query; // Obtener parámetros de búsqueda de la query string
 
   try {
     // Construir condiciones dinámicas
@@ -31,22 +31,23 @@ exports.obtenerUsuarios = async (req, res) => {
     const valores = [];
 
     if (nombre) {
-      condiciones.push("nombre LIKE ?");
-      valores.push(`%${nombre}%`);
-    }
-    if (apellido) {
-      condiciones.push("apellido LIKE ?");
-      valores.push(`%${apellido}%`);
+      condiciones.push("(nombre LIKE ? OR apellido LIKE ?)");
+      valores.push(`%${nombre}%`, `%${nombre}%`);  // Asegúrate de que se agreguen dos valores para nombre y apellido
     }
     if (email) {
       condiciones.push("email LIKE ?");
       valores.push(`%${email}%`);
     }
 
+    if (rol) {
+      condiciones.push("id_rol = ?");
+      valores.push(rol);
+    }
+
     // Generar consulta dinámica
-    const queryBase = "SELECT id, nombre, apellido, email, id_rol FROM utm.usuario";
+    const queryBase = "SELECT id, nombre, apellido, email, id_rol FROM utm.usuario WHERE 1=1";
     const queryFinal = condiciones.length
-      ? `${queryBase} WHERE ${condiciones.join(" AND ")}`
+      ? `${queryBase} AND ${condiciones.join(' AND ')}`  // Se debe unir las condiciones con "AND"
       : queryBase;
 
     // Ejecutar consulta
