@@ -43,18 +43,71 @@ exports.crearTrabajo = async (req, res) => {
 
 // Listar todos los trabajos de titulación
 exports.listarTrabajos = async (req, res) => {
+    const { page = 1, limit = 10, carrera_id, modalidad_id, estado, titulo } = req.query;
+    
+    // Calculando el offset para la paginación
+    const offset = (page - 1) * limit;
+
+    // Generando la cláusula WHERE dinámica según los filtros
+    let whereClauses = [];
+    let queryParams = [];
+
+    if (carrera_id) {
+        whereClauses.push('tt.carrera_id = ?');
+        queryParams.push(carrera_id);
+    }
+
+    if (modalidad_id) {
+        whereClauses.push('tt.modalidad_id = ?');
+        queryParams.push(modalidad_id);
+    }
+
+    if (estado) {
+        whereClauses.push('tt.estado = ?');
+        queryParams.push(estado);
+    }
+
+    if (titulo) {
+        whereClauses.push('tt.titulo LIKE ?');
+        queryParams.push(`%${titulo}%`);
+    }
+
+    // Unir todas las cláusulas WHERE si existen
+    let whereQuery = whereClauses.length ? 'WHERE ' + whereClauses.join(' AND ') : '';
+
+    // Consulta para obtener los trabajos de titulación con filtros y paginación
     try {
         const [rows] = await db.execute(`
             SELECT tt.*, c.nombre AS carrera, mt.nombre AS modalidad
             FROM trabajo_titulacion tt
             JOIN carrera c ON tt.carrera_id = c.id
             JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
-        `);
-        res.json(rows);
+            ${whereQuery}
+            LIMIT ? OFFSET ?
+        `, [...queryParams, limit, offset]);
+
+        // Consulta para contar el total de trabajos sin paginación, solo con filtros
+        const [totalRows] = await db.execute(`
+            SELECT COUNT(*) AS total
+            FROM trabajo_titulacion tt
+            JOIN carrera c ON tt.carrera_id = c.id
+            JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
+            ${whereQuery}
+        `, queryParams);
+
+        // Enviar la respuesta con los trabajos y el total de registros
+        res.json({
+            data: rows,
+            total: totalRows[0].total,
+            page: parseInt(page),
+            totalPages: Math.ceil(totalRows[0].total / limit)
+        });
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 // Obtener un trabajo de titulación por su ID
 exports.obtenerTrabajo = async (req, res) => {

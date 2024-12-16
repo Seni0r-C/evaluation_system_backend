@@ -70,13 +70,95 @@ module.exports = router;
  * @swagger
  * /trabajo-titulacion/listar:
  *   get:
- *     summary: Lista todos los trabajos de titulación.
+ *     summary: Lista todos los trabajos de titulación con paginación y filtros opcionales.
  *     tags: [Trabajos de Titulación]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Número de la página que se desea consultar (paginación).
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Número de registros por página (paginación).
+ *       - in: query
+ *         name: carrera_id
+ *         required: false
+ *         schema:
+ *           type: integer
+ *         description: Filtra los trabajos por el ID de la carrera.
+ *       - in: query
+ *         name: modalidad_id
+ *         required: false
+ *         schema:
+ *           type: integer
+ *         description: Filtra los trabajos por el ID de la modalidad.
+ *       - in: query
+ *         name: estado
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [Registrado, En defensa, Aprobado, Reprobado]
+ *         description: Filtra los trabajos por su estado.
+ *       - in: query
+ *         name: titulo
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Filtra los trabajos por el título, se realiza una búsqueda por coincidencia de texto.
  *     responses:
  *       200:
- *         description: Lista de trabajos de titulación.
+ *         description: Lista de trabajos de titulación con la paginación y filtros aplicados.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       carrera_id:
+ *                         type: integer
+ *                       modalidad_id:
+ *                         type: integer
+ *                       tutor_id:
+ *                         type: integer
+ *                       cotutor_id:
+ *                         type: integer
+ *                       estado:
+ *                         type: string
+ *                       fecha_defensa:
+ *                         type: string
+ *                         format: date
+ *                       titulo:
+ *                         type: string
+ *                       link_archivo:
+ *                         type: string
+ *                       carrera:
+ *                         type: string
+ *                       modalidad:
+ *                         type: string
+ *                 total:
+ *                   type: integer
+ *                   description: Total de trabajos de titulación que cumplen con los filtros.
+ *                 page:
+ *                   type: integer
+ *                   description: Página actual solicitada.
+ *                 totalPages:
+ *                   type: integer
+ *                   description: Total de páginas disponibles.
  *       500:
- *         description: Error del servidor.
+ *         description: Error interno del servidor.
  */
 
 /**
