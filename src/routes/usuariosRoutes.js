@@ -76,10 +76,26 @@ module.exports = router;
  *     tags:
  *       - Usuarios
  *     summary: Obtiene la lista de todos los usuarios
- *     description: Devuelve todos los usuarios registrados en el sistema.
+ *     description: Devuelve todos los usuarios registrados en el sistema. Permite realizar búsquedas opcionales filtrando por nombre, apellido o email.
+ *     parameters:
+ *       - in: query
+ *         name: nombre
+ *         schema:
+ *           type: string
+ *         description: Nombre del usuario para filtrar la búsqueda.
+ *       - in: query
+ *         name: apellido
+ *         schema:
+ *           type: string
+ *         description: Apellido del usuario para filtrar la búsqueda.
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *         description: Email del usuario para filtrar la búsqueda.
  *     responses:
  *       200:
- *         description: Lista de usuarios obtenida exitosamente
+ *         description: Lista de usuarios obtenida exitosamente.
  *         content:
  *           application/json:
  *             schema:
@@ -89,21 +105,37 @@ module.exports = router;
  *                 properties:
  *                   id:
  *                     type: integer
+ *                     description: Identificador único del usuario.
  *                   nombre:
  *                     type: string
+ *                     description: Nombre del usuario.
  *                   apellido:
  *                     type: string
+ *                     description: Apellido del usuario.
  *                   email:
  *                     type: string
+ *                     description: Correo electrónico del usuario.
  *                   id_rol:
  *                     type: integer
+ *                     description: Identificador del rol asociado al usuario.
  *       500:
- *         description: Error al obtener los usuarios
+ *         description: Error al obtener los usuarios.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error.
+ *                 message:
+ *                   type: string
+ *                   description: Descripción detallada del error.
  */
 
 /**
  * @swagger
- * /usuarios/{id}:
+ * /usuarios/{rol_id}:
  *   get:
  *     tags:
  *       - Usuarios

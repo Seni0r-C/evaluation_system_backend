@@ -15,10 +15,42 @@ exports.crearUsuario = async (req, res) => {
   }
 };
 
-// Obtener todos los usuarios
+/**
+ * Controlador para obtener los usuarios del sistema, con búsquedas opcionales.
+ *
+ * @param {Object} req - Objeto de solicitud HTTP.
+ * @param {Object} res - Objeto de respuesta HTTP.
+ * @returns {Promise<void>} Responde con un array de usuarios o un mensaje de error.
+ */
 exports.obtenerUsuarios = async (req, res) => {
+  const { nombre, apellido, email } = req.query; // Obtener parámetros de búsqueda de la query string
+
   try {
-    const [usuarios] = await db.execute('SELECT id, nombre, apellido, email, id_rol FROM utm.usuario');
+    // Construir condiciones dinámicas
+    const condiciones = [];
+    const valores = [];
+
+    if (nombre) {
+      condiciones.push("nombre LIKE ?");
+      valores.push(`%${nombre}%`);
+    }
+    if (apellido) {
+      condiciones.push("apellido LIKE ?");
+      valores.push(`%${apellido}%`);
+    }
+    if (email) {
+      condiciones.push("email LIKE ?");
+      valores.push(`%${email}%`);
+    }
+
+    // Generar consulta dinámica
+    const queryBase = "SELECT id, nombre, apellido, email, id_rol FROM utm.usuario";
+    const queryFinal = condiciones.length
+      ? `${queryBase} WHERE ${condiciones.join(" AND ")}`
+      : queryBase;
+
+    // Ejecutar consulta
+    const [usuarios] = await db.execute(queryFinal, valores);
     res.status(200).json(usuarios);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener los usuarios', message: error.message });
