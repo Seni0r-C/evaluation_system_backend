@@ -80,20 +80,20 @@ exports.listarTrabajos = async (req, res) => {
         const [rows] = await db.execute(`
             SELECT tt.*, c.nombre AS carrera, mt.nombre AS modalidad
             FROM trabajo_titulacion tt
-            JOIN carrera c ON tt.carrera_id = c.id
+            JOIN utm.carrera c ON tt.carrera_id = c.id
             JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
             ${whereQuery}
             LIMIT ? OFFSET ?
-        `, [...queryParams, limit, offset]);
+        `, [ limit, offset]);
 
         // Consulta para contar el total de trabajos sin paginación, solo con filtros
         const [totalRows] = await db.execute(`
             SELECT COUNT(*) AS total
             FROM trabajo_titulacion tt
-            JOIN carrera c ON tt.carrera_id = c.id
+            JOIN utm.carrera c ON tt.carrera_id = c.id
             JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
             ${whereQuery}
-        `, queryParams);
+        `);
 
         // Enviar la respuesta con los trabajos y el total de registros
         res.json({
@@ -116,7 +116,7 @@ exports.obtenerTrabajo = async (req, res) => {
         const [rows] = await db.execute(`
             SELECT tt.*, c.nombre AS carrera, mt.nombre AS modalidad
             FROM trabajo_titulacion tt
-            JOIN carrera c ON tt.carrera_id = c.id
+            JOIN utm.carrera c ON tt.carrera_id = c.id
             JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
             WHERE tt.id = ?`,
             [id]
