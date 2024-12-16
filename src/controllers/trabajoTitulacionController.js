@@ -4,20 +4,38 @@ const db = require('../config/db');
 exports.crearTrabajo = async (req, res) => {
     const { carrera_id, modalidad_id, tutor_id, cotutor_id, titulo, link_archivo } = req.body;
     try {
+        // Verificar si ya existe un trabajo con el mismo título
+        const [existingTitle] = await db.execute(
+            'SELECT id FROM trabajo_titulacion WHERE titulo = ?',
+            [titulo]
+        );
+        
+        if (existingTitle.length > 0) {
+            // Si existe, devolver un error indicando que el título ya está en uso
+            return res.status(400).json({ error: 'Ya existe un trabajo con ese título' });
+        }
+
+        // Verificar si la modalidad existe
         const [modalidad] = await db.execute(
             'SELECT max_participantes FROM modalidad_titulacion WHERE id = ?',
             [modalidad_id]
         );
+        
         if (!modalidad.length) {
             return res.status(400).json({ error: 'Modalidad no encontrada' });
         }
+
+        // Crear el nuevo trabajo de titulación
         const [result] = await db.execute(
             `INSERT INTO trabajo_titulacion 
             (carrera_id, modalidad_id, tutor_id, cotutor_id, titulo, link_archivo) 
             VALUES (?, ?, ?, ?, ?, ?)`,
             [carrera_id, modalidad_id, tutor_id, cotutor_id || null, titulo, link_archivo]
         );
+        
+        // Responder con éxito
         res.status(201).json({ id: result.insertId, titulo });
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
