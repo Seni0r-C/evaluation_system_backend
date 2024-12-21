@@ -6,11 +6,24 @@ require('dotenv').config();
 app.use(cors());
 app.use(express.json());
 
+// Swagger
+const setupSwaggerDocs = require('./src/config/swagger');
+setupSwaggerDocs(app);
+
 // Rutas de la API
 const authRoutes = require('./src/routes/authRoutes');
 const carrerasRoutes = require('./src/routes/carrerasControllers');
+const modalidadTitulacionRoutes = require('./src/routes/modalidadTitulacionRoutes');
+const trabajoTitulacionRoutes = require('./src/routes/trabajoTitulacionRoutes');
+const calificacionRoutes = require('./src/routes/calificacionRoutes');
+const usuariosRoutes = require('./src/routes/usuariosRoutes');
+
 app.use('/auth', authRoutes);
-app.use('/carreras', carrerasRoutes);
+app.use('/carrera', carrerasRoutes);
+app.use('/modalidad-titulacion', modalidadTitulacionRoutes);
+app.use('/trabajo-titulacion', trabajoTitulacionRoutes);
+app.use('/calificacion', calificacionRoutes);
+app.use('/usuarios', usuariosRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
