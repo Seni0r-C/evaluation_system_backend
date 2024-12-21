@@ -30,3 +30,4 @@ Thumbs.db
 *.ntvs*
 *.njsproj
 *.sln
+localdata/
