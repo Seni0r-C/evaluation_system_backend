@@ -203,7 +203,7 @@ exports.registerUser = async (req, res) => {
 exports.getAuthenticatedUser = async (req, res) => {
     try {
         const { userId } = req.user;
-        const sql = "SELECT * FROM utm.usuario WHERE id = ?";
+        const sql = "SELECT * FROM utm.usuario WHERE id_personal = ?";
         const [user] = await db.query(sql, [userId]);
         if (user.length === 0) {
             return res.status(404).json({ exito: false, mensaje: 'Usuario no encontrado' });
