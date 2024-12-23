@@ -1,28 +1,84 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
+const axios = require('axios');
+require('dotenv').config();
+const https = require('https');
+
+const agent = new https.Agent({
+    rejectUnauthorized: false
+});
 
 exports.loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { usuario, password } = req.body;
+
+        // Hace la petición al endpoint externo
+        const apiUrl = "https://app.utm.edu.ec/becas/api/publico/IniciaSesion";
+
+        const body = {
+            usuario: usuario, // Usa el email como usuario
+            clave: password // Usa la contraseña proporcionada
+        };
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-Api-Key': '3ecbcb4e62a00d2bc58080218a4376f24a8079e1'
+        };
+
+        const response = await axios.post(apiUrl, body, {
+            headers,
+            httpsAgent: agent
+        });
+
+        if (response.data.state !== 'success') {
+            return res.status(400).json({ exito: false, mensaje: 'Error en la autenticación externa. ' + response.data.error });
+        }
+
+        const apiData = response.data.value;
 
         // Verifica si el usuario existe en la base de datos
-        const sql = "SELECT * FROM utm.usuario WHERE Email = ?";
-        const [usuario] = await db.query(sql, [email]);
+        const sql = "SELECT * FROM utm.usuario WHERE usuario = ?";
+        const [usuarioExiste] = await db.query(sql, [usuario]);
 
-        if (usuario.length === 0) {
-            return res.status(400).json({ exito: false, mensaje: 'Usuario no encontrado' });
-        }
-        const user = usuario[0];
-        // Compara la contraseña
-        const isMatch = await bcrypt.compare(password, user.contrasenia);
-        if (!isMatch) {
-            return res.status(400).json({ exito: false, mensaje: 'Contraseña incorrecta' });
+        let user = null;
+
+        if (usuarioExiste.length === 0) {
+            // Inserta un nuevo usuario en la base de datos
+            const insertUserSql = `
+                INSERT INTO utm.usuario (id_personal, nombre, apellido, usuario, id_rol) 
+                VALUES (?, ?, ?, ?, ?)
+            `;
+            const [nombre, apellido] = apiData.nombres.split(" ");
+            const rolId = await getOrInsertRol(apiData.tipo_usuario);
+
+            await db.query(insertUserSql, [
+                apiData.idpersonal,
+                nombre,
+                apellido,
+                usuario,
+                rolId
+            ]);
+
+            // Inserta las carreras asociadas si no existen
+            if (apiData.datos_estudio) {
+                const carreras = JSON.parse(apiData.datos_estudio);
+                for (const carrera of carreras) {
+                    await insertCarreraIfNotExists(carrera.carrera);
+                }
+            }
+
+            user = {
+                id_personal: apiData.idpersonal,
+                usuario: usuario,
+            }
+        } else {
+            user = usuarioExiste[0];
         }
 
         // Genera el token JWT
         const token = jwt.sign(
-            { userId: user.id, usuario: user.email },
+            { userId: user.id_personal, usuario: user.usuario },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRES_IN }
         );
@@ -41,6 +97,31 @@ exports.loginUser = async (req, res) => {
         });
     }
 };
+
+// Función para obtener o insertar un rol
+async function getOrInsertRol(tipoUsuario) {
+    const selectRolSql = "SELECT id FROM utm.rol WHERE nombre = ?";
+    const [rol] = await db.query(selectRolSql, [tipoUsuario]);
+
+    if (rol.length > 0) {
+        return rol[0].id;
+    }
+
+    const insertRolSql = "INSERT INTO utm.rol (nombre) VALUES (?)";
+    const result = await db.query(insertRolSql, [tipoUsuario]);
+    return result.insertId;
+}
+
+// Función para insertar carrera si no existe
+async function insertCarreraIfNotExists(nombreCarrera) {
+    const selectCarreraSql = "SELECT id FROM utm.carrera WHERE nombre = ?";
+    const [carrera] = await db.query(selectCarreraSql, [nombreCarrera]);
+
+    if (carrera.length === 0) {
+        const insertCarreraSql = "INSERT INTO utm.carrera (nombre) VALUES (?)";
+        await db.query(insertCarreraSql, [nombreCarrera]);
+    }
+}
 
 exports.restablecerPassword = async (req, res) => {
     try {
