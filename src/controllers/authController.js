@@ -44,21 +44,27 @@ exports.loginUser = async (req, res) => {
         let user = null;
 
         if (usuarioExiste.length === 0) {
+            await db.query("BEGIN");
             // Inserta un nuevo usuario en la base de datos
             const insertUserSql = `
-                INSERT INTO utm.usuario (id_personal, nombre, apellido, usuario, id_rol) 
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO utm.usuario (id_personal, nombre, usuario) 
+                VALUES (?, ?, ?)
             `;
-            const [nombre, apellido] = apiData.nombres.split(" ");
+            const nombre = apiData.nombres;
             const rolId = await getOrInsertRol(apiData.tipo_usuario);
-
-            await db.query(insertUserSql, [
-                apiData.idpersonal,
+            const idpersonal = apiData.idpersonal;
+            const [result] = await db.query(insertUserSql, [
+                idpersonal,
                 nombre,
-                apellido,
-                usuario,
-                rolId
+                usuario
             ]);
+
+            const asocialRolSql = "INSERT INTO utm.usuario_rol (id_usuario, id_rol) VALUES (?, ?)";
+            const [asocialRol] = await db.query(asocialRolSql, [result.insertId, rolId]);
+
+            if (asocialRol.affectedRows === 0) {
+                return res.status(400).json({ exito: false, mensaje: 'Error al asociar el rol' });
+            }
 
             // Inserta las carreras asociadas si no existen
             if (apiData.datos_estudio) {
@@ -67,7 +73,7 @@ exports.loginUser = async (req, res) => {
                     await insertCarreraIfNotExists(carrera.carrera);
                 }
             }
-
+            await db.query("COMMIT");
             user = {
                 id_personal: apiData.idpersonal,
                 usuario: usuario,
@@ -90,6 +96,7 @@ exports.loginUser = async (req, res) => {
         });
 
     } catch (error) {
+        await db.query("ROLLBACK");
         res.status(500).json({
             exito: false,
             mensaje: 'Error del servidor',
