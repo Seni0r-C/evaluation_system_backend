@@ -31,21 +31,21 @@ exports.obtenerUsuarios = async (req, res) => {
     const valores = [];
 
     if (nombre) {
-      condiciones.push("(nombre LIKE ? OR apellido LIKE ?)");
-      valores.push(`%${nombre}%`, `%${nombre}%`);  // Asegúrate de que se agreguen dos valores para nombre y apellido
+      condiciones.push("u.nombre LIKE ? ");
+      valores.push(`%${nombre}%`);  // Asegúrate de que se agreguen dos valores para nombre y apellido
     }
     if (email) {
-      condiciones.push("email LIKE ?");
+      condiciones.push("u.usuario LIKE ?");
       valores.push(`%${email}%`);
     }
 
     if (rol) {
-      condiciones.push("id_rol = ?");
+      condiciones.push("r.id_rol = ?");
       valores.push(rol);
     }
 
     // Generar consulta dinámica
-    const queryBase = "SELECT id, nombre, apellido, email, id_rol FROM utm.usuario WHERE 1=1";
+    const queryBase = "SELECT DISTINCT u.* FROM utm.usuario u INNER JOIN utm.usuario_rol r WHERE r.id_usuario = u.id";
     const queryFinal = condiciones.length
       ? `${queryBase} AND ${condiciones.join(' AND ')}`  // Se debe unir las condiciones con "AND"
       : queryBase;
@@ -60,9 +60,9 @@ exports.obtenerUsuarios = async (req, res) => {
 
 // Obtener un usuario por su id
 exports.obtenerUsuariosByRol = async (req, res) => {
-  const {  rol } = req.params;
+  const { rol } = req.params;
   try {
-    const [usuario] = await db.execute('SELECT id, nombre, apellido, email FROM utm.usuario WHERE id_rol = ?', [rol]);
+    const [usuario] = await db.execute('SELECT * FROM usuario u INNER JOIN usuario_rol r WHERE u.id_personal = 104419 AND r.id_usuario = u.id AND r.id_rol = ?', [rol]);
     if (usuario.length === 0) {
       return res.status(404).json({ message: 'No hay usuarios con ese rol' });
     }
