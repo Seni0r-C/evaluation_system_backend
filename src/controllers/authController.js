@@ -210,12 +210,15 @@ exports.getAuthenticatedUser = async (req, res) => {
             return res.status(404).json({ exito: false, mensaje: 'Usuario no encontrado' });
         }
 
+        const rolesSql = "SELECT * FROM utm.usuario_rol WHERE id_usuario = ?";
+        const [roles] = await db.query(rolesSql, [user[0].id]);
+
         // Obtener la foto del usuario
         let userPhotoBase64 = null;
         try {
             const photoResponse = await axios.post(
                 "https://app.utm.edu.ec:3000/movil/obtener_foto_carnet",
-                { idpersonal: user[0].id_personal }, {
+                { idpersonal: userId }, {
                 httpsAgent: agent
             }
             );
@@ -235,6 +238,7 @@ exports.getAuthenticatedUser = async (req, res) => {
             mensaje: 'Datos del usuario',
             datos: {
                 ...user[0],
+                roles: roles.map(rol => rol.id_rol), // Agregar los roles asociados
                 fotoBase64: userPhotoBase64, // Agregar la foto en Base64
             }
         });
