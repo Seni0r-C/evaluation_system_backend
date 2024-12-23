@@ -205,13 +205,38 @@ exports.getAuthenticatedUser = async (req, res) => {
         const { userId } = req.user;
         const sql = "SELECT * FROM utm.usuario WHERE id_personal = ?";
         const [user] = await db.query(sql, [userId]);
+
         if (user.length === 0) {
             return res.status(404).json({ exito: false, mensaje: 'Usuario no encontrado' });
         }
+
+        // Obtener la foto del usuario
+        let userPhotoBase64 = null;
+        try {
+            const photoResponse = await axios.post(
+                "https://app.utm.edu.ec:3000/movil/obtener_foto_carnet",
+                { idpersonal: user[0].id_personal }, {
+                httpsAgent: agent
+            }
+            );
+
+            const photoData = photoResponse.data[0]?.archivo_bin?.data;
+            if (photoData) {
+                // Convertir buffer a Base64
+                userPhotoBase64 = Buffer.from(photoData).toString('base64');
+            }
+        } catch (photoError) {
+            console.error("Error al obtener la foto del usuario:", photoError.message);
+        }
+
+        // Incluir la foto en la respuesta
         res.status(200).json({
             exito: true,
             mensaje: 'Datos del usuario',
-            datos: user[0]
+            datos: {
+                ...user[0],
+                fotoBase64: userPhotoBase64, // Agregar la foto en Base64
+            }
         });
 
     } catch (error) {
