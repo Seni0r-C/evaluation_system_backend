@@ -9,7 +9,7 @@ exports.crearTrabajo = async (req, res) => {
             'SELECT id FROM trabajo_titulacion WHERE titulo = ?',
             [titulo]
         );
-        
+
         if (existingTitle.length > 0) {
             // Si existe, devolver un error indicando que el título ya está en uso
             return res.status(400).json({ error: 'Ya existe un trabajo con ese título' });
@@ -20,7 +20,7 @@ exports.crearTrabajo = async (req, res) => {
             'SELECT max_participantes FROM modalidad_titulacion WHERE id = ?',
             [modalidad_id]
         );
-        
+
         if (!modalidad.length) {
             return res.status(400).json({ error: 'Modalidad no encontrada' });
         }
@@ -32,7 +32,7 @@ exports.crearTrabajo = async (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?)`,
             [carrera_id, modalidad_id, tutor_id, cotutor_id || null, titulo, link_archivo]
         );
-        
+
         // Responder con éxito
         res.status(201).json({ id: result.insertId, titulo });
 
@@ -43,40 +43,52 @@ exports.crearTrabajo = async (req, res) => {
 
 // Listar todos los trabajos de titulación
 exports.listarTrabajos = async (req, res) => {
-    const { page = 1, limit = 10, carrera_id, modalidad_id, estado, titulo } = req.query;
-    
-    // Calculando el offset para la paginación
-    const offset = (page - 1) * limit;
-
-    // Generando la cláusula WHERE dinámica según los filtros
-    let whereClauses = [];
-    let queryParams = [];
-
-    if (carrera_id) {
-        whereClauses.push('tt.carrera_id = ?');
-        queryParams.push(carrera_id);
-    }
-
-    if (modalidad_id) {
-        whereClauses.push('tt.modalidad_id = ?');
-        queryParams.push(modalidad_id);
-    }
-
-    if (estado) {
-        whereClauses.push('tt.estado = ?');
-        queryParams.push(estado);
-    }
-
-    if (titulo) {
-        whereClauses.push('tt.titulo LIKE ?');
-        queryParams.push(`%${titulo}%`);
-    }
-
-    // Unir todas las cláusulas WHERE si existen
-    let whereQuery = whereClauses.length ? 'WHERE ' + whereClauses.join(' AND ') : '';
-
-    // Consulta para obtener los trabajos de titulación con filtros y paginación
     try {
+        const { page = 1, limit = 10, carrera_id, modalidad_id, estado, titulo } = req.query;
+
+        // Validación y conversión de parámetros de paginación
+        const pageNumber = parseInt(page, 10);
+        const limitNumber = parseInt(limit, 10);
+
+        if (isNaN(pageNumber) || pageNumber < 1) {
+            return res.status(400).json({ error: "El parámetro 'page' debe ser un número mayor o igual a 1." });
+        }
+
+        if (isNaN(limitNumber) || limitNumber < 1) {
+            return res.status(400).json({ error: "El parámetro 'limit' debe ser un número mayor o igual a 1." });
+        }
+
+        // Calculando el offset para la paginación
+        const offset = (pageNumber - 1) * limitNumber;
+
+        // Generando la cláusula WHERE dinámica según los filtros
+        let whereClauses = [];
+        let queryParams = [];
+
+        if (carrera_id) {
+            whereClauses.push('tt.carrera_id = ?');
+            queryParams.push(carrera_id);
+        }
+
+        if (modalidad_id) {
+            whereClauses.push('tt.modalidad_id = ?');
+            queryParams.push(modalidad_id);
+        }
+
+        if (estado) {
+            whereClauses.push('tt.estado = ?');
+            queryParams.push(estado);
+        }
+
+        if (titulo) {
+            whereClauses.push('tt.titulo LIKE ?');
+            queryParams.push(`%${titulo}%`);
+        }
+
+        // Unir todas las cláusulas WHERE si existen
+        const whereQuery = whereClauses.length ? 'WHERE ' + whereClauses.join(' AND ') : '';
+
+        // Consulta para obtener los trabajos de titulación con filtros y paginación
         const [rows] = await db.execute(`
             SELECT tt.*, c.nombre AS carrera, mt.nombre AS modalidad
             FROM trabajo_titulacion tt
@@ -84,7 +96,7 @@ exports.listarTrabajos = async (req, res) => {
             JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
             ${whereQuery}
             LIMIT ? OFFSET ?
-        `, [ limit, offset]);
+        `, [...queryParams, limitNumber, offset]);
 
         // Consulta para contar el total de trabajos sin paginación, solo con filtros
         const [totalRows] = await db.execute(`
@@ -93,18 +105,19 @@ exports.listarTrabajos = async (req, res) => {
             JOIN utm.carrera c ON tt.carrera_id = c.id
             JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
             ${whereQuery}
-        `);
+        `, queryParams);
 
         // Enviar la respuesta con los trabajos y el total de registros
         res.json({
             data: rows,
             total: totalRows[0].total,
-            page: parseInt(page),
-            totalPages: Math.ceil(totalRows[0].total / limit)
+            page: pageNumber,
+            totalPages: Math.ceil(totalRows[0].total / limitNumber)
         });
 
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Error al listar trabajos de titulación:", error.message);
+        res.status(500).json({ error: "Ocurrió un error al procesar la solicitud. Por favor, intente nuevamente más tarde." });
     }
 };
 
