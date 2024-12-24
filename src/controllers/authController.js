@@ -70,7 +70,18 @@ exports.loginUser = async (req, res) => {
             if (apiData.datos_estudio) {
                 const carreras = JSON.parse(apiData.datos_estudio);
                 for (const carrera of carreras) {
-                    await insertCarreraIfNotExists(carrera.carrera);
+                    const idCarrera = await insertCarreraIfNotExists(carrera.carrera);
+                    // Asocia la carrera al usuario
+                    const [existingCarrera] = await db.query("SELECT * FROM utm.usuario_carrera WHERE id_usuario = ? AND id_carrera = ?", [result.insertId, idCarrera]);
+
+                    if (existingCarrera.length == 0) {
+                        const asocialCarreraSql = "INSERT INTO utm.usuario_carrera (id_usuario, id_carrera) VALUES (?, ?)";
+                        const [asocialCarrera] = await db.query(asocialCarreraSql, [result.insertId, idCarrera]);
+
+                        if (asocialCarrera.affectedRows === 0) {
+                            return res.status(400).json({ exito: false, mensaje: 'Error al asociar la carrera' });
+                        }
+                    }
                 }
             }
             await db.query("COMMIT");
@@ -116,7 +127,7 @@ async function getOrInsertRol(tipoUsuario) {
 
     const insertRolSql = "INSERT INTO utm.rol (nombre) VALUES (?)";
     const result = await db.query(insertRolSql, [tipoUsuario]);
-    return result.insertId;
+    return result[0].insertId;
 }
 
 // Función para insertar carrera si no existe
@@ -126,8 +137,10 @@ async function insertCarreraIfNotExists(nombreCarrera) {
 
     if (carrera.length === 0) {
         const insertCarreraSql = "INSERT INTO utm.carrera (nombre) VALUES (?)";
-        await db.query(insertCarreraSql, [nombreCarrera]);
+        const [result] = await db.query(insertCarreraSql, [nombreCarrera]);
+        return result.insertId;
     }
+    return carrera[0].id;
 }
 
 exports.restablecerPassword = async (req, res) => {
@@ -213,6 +226,8 @@ exports.getAuthenticatedUser = async (req, res) => {
         const rolesSql = "SELECT * FROM utm.usuario_rol WHERE id_usuario = ?";
         const [roles] = await db.query(rolesSql, [user[0].id]);
 
+        const carreraSql = "SELECT * FROM utm.usuario_carrera WHERE id_usuario = ?";
+        const [carrera] = await db.query(carreraSql, [user[0].id]);
         // Obtener la foto del usuario
         let userPhotoBase64 = null;
         try {
@@ -239,6 +254,7 @@ exports.getAuthenticatedUser = async (req, res) => {
             datos: {
                 ...user[0],
                 roles: roles.map(rol => rol.id_rol), // Agregar los roles asociados
+                carreras: carrera.map(c => c.id_carrera), // Agregar las carreras asociadas
                 fotoBase64: userPhotoBase64, // Agregar la foto en Base64
             }
         });
