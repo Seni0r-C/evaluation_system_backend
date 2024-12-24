@@ -37,6 +37,22 @@ exports.loginUser = async (req, res) => {
 
         const apiData = response.data.value;
 
+        // Inserta las carreras asociadas si no existen
+        if (apiData.datos_estudio) {
+            const datos = JSON.parse(apiData.datos_estudio);
+            let isCienciasInformticas = false;
+            for (const carrera of datos) {
+                const facultad = carrera.facultad;
+                if (facultad.includes('CIENCIAS INFORMÁTICAS')) {
+                    isCienciasInformticas = true;
+                    break;
+                }
+            }
+            if (!isCienciasInformticas) {
+                return res.status(400).json({ exito: false, mensaje: 'Usted no pertenece a la carrera CIENCIAS INFORMÁTICAS' });
+            }
+        }
+
         // Verifica si el usuario existe en la base de datos
         const sql = "SELECT * FROM utm.usuario WHERE usuario = ?";
         const [usuarioExiste] = await db.query(sql, [usuario]);
@@ -70,16 +86,18 @@ exports.loginUser = async (req, res) => {
             if (apiData.datos_estudio) {
                 const carreras = JSON.parse(apiData.datos_estudio);
                 for (const carrera of carreras) {
-                    const idCarrera = await insertCarreraIfNotExists(carrera.carrera);
-                    // Asocia la carrera al usuario
-                    const [existingCarrera] = await db.query("SELECT * FROM utm.usuario_carrera WHERE id_usuario = ? AND id_carrera = ?", [result.insertId, idCarrera]);
+                    if (carrera.facultad.includes('CIENCIAS INFORMÁTICAS')) {
+                        const idCarrera = await insertCarreraIfNotExists(carrera.carrera);
+                        // Asocia la carrera al usuario
+                        const [existingCarrera] = await db.query("SELECT * FROM utm.usuario_carrera WHERE id_usuario = ? AND id_carrera = ?", [result.insertId, idCarrera]);
 
-                    if (existingCarrera.length == 0) {
-                        const asocialCarreraSql = "INSERT INTO utm.usuario_carrera (id_usuario, id_carrera) VALUES (?, ?)";
-                        const [asocialCarrera] = await db.query(asocialCarreraSql, [result.insertId, idCarrera]);
+                        if (existingCarrera.length == 0) {
+                            const asocialCarreraSql = "INSERT INTO utm.usuario_carrera (id_usuario, id_carrera) VALUES (?, ?)";
+                            const [asocialCarrera] = await db.query(asocialCarreraSql, [result.insertId, idCarrera]);
 
-                        if (asocialCarrera.affectedRows === 0) {
-                            return res.status(400).json({ exito: false, mensaje: 'Error al asociar la carrera' });
+                            if (asocialCarrera.affectedRows === 0) {
+                                return res.status(400).json({ exito: false, mensaje: 'Error al asociar la carrera' });
+                            }
                         }
                     }
                 }

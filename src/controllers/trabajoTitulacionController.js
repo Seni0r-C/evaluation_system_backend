@@ -143,6 +143,26 @@ exports.obtenerTrabajo = async (req, res) => {
     }
 };
 
+// Obtener los estados de un trabajo de titulación
+exports.obtenerEstados = async (req, res) => {
+    try {
+        const [rows] = await db.execute(
+            `SELECT COLUMN_TYPE
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME = 'trabajo_titulacion'
+            AND COLUMN_NAME = 'estado';
+            `
+        );
+        res.json({
+            exito: true,
+            mensaje: 'Estados de trabajo de titulación',
+            estados: rows[0]
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 // Actualizar un trabajo de titulación
 exports.actualizarTrabajo = async (req, res) => {
     const { id } = req.params;
