@@ -44,7 +44,7 @@ exports.crearTrabajo = async (req, res) => {
 // Listar todos los trabajos de titulación
 exports.listarTrabajos = async (req, res) => {
     try {
-        const { page = 1, limit = 10, carrera_id, modalidad_id, estado, titulo } = req.query;
+        const { page = 1, limit = 10, carrera_id, modalidad_id, estado, titulo, fecha_defensa } = req.query;
 
         // Validación y conversión de parámetros de paginación
         const pageNumber = parseInt(page, 10);
@@ -83,6 +83,11 @@ exports.listarTrabajos = async (req, res) => {
         if (titulo) {
             whereClauses.push('tt.titulo LIKE ?');
             queryParams.push(`%${titulo}%`);
+        }
+
+        if (fecha_defensa) {
+            whereClauses.push('tt.fecha_defensa = ?');
+            queryParams.push(fecha_defensa);
         }
 
         // Unir todas las cláusulas WHERE si existen
