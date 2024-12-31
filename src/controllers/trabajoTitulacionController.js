@@ -152,16 +152,12 @@ exports.obtenerTrabajo = async (req, res) => {
 exports.obtenerEstados = async (req, res) => {
     try {
         const [rows] = await db.execute(
-            `SELECT COLUMN_TYPE
-            FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_NAME = 'trabajo_titulacion'
-            AND COLUMN_NAME = 'estado';
-            `
+            `SELECT id, nombre FROM trabajo_estado`
         );
         res.json({
             exito: true,
             mensaje: 'Estados de trabajo de titulación',
-            estados: rows[0]
+            estados: rows
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
