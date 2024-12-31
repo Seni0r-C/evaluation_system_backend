@@ -3,7 +3,7 @@ const db = require('../config/db');
 // Obtener todas las carreras
 exports.getCarreras = async (req, res) => {
     try {
-        const [results] = await db.query('SELECT * FROM carrera');
+        const [results] = await db.query('SELECT * FROM sistema_carrera');
         res.status(200).json({
             exito: true,
             mensaje: 'Carreras obtenidas',
