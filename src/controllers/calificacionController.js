@@ -5,7 +5,7 @@ const db = require('../config/db'); // Importa la conexión a tu base de datos
 exports.createTipoEvaluacion = async (req, res) => {
     const { nombre } = req.body;
     try {
-        const result = await db.query('INSERT INTO tipo_evaluacion (nombre) VALUES (?)', [nombre]);
+        const result = await db.query('INSERT INTO sistema_tipo_evaluacion (nombre) VALUES (?)', [nombre]);
         res.status(201).json({ id: result.insertId, nombre });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -24,7 +24,7 @@ exports.getTiposEvaluacion = async (req, res) => {
 exports.getTipoEvaluacionById = async (req, res) => {
     const { id } = req.params;
     try {
-        const [rows] = await db.query('SELECT * FROM tipo_evaluacion WHERE id = ?', [id]);
+        const [rows] = await db.query('SELECT * FROM sistema_tipo_evaluacion WHERE id = ?', [id]);
         if (rows.length === 0) return res.status(404).json({ message: 'Tipo de evaluación no encontrado' });
         res.json(rows[0]);
     } catch (error) {
@@ -36,7 +36,7 @@ exports.updateTipoEvaluacion = async (req, res) => {
     const { id } = req.params;
     const { nombre } = req.body;
     try {
-        const result = await db.query('UPDATE tipo_evaluacion SET nombre = ? WHERE id = ?', [nombre, id]);
+        const result = await db.query('UPDATE sistema_tipo_evaluacion SET nombre = ? WHERE id = ?', [nombre, id]);
         if (result.affectedRows === 0) return res.status(404).json({ message: 'Tipo de evaluación no encontrado' });
         res.json({ id, nombre });
     } catch (error) {
@@ -47,7 +47,7 @@ exports.updateTipoEvaluacion = async (req, res) => {
 exports.deleteTipoEvaluacion = async (req, res) => {
     const { id } = req.params;
     try {
-        const result = await db.query('DELETE FROM tipo_evaluacion WHERE id = ?', [id]);
+        const result = await db.query('DELETE FROM sistema_tipo_evaluacion WHERE id = ?', [id]);
         if (result.affectedRows === 0) return res.status(404).json({ message: 'Tipo de evaluación no encontrado' });
         res.status(204).send();
     } catch (error) {

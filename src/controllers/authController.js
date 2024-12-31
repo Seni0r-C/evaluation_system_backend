@@ -54,7 +54,7 @@ exports.loginUser = async (req, res) => {
         }
 
         // Verifica si el usuario existe en la base de datos
-        const sql = "SELECT * FROM utm.usuario WHERE usuario = ?";
+        const sql = "SELECT * FROM usuario WHERE usuario = ?";
         const [usuarioExiste] = await db.query(sql, [usuario]);
 
         let user = null;
@@ -63,7 +63,7 @@ exports.loginUser = async (req, res) => {
             await db.query("BEGIN");
             // Inserta un nuevo usuario en la base de datos
             const insertUserSql = `
-                INSERT INTO utm.usuario (id_personal, nombre, usuario) 
+                INSERT INTO usuario (id_personal, nombre, usuario) 
                 VALUES (?, ?, ?)
             `;
             const nombre = apiData.nombres;
@@ -75,7 +75,7 @@ exports.loginUser = async (req, res) => {
                 usuario
             ]);
 
-            const asocialRolSql = "INSERT INTO utm.usuario_rol (id_usuario, id_rol) VALUES (?, ?)";
+            const asocialRolSql = "INSERT INTO usuario_rol (id_usuario, id_rol) VALUES (?, ?)";
             const [asocialRol] = await db.query(asocialRolSql, [result.insertId, rolId]);
 
             if (asocialRol.affectedRows === 0) {
@@ -89,10 +89,10 @@ exports.loginUser = async (req, res) => {
                     if (carrera.facultad.includes('CIENCIAS INFORMÁTICAS')) {
                         const idCarrera = await insertCarreraIfNotExists(carrera.carrera);
                         // Asocia la carrera al usuario
-                        const [existingCarrera] = await db.query("SELECT * FROM utm.usuario_carrera WHERE id_usuario = ? AND id_carrera = ?", [result.insertId, idCarrera]);
+                        const [existingCarrera] = await db.query("SELECT * FROM usuario_carrera WHERE id_usuario = ? AND id_carrera = ?", [result.insertId, idCarrera]);
 
                         if (existingCarrera.length == 0) {
-                            const asocialCarreraSql = "INSERT INTO utm.usuario_carrera (id_usuario, id_carrera) VALUES (?, ?)";
+                            const asocialCarreraSql = "INSERT INTO usuario_carrera (id_usuario, id_carrera) VALUES (?, ?)";
                             const [asocialCarrera] = await db.query(asocialCarreraSql, [result.insertId, idCarrera]);
 
                             if (asocialCarrera.affectedRows === 0) {
@@ -136,25 +136,25 @@ exports.loginUser = async (req, res) => {
 
 // Función para obtener o insertar un rol
 async function getOrInsertRol(tipoUsuario) {
-    const selectRolSql = "SELECT id FROM utm.rol WHERE nombre = ?";
+    const selectRolSql = "SELECT id FROM sistema_rol WHERE nombre = ?";
     const [rol] = await db.query(selectRolSql, [tipoUsuario]);
 
     if (rol.length > 0) {
         return rol[0].id;
     }
 
-    const insertRolSql = "INSERT INTO utm.rol (nombre) VALUES (?)";
+    const insertRolSql = "INSERT INTO sistema_rol (nombre) VALUES (?)";
     const result = await db.query(insertRolSql, [tipoUsuario]);
     return result[0].insertId;
 }
 
 // Función para insertar carrera si no existe
 async function insertCarreraIfNotExists(nombreCarrera) {
-    const selectCarreraSql = "SELECT id FROM utm.carrera WHERE nombre = ?";
+    const selectCarreraSql = "SELECT id FROM sistema_carrera WHERE nombre = ?";
     const [carrera] = await db.query(selectCarreraSql, [nombreCarrera]);
 
     if (carrera.length === 0) {
-        const insertCarreraSql = "INSERT INTO utm.carrera (nombre) VALUES (?)";
+        const insertCarreraSql = "INSERT INTO sistema_carrera (nombre) VALUES (?)";
         const [result] = await db.query(insertCarreraSql, [nombreCarrera]);
         return result.insertId;
     }
@@ -166,7 +166,7 @@ exports.restablecerPassword = async (req, res) => {
         const { email, password } = req.body;
 
         // Verifica si el usuario existe en la base de datos
-        let sql = "SELECT * FROM utm.usuario WHERE Email = ?";
+        let sql = "SELECT * FROM usuario WHERE Email = ?";
         const [usuario] = await db.query(sql, [email]);
 
         if (usuario.length === 0) {
@@ -177,7 +177,7 @@ exports.restablecerPassword = async (req, res) => {
         // Cambia la contraseña
         const salt = await bcrypt.genSalt(10);
         const newPassword = await bcrypt.hash(password, salt);
-        sql = "UPDATE utm.usuario SET contrasenia = ? WHERE email = ?";
+        sql = "UPDATE usuario SET contrasenia = ? WHERE email = ?";
         const [result] = await db.query(sql, [newPassword, user.email]);
 
         if (result.affectedRows === 0) {
@@ -202,7 +202,7 @@ exports.registerUser = async (req, res) => {
         const { nombre, apellido, email, password, id_rol } = req.body;
 
         // Verifica si el email ya está registrado
-        const sqlCheck = "SELECT * FROM utm.usuario WHERE Email = ?";
+        const sqlCheck = "SELECT * FROM usuario WHERE Email = ?";
         const [existingUser] = await db.query(sqlCheck, [email]);
 
         if (existingUser.length > 0) {
@@ -214,7 +214,7 @@ exports.registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         // Inserta el nuevo usuario en la base de datos
-        const sqlInsert = "INSERT INTO utm.usuario (nombre, apellido, email, contrasenia, id_rol) VALUES (?, ?, ?, ?, ?)";
+        const sqlInsert = "INSERT INTO usuario (nombre, apellido, email, contrasenia, id_rol) VALUES (?, ?, ?, ?, ?)";
         const [result] = await db.query(sqlInsert, [nombre, apellido, email, hashedPassword, id_rol]);
 
         res.status(201).json({
@@ -234,17 +234,17 @@ exports.registerUser = async (req, res) => {
 exports.getAuthenticatedUser = async (req, res) => {
     try {
         const { userId } = req.user;
-        const sql = "SELECT * FROM utm.usuario WHERE id_personal = ?";
+        const sql = "SELECT * FROM usuario WHERE id_personal = ?";
         const [user] = await db.query(sql, [userId]);
 
         if (user.length === 0) {
             return res.status(404).json({ exito: false, mensaje: 'Usuario no encontrado' });
         }
 
-        const rolesSql = "SELECT * FROM utm.usuario_rol WHERE id_usuario = ?";
+        const rolesSql = "SELECT * FROM usuario_rol WHERE id_usuario = ?";
         const [roles] = await db.query(rolesSql, [user[0].id]);
 
-        const carreraSql = "SELECT * FROM utm.usuario_carrera WHERE id_usuario = ?";
+        const carreraSql = "SELECT * FROM usuario_carrera WHERE id_usuario = ?";
         const [carrera] = await db.query(carreraSql, [user[0].id]);
         // Obtener la foto del usuario
         let userPhotoBase64 = null;

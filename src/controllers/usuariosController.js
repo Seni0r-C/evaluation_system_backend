@@ -6,7 +6,7 @@ exports.crearUsuario = async (req, res) => {
   const { nombre, apellido, email, contrasenia, id_rol } = req.body;
   try {
     const [result] = await db.execute(
-      `INSERT INTO utm.usuario (nombre, apellido, email, contrasenia, id_rol) VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO .usuario (nombre, apellido, email, contrasenia, id_rol) VALUES (?, ?, ?, ?, ?)`,
       [nombre, apellido, email, contrasenia, id_rol]
     );
     res.status(201).json({ message: 'Usuario creado', id: result.insertId });
@@ -45,7 +45,7 @@ exports.obtenerUsuarios = async (req, res) => {
     }
 
     // Generar consulta dinámica
-    const queryBase = "SELECT DISTINCT u.* FROM utm.usuario u INNER JOIN utm.usuario_rol r WHERE r.id_usuario = u.id";
+    const queryBase = "SELECT DISTINCT u.* FROM .usuario u INNER JOIN .usuario_rol r WHERE r.id_usuario = u.id";
     const queryFinal = condiciones.length
       ? `${queryBase} AND ${condiciones.join(' AND ')}`  // Se debe unir las condiciones con "AND"
       : queryBase;
@@ -78,7 +78,7 @@ exports.actualizarUsuario = async (req, res) => {
   const { nombre, apellido, email, contrasenia, id_rol } = req.body;
   try {
     const [result] = await db.execute(
-      `UPDATE utm.usuario SET nombre = ?, apellido = ?, email = ?, contrasenia = ?, id_rol = ? WHERE id = ?`,
+      `UPDATE .usuario SET nombre = ?, apellido = ?, email = ?, contrasenia = ?, id_rol = ? WHERE id = ?`,
       [nombre, apellido, email, contrasenia, id_rol, id]
     );
     if (result.affectedRows === 0) {
@@ -94,7 +94,7 @@ exports.actualizarUsuario = async (req, res) => {
 exports.eliminarUsuario = async (req, res) => {
   const { id } = req.params;
   try {
-    const [result] = await db.execute('DELETE FROM utm.usuario WHERE id = ?', [id]);
+    const [result] = await db.execute('DELETE FROM .usuario WHERE id = ?', [id]);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }

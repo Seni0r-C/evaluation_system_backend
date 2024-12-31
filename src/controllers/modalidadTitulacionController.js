@@ -122,7 +122,7 @@ exports.getCarreras = async (req, res) => {
     try {
         const [rows] = await db.query(
             `SELECT *
-            FROM utm.carrera`);
+            FROM carrera`);
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: error.message });

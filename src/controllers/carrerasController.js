@@ -3,7 +3,7 @@ const db = require('../config/db');
 // Obtener todas las carreras
 exports.getCarreras = async (req, res) => {
     try {
-        const [results] = await db.query('SELECT * FROM utm.carrera');
+        const [results] = await db.query('SELECT * FROM carrera');
         res.status(200).json({
             exito: true,
             mensaje: 'Carreras obtenidas',
@@ -17,7 +17,7 @@ exports.getCarreras = async (req, res) => {
 exports.getCarreraById = async (req, res) => {
     const { id } = req.params;
     try {
-        const [results] = await db.query('SELECT * FROM utm.carrera WHERE id = ?', [id]);
+        const [results] = await db.query('SELECT * FROM sistema_carrera WHERE id = ?', [id]);
         res.status(200).json({
             exito: true,
             mensaje: 'Carrera obtenida',
@@ -31,7 +31,7 @@ exports.getCarreraById = async (req, res) => {
 // Crear una nueva carrera
 exports.createCarrera = (req, res) => {
     const { nombre, id_facultad } = req.body;
-    const query = 'INSERT INTO utm.carrera (nombre, id_facultad) VALUES (?, ?)';
+    const query = 'INSERT INTO sistema_carrera (nombre, id_facultad) VALUES (?, ?)';
     const [results] = db.query(query, [nombre, id_facultad]);
     res.status(201).json({
         exito: true,
@@ -44,7 +44,7 @@ exports.createCarrera = (req, res) => {
 exports.updateCarrera = (req, res) => {
     const { id } = req.params;
     const { nombre, id_facultad } = req.body;
-    const query = 'UPDATE utm.carrera SET nombre = ?, id_facultad = ? WHERE id = ?';
+    const query = 'UPDATE sistema_carrera SET nombre = ?, id_facultad = ? WHERE id = ?';
     const [results] = db.query(query, [nombre, id_facultad, id]);
 
     res.status(200).json({
@@ -56,7 +56,7 @@ exports.updateCarrera = (req, res) => {
 // Eliminar una carrera
 exports.deleteCarrera = (req, res) => {
     const { id } = req.params;
-    const query = 'DELETE FROM utm.carrera WHERE id = ?';
+    const query = 'DELETE FROM sistema_carrera WHERE id = ?';
     const [results] = db.query(query, [id]);
     if (results.affectedRows === 0) {
         return res.status(404).json({ exito: false, mensaje: 'Carrera no encontrada' });
