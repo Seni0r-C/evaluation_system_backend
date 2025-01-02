@@ -50,7 +50,7 @@ async function utmAuth(body) {
 
 // Simulamos un conjunto de usuarios con sus contraseñas
 const usuariosSimulados = {
-    'vicedecano@utm.edu.com': {
+    'vicedecano': {
       nombres: 'KATTY GARCIA BARREIRO VERA',
       tipo_usuario: 'VICEDECANO',
       idpersonal: 12342,
@@ -58,7 +58,7 @@ const usuariosSimulados = {
           { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
         ])
     },
-    'tribunal@utm.edu.com': {
+    'tribunal': {
         nombres: 'PEDRO MANOLO ANESTECIO ONETWO',
         tipo_usuario: 'DOCENTE',
         idpersonal: 12351,
@@ -66,7 +66,7 @@ const usuariosSimulados = {
             { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
       ])
     },
-    'tutor@utm.edu.com': {
+    'tutor': {
       nombres: 'CARLOS MANICHO VENEZUELO MANGIZO',
       tipo_usuario: 'DOCENTE',
       idpersonal: 56709,
@@ -74,7 +74,7 @@ const usuariosSimulados = {
         { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
       ])
     },
-    'tutor2@utm.edu.com': {
+    'tutor2': {
       nombres: 'ANA GABRIELA YUKATAN SLOVAKY',
       tipo_usuario: 'DOCENTE',
       idpersonal: 56709,
@@ -116,7 +116,7 @@ exports.loginUser = async (req, res) => {
             clave: password // Usa la contraseña proporcionada
         };
 
-        const apiData = await externAuth(body);
+        const apiData = await externAuth(body, true);
 
         // Verifica si el usuario existe en la base de datos
         const sql = "SELECT * FROM usuario WHERE usuario = ?";
