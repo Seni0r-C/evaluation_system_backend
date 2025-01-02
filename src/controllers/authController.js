@@ -9,49 +9,114 @@ const agent = new https.Agent({
     rejectUnauthorized: false
 });
 
+async function utmAuth(body) {
+    // Hace la petición al endpoint externo
+    const apiUrl = "https://app.utm.edu.ec/becas/api/publico/IniciaSesion";
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-Api-Key': '3ecbcb4e62a00d2bc58080218a4376f24a8079e1'
+    };
+
+    const response = await axios.post(apiUrl, body, {
+        headers,
+        httpsAgent: agent
+    });
+
+    if (response.data.state !== 'success') {
+        return res.status(400).json({ exito: false, mensaje: 'Error en la autenticación externa. ' + response.data.error });
+    }
+
+    const apiData = response.data.value;
+
+    // Inserta las carreras asociadas si no existen
+    if (apiData.datos_estudio) {
+        const datos = JSON.parse(apiData.datos_estudio);
+        let isCienciasInformticas = false;
+        for (const carrera of datos) {
+            const facultad = carrera.facultad;
+            if (facultad.includes('CIENCIAS INFORMÁTICAS')) {
+                isCienciasInformticas = true;
+                break;
+            }
+        }
+        if (!isCienciasInformticas) {
+            return res.status(400).json({ exito: false, mensaje: 'Usted no pertenece a la carrera CIENCIAS INFORMÁTICAS' });
+        }
+    }
+    return await apiData;
+}
+
+
+// Simulamos un conjunto de usuarios con sus contraseñas
+const usuariosSimulados = {
+    'vicedecano@utm.edu.com': {
+      nombres: 'KATTY GARCIA BARREIRO VERA',
+      tipo_usuario: 'VICEDECANO',
+      idpersonal: 12342,
+      datos_estudio: JSON.stringify([
+          { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+        ])
+    },
+    'tribunal@utm.edu.com': {
+        nombres: 'PEDRO MANOLO ANESTECIO ONETWO',
+        tipo_usuario: 'DOCENTE',
+        idpersonal: 12351,
+        datos_estudio: JSON.stringify([
+            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+      ])
+    },
+    'tutor@utm.edu.com': {
+      nombres: 'CARLOS MANICHO VENEZUELO MANGIZO',
+      tipo_usuario: 'DOCENTE',
+      idpersonal: 56709,
+      datos_estudio: JSON.stringify([
+        { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+      ])
+    },
+    'tutor2@utm.edu.com': {
+      nombres: 'ANA GABRIELA YUKATAN SLOVAKY',
+      tipo_usuario: 'DOCENTE',
+      idpersonal: 56709,
+      datos_estudio: JSON.stringify([
+        { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+      ])
+    }
+    // Otros usuarios pueden ser añadidos aquí para la simulación
+  };
+  
+  // La función `truchaAuth` emula una llamada a la API externa
+  const truchaAuth = async ({ usuario, clave }) => {
+    // Simulamos un retraso en la respuesta como si fuera una llamada externa
+    await new Promise(resolve => setTimeout(resolve, 500));
+  
+    // Verificamos que el usuario exista y que la contraseña sea la correcta
+    if (usuariosSimulados[usuario] && clave === '123') {
+      // Si existe el usuario y la contraseña es correcta, devolvemos los datos del usuario
+      return usuariosSimulados[usuario];
+    } else {
+      // Si no, lanzamos un error indicando que el usuario o la contraseña son incorrectos
+      throw new Error('Usuario o contraseña incorrectos');
+    }
+  };
+  
+async function externAuth(body, truchaMode=false) {
+    if(truchaMode) {
+        return await truchaAuth(body);
+    }
+    return await utmAuth(body);
+}
+
 exports.loginUser = async (req, res) => {
     try {
         const { usuario, password } = req.body;
-
-        // Hace la petición al endpoint externo
-        const apiUrl = "https://app.utm.edu.ec/becas/api/publico/IniciaSesion";
 
         const body = {
             usuario: usuario, // Usa el email como usuario
             clave: password // Usa la contraseña proporcionada
         };
 
-        const headers = {
-            'Content-Type': 'application/json',
-            'X-Api-Key': '3ecbcb4e62a00d2bc58080218a4376f24a8079e1'
-        };
-
-        const response = await axios.post(apiUrl, body, {
-            headers,
-            httpsAgent: agent
-        });
-
-        if (response.data.state !== 'success') {
-            return res.status(400).json({ exito: false, mensaje: 'Error en la autenticación externa. ' + response.data.error });
-        }
-
-        const apiData = response.data.value;
-
-        // Inserta las carreras asociadas si no existen
-        if (apiData.datos_estudio) {
-            const datos = JSON.parse(apiData.datos_estudio);
-            let isCienciasInformticas = false;
-            for (const carrera of datos) {
-                const facultad = carrera.facultad;
-                if (facultad.includes('CIENCIAS INFORMÁTICAS')) {
-                    isCienciasInformticas = true;
-                    break;
-                }
-            }
-            if (!isCienciasInformticas) {
-                return res.status(400).json({ exito: false, mensaje: 'Usted no pertenece a la carrera CIENCIAS INFORMÁTICAS' });
-            }
-        }
+        const apiData = await externAuth(body);
 
         // Verifica si el usuario existe en la base de datos
         const sql = "SELECT * FROM usuario WHERE usuario = ?";
