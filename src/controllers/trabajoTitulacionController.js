@@ -75,10 +75,7 @@ exports.listarTrabajos = async (req, res) => {
             queryParams.push(modalidad_id);
         }
         
-        if (estado) {
-            res.json({
-                estado: estado,
-            });
+        if (estado) {            
             whereClauses.push('tte.nombre = ?');
             queryParams.push(estado);
         }
