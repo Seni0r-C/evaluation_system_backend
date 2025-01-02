@@ -74,9 +74,12 @@ exports.listarTrabajos = async (req, res) => {
             whereClauses.push('tt.modalidad_id = ?');
             queryParams.push(modalidad_id);
         }
-
+        
         if (estado) {
-            whereClauses.push('tt.estado = ?');
+            res.json({
+                estado: estado,
+            });
+            whereClauses.push('tte.nombre = ?');
             queryParams.push(estado);
         }
 
@@ -92,13 +95,16 @@ exports.listarTrabajos = async (req, res) => {
 
         // Unir todas las cláusulas WHERE si existen
         const whereQuery = whereClauses.length ? 'WHERE ' + whereClauses.join(' AND ') : '';
-
+        const innerJoins = `
+            JOIN sistema_carrera c ON tt.carrera_id = c.id
+            JOIN trabajo_estado tte ON tt.estado_id = tte.id
+            JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
+        `
         // Consulta para obtener los trabajos de titulación con filtros y paginación
         const [rows] = await db.execute(`
-            SELECT tt.*, c.nombre AS carrera, mt.nombre AS modalidad
+            SELECT tt.*, tte.nombre AS estado, c.nombre AS carrera, mt.nombre AS modalidad
             FROM trabajo_titulacion tt
-            JOIN sistema_carrera c ON tt.carrera_id = c.id
-            JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
+            ${innerJoins}
             ${whereQuery}
             LIMIT ? OFFSET ?
         `, [...queryParams, limitNumber, offset]);
@@ -107,8 +113,7 @@ exports.listarTrabajos = async (req, res) => {
         const [totalRows] = await db.execute(`
             SELECT COUNT(*) AS total
             FROM trabajo_titulacion tt
-            JOIN sistema_carrera c ON tt.carrera_id = c.id
-            JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
+            ${innerJoins}
             ${whereQuery}
         `, queryParams);
 
