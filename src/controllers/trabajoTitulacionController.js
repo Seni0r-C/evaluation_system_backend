@@ -127,24 +127,38 @@ exports.listarTrabajos = async (req, res) => {
         res.status(500).json({ error: "Ocurrió un error al procesar la solicitud. Por favor, intente nuevamente más tarde." });
     }
 };
-
 const getTrabajoByID = async (id) => {
     const [rows] = await db.execute(`
         SELECT tt.*, 
                c.nombre AS carrera, 
                mt.nombre AS modalidad, 
                ttor.nombre AS tutor, 
-               cttor.nombre AS cotutor
+               cttor.nombre AS cotutor,
+               GROUP_CONCAT(est.nombre) AS estudiantes
         FROM trabajo_titulacion tt
         JOIN sistema_carrera c ON tt.carrera_id = c.id
         JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
         JOIN usuario ttor ON tt.tutor_id = ttor.id
         LEFT JOIN usuario cttor ON tt.cotutor_id = cttor.id
-        WHERE tt.id = ?`,
+        LEFT JOIN trabajo_estudiante te ON tt.id = te.trabajo_id
+        LEFT JOIN usuario est ON te.estudiante_id = est.id
+        WHERE tt.id = ?
+        GROUP BY tt.id, c.nombre, mt.nombre, ttor.nombre, cttor.nombre`,
         [id]
     );
+
+    // Verificamos que hay filas y que 'estudiantes' no es null o vacío
+    if (rows?.length > 0 && rows[0]?.estudiantes) {
+        // Convertimos el string 'estudiantes' a un array
+        const estudiantes = rows[0].estudiantes.split(',').map((e) => e.trim());
+        rows[0].estudiantes = estudiantes;
+    }
+
     return rows;
-}
+};
+
+
+
 
 // Obtener un trabajo de titulación por su ID
 exports.obtenerTrabajo = async (req, res) => {
