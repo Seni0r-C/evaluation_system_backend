@@ -67,27 +67,27 @@ const usuariosSimulados = {
       ])
     },
     'estudiante': {
-        nombres: 'TAMIÑAWI SUMI SUMIWKA MANIKO',
-        tipo_usuario: 'DOCENTE',
-        idpersonal: 19351,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-      ])
-    },
-    'estudiante2': {
         nombres: 'SANTIAGO SEGUNDO PACHECO VEREDICTO',
-        tipo_usuario: 'DOCENTE',
+        tipo_usuario: 'ESTUDIANTE',
         idpersonal: 34351,
         datos_estudio: JSON.stringify([
             { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
       ])
     },
-    'tutor': {
+    'estudiante2': {
       nombres: 'CARLOS MANICHO VENEZUELO MANGIZO',
-      tipo_usuario: 'DOCENTE',
+      tipo_usuario: 'ESTUDIANTE',
       idpersonal: 56709,
       datos_estudio: JSON.stringify([
         { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+      ])
+    },
+    'tutor': {
+        nombres: 'TAMIÑAWI SUMI SUMIWKA MANIKO',
+        tipo_usuario: 'DOCENTE',
+        idpersonal: 19351,
+        datos_estudio: JSON.stringify([
+            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
       ])
     },
     'tutor2': {
