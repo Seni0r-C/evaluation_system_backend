@@ -66,7 +66,8 @@ const usuariosSimulados = {
             { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
       ])
     },
-    'estudiante': {
+    // Estudiantes
+    'pupilo': {
         nombres: 'SANTIAGO SEGUNDO PACHECO VEREDICTO',
         tipo_usuario: 'ESTUDIANTE',
         idpersonal: 34351,
@@ -74,15 +75,24 @@ const usuariosSimulados = {
             { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
       ])
     },
-    'estudiante2': {
-      nombres: 'CARLOS MANICHO VENEZUELO MANGIZO',
+    'alumno': {
+      nombres: 'JAIME ENRIQUYE ALMIGUEZ GONZALEZ',
       tipo_usuario: 'ESTUDIANTE',
-      idpersonal: 56709,
+      idpersonal: 19359,
       datos_estudio: JSON.stringify([
         { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
       ])
     },
-    'tutor': {
+    'alumna': {
+      nombres: 'AGUINALDA GUISELLE VALIVIEZO JILIWE',
+      tipo_usuario: 'ESTUDIANTE',
+      idpersonal: 19355,
+      datos_estudio: JSON.stringify([
+        { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+      ])
+    },
+    // Tutores
+    'estudiante': {
         nombres: 'TAMIÑAWI SUMI SUMIWKA MANIKO',
         tipo_usuario: 'DOCENTE',
         idpersonal: 19351,
@@ -90,10 +100,18 @@ const usuariosSimulados = {
             { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
       ])
     },
-    'tutor2': {
+    'tutor': {
+        nombres: 'CARLOS MANICHO VENEZUELO MANGIZO',
+        tipo_usuario: 'ESTUDIANTE',
+        idpersonal: 56709,
+        datos_estudio: JSON.stringify([
+          { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+        ])
+      },
+    'tutora': {
       nombres: 'ANA GABRIELA YUKATAN SLOVAKY',
       tipo_usuario: 'DOCENTE',
-      idpersonal: 56709,
+      idpersonal: 19360,
       datos_estudio: JSON.stringify([
         { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
       ])
