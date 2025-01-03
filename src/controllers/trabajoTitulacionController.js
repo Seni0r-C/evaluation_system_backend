@@ -160,27 +160,6 @@ exports.obtenerTrabajo = async (req, res) => {
     }
 };
 
-// Obtener un trabajo de titulación por su ID
-exports.getfulll = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const [rows] = await db.execute(`
-            SELECT tt.*, c.nombre AS carrera, mt.nombre AS modalidad
-            FROM trabajo_titulacion tt
-            JOIN sistema_carrera c ON tt.carrera_id = c.id
-            JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
-            WHERE tt.id = ?`,
-            [id]
-        );
-        if (rows.length === 0) {
-            return res.status(404).json({ error: 'Trabajo no encontrado' });
-        }
-        res.json(rows[0]);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
 // Obtener los estados de un trabajo de titulación
 exports.obtenerEstados = async (req, res) => {
     try {
