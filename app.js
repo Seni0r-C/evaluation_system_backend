@@ -1,10 +1,14 @@
 const express = require('express');
 const cors = require('cors');
+const morgan = require('morgan');  // Importar morgan
 const app = express();
 require('dotenv').config();
 
 app.use(cors());
 app.use(express.json());
+
+// Usar morgan para registrar las solicitudes HTTP
+app.use(morgan('dev'));  // 'dev' es un formato de log predefinido
 
 // Swagger
 const setupSwaggerDocs = require('./src/config/swagger');
