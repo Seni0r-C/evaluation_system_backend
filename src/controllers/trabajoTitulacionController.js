@@ -255,44 +255,52 @@ exports.desasociarEstudiante = async (req, res) => {
     }
 };
 
-// Asignar un tribunal a un trabajo de titulación
 exports.asignarTribunal = async (req, res) => {
     console.log(req.body);
     const { trabajo_id, docente_ids } = req.body;
 
     try {
-        // Creamos un array vacío para los valores del INSERT
-        const values = [];
-
-        // Recorremos el array de docente_ids para preparar los valores
-        docente_ids.forEach(docente => {
-            values.push([trabajo_id, docente.id]); // Preparamos un array de valores [trabajo_id, docente_id]
-        });
-
-        // Si hay docentes para insertar
-        if (values.length > 0) {
-            // Usamos un solo query para insertar todos los docentes en la tabla trabajo_tribunal
-            const query = `
-                INSERT INTO trabajo_tribunal (trabajo_id, docente_id) 
-                VALUES ?`;
-
-            // Ejecutamos el query con los valores generados
-            const [result] = await db.execute(query, [values]);
-
-            // Devolvemos una respuesta con el éxito
-            return res.status(201).json({
-                message: 'Tribunal asignado correctamente',
-                trabajo_id,
-                docente_ids
-            });
-        } else {
-            return res.status(400).json({ error: 'No se proporcionaron docentes' });
+        // Validar la entrada
+        if (!trabajo_id) {
+            return res.status(400).json({ error: 'El trabajo_id es obligatorio.' });
         }
+
+        if (!Array.isArray(docente_ids) || docente_ids.length === 0) {
+            return res.status(400).json({ error: 'Debe proporcionar al menos un docente válido.' });
+        }
+
+        // Preparar los valores y asegurar que estén definidos
+        const values = docente_ids
+            .filter(docente => docente?.id)
+            .map(docente => [trabajo_id, docente.id]);
+
+        if (values.length === 0) {
+            return res.status(400).json({ error: 'No se proporcionaron docentes válidos.' });
+        }
+
+        // Generar placeholders dinámicamente para la inserción masiva
+        const placeholders = values.map(() => '(?, ?)').join(', '); 
+        const flattenedValues = values.flat(); // Aplana el array para que sea un solo nivel
+
+        const query = `
+            INSERT INTO trabajo_tribunal (trabajo_id, docente_id) 
+            VALUES ${placeholders}`;
+
+        // Ejecutar la consulta con los valores aplanados
+        const [result] = await db.execute(query, flattenedValues);
+
+        res.status(201).json({
+            message: 'Tribunal asignado correctamente',
+            insertedCount: result.affectedRows,
+            insertedIds: values.map(v => v[1])
+        });
+        
     } catch (error) {
-        // En caso de error, devolvemos el mensaje de error
-        return res.status(500).json({ error: error.message });
+        console.error('Error al asignar tribunal:', error);
+        res.status(500).json({ error: 'Error interno del servidor.' });
     }
 };
+
 
 // Remover un tribunal de un trabajo de titulación
 exports.removerTribunal = async (req, res) => {
