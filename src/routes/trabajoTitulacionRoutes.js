@@ -16,6 +16,8 @@ router.delete('/desasociarEstudiante', trabajoController.desasociarEstudiante);
 
 // Gestión de tribunales
 router.post('/asignarTribunal', trabajoController.asignarTribunal);
+router.post('/reasignarTribunal', trabajoController.reasignarTribunal);
+router.get('/obtenerTribunal/:id', trabajoController.obtenerTribunal);
 router.delete('/removerTribunal', trabajoController.removerTribunal);
 
 module.exports = router;

@@ -129,12 +129,14 @@ exports.listarTrabajos = async (req, res) => {
 };
 const getTrabajoByID = async (id) => {
     const [rows] = await db.execute(`
-        SELECT tt.*, 
-               c.nombre AS carrera, 
-               mt.nombre AS modalidad, 
-               ttor.nombre AS tutor, 
-               cttor.nombre AS cotutor,
-               GROUP_CONCAT(est.nombre) AS estudiantes
+        SELECT 
+            tt.*, 
+            c.nombre AS carrera, 
+            mt.nombre AS modalidad, 
+            ttor.nombre AS tutor, 
+            cttor.nombre AS cotutor,
+            GROUP_CONCAT(DISTINCT est.nombre) AS estudiantes,
+            GROUP_CONCAT(DISTINCT tribunal.nombre) AS tribunal
         FROM trabajo_titulacion tt
         JOIN sistema_carrera c ON tt.carrera_id = c.id
         JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
@@ -142,22 +144,25 @@ const getTrabajoByID = async (id) => {
         LEFT JOIN usuario cttor ON tt.cotutor_id = cttor.id
         LEFT JOIN trabajo_estudiante te ON tt.id = te.trabajo_id
         LEFT JOIN usuario est ON te.estudiante_id = est.id
+        LEFT JOIN trabajo_tribunal ttrib ON tt.id = ttrib.trabajo_id
+        LEFT JOIN usuario tribunal ON ttrib.docente_id = tribunal.id
         WHERE tt.id = ?
-        GROUP BY tt.id, c.nombre, mt.nombre, ttor.nombre, cttor.nombre`,
-        [id]
-    );
+        GROUP BY 
+            tt.id, c.nombre, mt.nombre, ttor.nombre, cttor.nombre
+    `, [id]);
 
-    // Verificamos que hay filas y que 'estudiantes' no es null o vacío
-    if (rows?.length > 0 && rows[0]?.estudiantes) {
-        // Convertimos el string 'estudiantes' a un array
-        const estudiantes = rows[0].estudiantes.split(',').map((e) => e.trim());
-        rows[0].estudiantes = estudiantes;
+    // Convertir resultados de cadena a arrays
+    if (rows?.length > 0) {
+        if (rows[0]?.estudiantes) {
+            rows[0].estudiantes = rows[0].estudiantes.split(',').map(e => e.trim());
+        }
+        if (rows[0]?.tribunal) {
+            rows[0].tribunal = rows[0].tribunal.split(',').map(e => e.trim());
+        }
     }
 
     return rows;
 };
-
-
 
 
 // Obtener un trabajo de titulación por su ID
@@ -255,12 +260,12 @@ exports.desasociarEstudiante = async (req, res) => {
     }
 };
 
+// Asignar Tribunal (Verifica si ya existen docentes asignados)
 exports.asignarTribunal = async (req, res) => {
     console.log(req.body);
     const { trabajo_id, docente_ids } = req.body;
 
     try {
-        // Validar la entrada
         if (!trabajo_id) {
             return res.status(400).json({ error: 'El trabajo_id es obligatorio.' });
         }
@@ -269,34 +274,145 @@ exports.asignarTribunal = async (req, res) => {
             return res.status(400).json({ error: 'Debe proporcionar al menos un docente válido.' });
         }
 
-        // Preparar los valores y asegurar que estén definidos
-        const values = docente_ids
-            .filter(docente => docente?.id)
-            .map(docente => [trabajo_id, docente.id]);
+        // Verificar si ya hay docentes asignados
+        const [existingRows] = await db.execute(
+            `SELECT docente_id FROM trabajo_tribunal WHERE trabajo_id = ?`,
+            [trabajo_id]
+        );
 
-        if (values.length === 0) {
-            return res.status(400).json({ error: 'No se proporcionaron docentes válidos.' });
+        const existingDocenteIds = existingRows.map(row => row.docente_id);
+
+        if (existingDocenteIds.length > 0) {
+            return res.status(400).json({
+                error: 'Ya existen docentes asignados a este trabajo. ¿Deseas reemplazarlos?',
+                existingDocenteIds
+            });
         }
 
-        // Generar placeholders dinámicamente para la inserción masiva
-        const placeholders = values.map(() => '(?, ?)').join(', '); 
-        const flattenedValues = values.flat(); // Aplana el array para que sea un solo nivel
+        // Si no hay docentes previos, proceder con la asignación
+        return await module.exports.reasignarTribunal(req, res); // Llama a la función de reasignación
 
-        const query = `
-            INSERT INTO trabajo_tribunal (trabajo_id, docente_id) 
-            VALUES ${placeholders}`;
-
-        // Ejecutar la consulta con los valores aplanados
-        const [result] = await db.execute(query, flattenedValues);
-
-        res.status(201).json({
-            message: 'Tribunal asignado correctamente',
-            insertedCount: result.affectedRows,
-            insertedIds: values.map(v => v[1])
-        });
-        
     } catch (error) {
         console.error('Error al asignar tribunal:', error);
+        res.status(500).json({ error: 'Error interno del servidor.' });
+    }
+};
+
+// Reasignar Tribunal (Inserta solo docentes no asignados previamente)
+exports.reasignarTribunal = async (req, res) => {
+    console.log(req.body);
+    const { trabajo_id, docente_ids } = req.body;
+
+    try {
+        if (!trabajo_id) {
+            return res.status(400).json({ error: 'El trabajo_id es obligatorio.' });
+        }
+
+        if (!Array.isArray(docente_ids) || docente_ids.length === 0) {
+            return res.status(400).json({ error: 'Debe proporcionar al menos un docente válido.' });
+        }
+
+        // Obtener los docentes actualmente asignados al trabajo
+        const [existingRows] = await db.execute(
+            `SELECT docente_id FROM trabajo_tribunal WHERE trabajo_id = ?`,
+            [trabajo_id]
+        );
+        const existingDocenteIds = existingRows.map(row => row.docente_id);
+
+        // Obtener los ids de la solicitud
+        const requestedDocenteIds = docente_ids.map(docente => docente.id);
+
+        // Verificar si se debe realizar un reemplazo completo
+        const idsAreDifferent = requestedDocenteIds.some(id => !existingDocenteIds.includes(id));
+        const sameLength = requestedDocenteIds.length === existingDocenteIds.length;
+
+        if (idsAreDifferent && sameLength) {
+            // Reemplazo completo: eliminar y volver a insertar
+            await db.execute(`DELETE FROM trabajo_tribunal WHERE trabajo_id = ?`, [trabajo_id]);
+
+            const placeholders = docente_ids.map(() => '(?, ?)').join(', ');
+            const flattenedValues = docente_ids.map(docente => [trabajo_id, docente.id]).flat();
+
+            const query = `
+                INSERT INTO trabajo_tribunal (trabajo_id, docente_id) 
+                VALUES ${placeholders}`;
+
+            const [result] = await db.execute(query, flattenedValues);
+
+            return res.status(200).json({
+                message: 'Los docentes han sido reemplazados correctamente.',
+                insertedCount: result.affectedRows
+            });
+        }
+
+        // Filtrar e insertar solo los docentes no existentes
+        const newValues = docente_ids
+            .filter(docente => docente?.id && !existingDocenteIds.includes(docente.id))
+            .map(docente => [trabajo_id, docente.id]);
+
+        if (newValues.length > 0) {
+            const placeholders = newValues.map(() => '(?, ?)').join(', ');
+            const flattenedValues = newValues.flat();
+
+            const query = `
+                INSERT INTO trabajo_tribunal (trabajo_id, docente_id) 
+                VALUES ${placeholders}`;
+
+            const [result] = await db.execute(query, flattenedValues);
+
+            return res.status(201).json({
+                message: 'Se han añadido nuevos docentes al tribunal.',
+                insertedCount: result.affectedRows
+            });
+        }
+
+        // Ningún cambio realizado
+        res.status(200).json({
+            message: 'No se realizaron cambios, los docentes ya estaban correctamente asignados.'
+        });
+
+    } catch (error) {
+        console.error('Error al reasignar tribunal:', error);
+        res.status(500).json({ error: 'Error interno del servidor.' });
+    }
+};
+
+
+
+exports.obtenerTribunal = async (req, res) => {
+    const { id } = req.params;
+    const trabajo_id = id;
+    try {
+        // Validar la entrada
+        if (!trabajo_id) {
+            return res.status(400).json({ error: 'El trabajo_id es obligatorio.' });
+        }
+
+        // Consulta para obtener los docentes asociados al trabajo con información de la tabla usuario
+        const query = `
+            SELECT u.id, u.usuario, u.id_personal, u.nombre
+            FROM trabajo_tribunal tt
+            JOIN usuario u ON tt.docente_id = u.id
+            WHERE tt.trabajo_id = ?;
+        `;
+
+        const [results] = await db.execute(query, [trabajo_id]);
+
+        // Validar si no existen docentes asociados
+        if (results.length === 0) {
+            return res.status(404).json({
+                message: 'No se encontraron docentes asociados a este trabajo.'
+            });
+        }
+
+        // Respuesta exitosa con la lista de docentes
+        res.status(200).json({
+            message: 'Docentes obtenidos correctamente.',
+            data: results
+        });
+
+    } catch (error) {
+        console.error('Error al obtener el tribunal:', error);
         res.status(500).json({ error: 'Error interno del servidor.' });
     }
 };
