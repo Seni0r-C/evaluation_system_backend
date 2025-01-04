@@ -257,15 +257,40 @@ exports.desasociarEstudiante = async (req, res) => {
 
 // Asignar un tribunal a un trabajo de titulación
 exports.asignarTribunal = async (req, res) => {
-    const { trabajo_id, docente_id } = req.body;
+    console.log(req.body);
+    const { trabajo_id, docente_ids } = req.body;
+
     try {
-        const [result] = await db.execute(`
-            INSERT INTO trabajo_tribunal (trabajo_id, docente_id) VALUES (?, ?)`,
-            [trabajo_id, docente_id]
-        );
-        res.status(201).json({ id: result.insertId, trabajo_id, docente_id });
+        // Creamos un array vacío para los valores del INSERT
+        const values = [];
+
+        // Recorremos el array de docente_ids para preparar los valores
+        docente_ids.forEach(docente => {
+            values.push([trabajo_id, docente.id]); // Preparamos un array de valores [trabajo_id, docente_id]
+        });
+
+        // Si hay docentes para insertar
+        if (values.length > 0) {
+            // Usamos un solo query para insertar todos los docentes en la tabla trabajo_tribunal
+            const query = `
+                INSERT INTO trabajo_tribunal (trabajo_id, docente_id) 
+                VALUES ?`;
+
+            // Ejecutamos el query con los valores generados
+            const [result] = await db.execute(query, [values]);
+
+            // Devolvemos una respuesta con el éxito
+            return res.status(201).json({
+                message: 'Tribunal asignado correctamente',
+                trabajo_id,
+                docente_ids
+            });
+        } else {
+            return res.status(400).json({ error: 'No se proporcionaron docentes' });
+        }
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        // En caso de error, devolvemos el mensaje de error
+        return res.status(500).json({ error: error.message });
     }
 };
 
