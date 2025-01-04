@@ -75,11 +75,16 @@ exports.listarTrabajos = async (req, res) => {
             queryParams.push(modalidad_id);
         }
         
-        if (estado) {            
+        if (Array.isArray(estado) && estado.length > 0) {            
+            // Generar marcadores de posición dinámicos
+            const placeholders = estado.map(() => '?').join(', ');
+            whereClauses.push(`tte.nombre IN (${placeholders})`);
+            queryParams.push(...estado);  // Expandir el array de estados como valores individuales
+        } else if (estado) {            
             whereClauses.push('tte.nombre = ?');
             queryParams.push(estado);
         }
-
+        
         if (titulo) {
             whereClauses.push('tt.titulo LIKE ?');
             queryParams.push(`%${titulo}%`);
@@ -301,16 +306,22 @@ exports.asignarTribunal = async (req, res) => {
 
 // Reasignar Tribunal (Inserta solo docentes no asignados previamente)
 exports.reasignarTribunal = async (req, res) => {
-    console.log(req.body);
     const { trabajo_id, docente_ids } = req.body;
 
     try {
         if (!trabajo_id) {
-            return res.status(400).json({ error: 'El trabajo_id es obligatorio.' });
+            return res.status(400).json({ 
+                typeMsg: 'error',
+                message: 'Error al reasignar tribunal.',
+                error: 'El trabajo_id es obligatorio.'
+             });
         }
 
         if (!Array.isArray(docente_ids) || docente_ids.length === 0) {
-            return res.status(400).json({ error: 'Debe proporcionar al menos un docente válido.' });
+            return res.status(400).json({
+                typeMsg: 'warning',
+                message: 'Debe proporcionar al menos un docente válido.',
+            });
         }
 
         // Obtener los docentes actualmente asignados al trabajo
@@ -341,6 +352,7 @@ exports.reasignarTribunal = async (req, res) => {
             const [result] = await db.execute(query, flattenedValues);
 
             return res.status(200).json({
+                typeMsg: 'success',
                 message: 'Los docentes han sido reemplazados correctamente.',
                 insertedCount: result.affectedRows
             });
@@ -362,6 +374,7 @@ exports.reasignarTribunal = async (req, res) => {
             const [result] = await db.execute(query, flattenedValues);
 
             return res.status(201).json({
+                typeMsg: 'success',
                 message: 'Se han añadido nuevos docentes al tribunal.',
                 insertedCount: result.affectedRows
             });
@@ -369,12 +382,15 @@ exports.reasignarTribunal = async (req, res) => {
 
         // Ningún cambio realizado
         res.status(200).json({
+            typeMsg: 'success',
             message: 'No se realizaron cambios, los docentes ya estaban correctamente asignados.'
         });
 
     } catch (error) {
         console.error('Error al reasignar tribunal:', error);
-        res.status(500).json({ error: 'Error interno del servidor.' });
+        res.status(500).json({
+            typeMsg: 'error',
+            message: 'Error interno del servidor.' });
     }
 };
 
@@ -386,7 +402,10 @@ exports.obtenerTribunal = async (req, res) => {
     try {
         // Validar la entrada
         if (!trabajo_id) {
-            return res.status(400).json({ error: 'El trabajo_id es obligatorio.' });
+            return res.status(400).json({ 
+                typeMsg: 'error',
+                message: 'Error en el servidor al obtener datos del tribunal.',
+                error: 'El trabajo_id es obligatorio.' });
         }
 
         // Consulta para obtener los docentes asociados al trabajo con información de la tabla usuario
@@ -402,6 +421,7 @@ exports.obtenerTribunal = async (req, res) => {
         // Validar si no existen docentes asociados
         if (results.length === 0) {
             return res.status(404).json({
+                typeMsg: 'warning',
                 message: 'No se encontraron docentes asociados a este trabajo.'
             });
         }
@@ -414,7 +434,11 @@ exports.obtenerTribunal = async (req, res) => {
 
     } catch (error) {
         console.error('Error al obtener el tribunal:', error);
-        res.status(500).json({ error: 'Error interno del servidor.' });
+        res.status(500).json({ 
+            typeMsg: 'error',
+            message: 'Error interno del servidor.' ,
+            error: 'Error interno del servidor.' 
+        });
     }
 };
 
