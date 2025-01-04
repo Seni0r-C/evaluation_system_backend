@@ -283,9 +283,10 @@ exports.asignarTribunal = async (req, res) => {
         const existingDocenteIds = existingRows.map(row => row.docente_id);
 
         if (existingDocenteIds.length > 0) {
-            return res.status(400).json({
-                error: 'Ya existen docentes asignados a este trabajo. ¿Deseas reemplazarlos?',
-                existingDocenteIds
+            return res.status(200).json({
+                typeMsg: 'warning',
+                message: 'Ya existen docentes asignados a este trabajo.',
+                data: existingDocenteIds
             });
         }
 
