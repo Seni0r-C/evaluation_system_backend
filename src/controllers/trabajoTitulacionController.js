@@ -267,16 +267,31 @@ exports.desasociarEstudiante = async (req, res) => {
 
 // Asignar Tribunal (Verifica si ya existen docentes asignados)
 exports.asignarTribunal = async (req, res) => {
-    console.log(req.body);
-    const { trabajo_id, docente_ids } = req.body;
+    const { trabajo_id, docente_ids, fecha_defensa } = req.body;
 
     try {
         if (!trabajo_id) {
-            return res.status(400).json({ error: 'El trabajo_id es obligatorio.' });
+            return res.status(400).json({
+                typeMsg: 'error',
+                message: 'Error en el servidor al asignar tribunal.',
+                error: 'El trabajo_id es obligatorio.'
+            });
+        }
+
+        if (!fecha_defensa) {
+            return res.status(400).json({
+                typeMsg: 'error',
+                message: 'Error en el servidor al asignar tribunal.',
+                error: 'La fecha de defensa es obligatoria.'
+            });
         }
 
         if (!Array.isArray(docente_ids) || docente_ids.length === 0) {
-            return res.status(400).json({ error: 'Debe proporcionar al menos un docente válido.' });
+            return res.status(400).json({
+                typeMsg: 'error',
+                message: 'Error en el servidor al asignar tribunal.',
+                error: 'Debe proporcionar al menos un docente válido.'
+            });
         }
 
         // Verificar si ya hay docentes asignados
@@ -295,18 +310,31 @@ exports.asignarTribunal = async (req, res) => {
             });
         }
 
+        // Actualizar la fecha de defensa en la tabla trabajo_titulacion
+        await db.execute(
+            `UPDATE trabajo_titulacion 
+             SET fecha_defensa = ? 
+             WHERE id = ?`,
+            [fecha_defensa, trabajo_id]
+        );
+
         // Si no hay docentes previos, proceder con la asignación
-        return await module.exports.reasignarTribunal(req, res); // Llama a la función de reasignación
+        return await module.exports.reasignarTribunal(req, res);
 
     } catch (error) {
         console.error('Error al asignar tribunal:', error);
-        res.status(500).json({ error: 'Error interno del servidor.' });
+        res.status(500).json({
+            typeMsg: 'error',
+            message: 'Error interno del servidor al asignar tribunal.',
+            error: error.message
+        });
     }
 };
 
+
 // Reasignar Tribunal (Inserta solo docentes no asignados previamente)
 exports.reasignarTribunal = async (req, res) => {
-    const { trabajo_id, docente_ids } = req.body;
+    const { trabajo_id, docente_ids, fecha_defensa } = req.body;
 
     try {
         if (!trabajo_id) {
@@ -323,6 +351,22 @@ exports.reasignarTribunal = async (req, res) => {
                 message: 'Debe proporcionar al menos un docente válido.',
             });
         }
+
+        if (!fecha_defensa) {
+            return res.status(400).json({ 
+                typeMsg: 'error',
+                message: 'Error al reasignar tribunal.',
+                error: 'La fecha de defensa es obligatoria.'
+             });
+        }
+
+         // Actualizar la fecha de defensa en la tabla trabajo_titulacion
+        await db.execute(
+            `UPDATE trabajo_titulacion 
+             SET fecha_defensa = ? 
+             WHERE id = ?`,
+            [fecha_defensa, trabajo_id]
+        );
 
         // Obtener los docentes actualmente asignados al trabajo
         const [existingRows] = await db.execute(
@@ -373,9 +417,9 @@ exports.reasignarTribunal = async (req, res) => {
 
             const [result] = await db.execute(query, flattenedValues);
 
-            return res.status(201).json({
+            return res.status(200).json({
                 typeMsg: 'success',
-                message: 'Se han añadido nuevos docentes al tribunal.',
+                message: 'Se han actualizado los miembros del tribunal.',
                 insertedCount: result.affectedRows
             });
         }
@@ -383,14 +427,16 @@ exports.reasignarTribunal = async (req, res) => {
         // Ningún cambio realizado
         res.status(200).json({
             typeMsg: 'success',
-            message: 'No se realizaron cambios, los docentes ya estaban correctamente asignados.'
+            message: 'Los docentes ya estaban correctamente asignados y la fecha ha sido actualizada.'
         });
 
     } catch (error) {
         console.error('Error al reasignar tribunal:', error);
         res.status(500).json({
             typeMsg: 'error',
-            message: 'Error interno del servidor.' });
+            message: 'Error interno del servidor.',
+            error: error.message
+        });
     }
 };
 
@@ -420,9 +466,10 @@ exports.obtenerTribunal = async (req, res) => {
 
         // Validar si no existen docentes asociados
         if (results.length === 0) {
-            return res.status(404).json({
-                typeMsg: 'warning',
-                message: 'No se encontraron docentes asociados a este trabajo.'
+            return res.status(200).json({
+                typeMsg: 'info',
+                message: 'No se encontraron docentes asociados a este trabajo.',
+                data: []
             });
         }
 
