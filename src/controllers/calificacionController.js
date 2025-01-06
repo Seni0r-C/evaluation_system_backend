@@ -87,14 +87,49 @@ exports.getRubricas = async (req, res) => {
     }
 };
 
-exports.getRubricaById = async (req, res) => {
-    const { id } = req.params;
+exports.getRubrica = async (req, res) => {
+    const { id_tipo_evaluacion, id_modalidad } = req.query;
+
+    if (!id_tipo_evaluacion || !id_modalidad) {
+        return res.status(400).json({ message: 'Faltan parámetros: id_tipo_evaluacion o id_modalidad' });
+    }
+
     try {
-        const [rows] = await db.query('SELECT * FROM rubrica WHERE id = ?', [id]);
-        if (rows.length === 0) return res.status(404).json({ message: 'Rubrica no encontrado' });
-        res.json(rows[0]);
+        // Obtener la rúbrica principal
+        const [rubricaRows] = await db.query(
+            'SELECT * FROM rubrica WHERE tipo_evaluacion_id = ? AND modalidad_id = ?',
+            [id_tipo_evaluacion, id_modalidad]
+        );
+
+        if (rubricaRows.length === 0) {
+            return res.status(404).json({ message: 'Rúbrica no encontrada' });
+        }
+
+        const rubrica = rubricaRows[0];
+
+        // Obtener los criterios asociados a la rúbrica
+        const [criteriosRows] = await db.query(
+            'SELECT * FROM rubrica_criterio WHERE rubrica_id = ?',
+            [rubrica.id]
+        );
+
+        // Obtener niveles para cada criterio de forma asincrónica
+        for (const criterio of criteriosRows) {
+            const [nivelesRows] = await db.query(
+                'SELECT * FROM rubrica_nivel WHERE rubrica_criterio_id = ?',
+                [criterio.id]
+            );
+            criterio.niveles = nivelesRows;
+        }
+
+        return res.json({
+            rubrica,
+            criterios: criteriosRows
+        });
+
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error al obtener la rúbrica:', error);
+        return res.status(500).json({ error: 'Error interno del servidor' });
     }
 };
 

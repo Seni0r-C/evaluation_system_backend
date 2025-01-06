@@ -12,8 +12,7 @@ router.delete('/tipo-evaluacion/:id', calificacionController.deleteTipoEvaluacio
 
 // Rutas para rubrica
 router.post('/rubrica', calificacionController.createRubrica);
-router.get('/rubrica', calificacionController.getRubricas);
-router.get('/rubrica/:id', calificacionController.getRubricaById);
+router.get('/rubrica', calificacionController.getRubrica);
 router.put('/rubrica/:id', calificacionController.updateRubrica);
 router.delete('/rubrica/:id', calificacionController.deleteRubrica);
 
