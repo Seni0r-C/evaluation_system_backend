@@ -132,6 +132,7 @@ exports.listarTrabajos = async (req, res) => {
         res.status(500).json({ error: "Ocurrió un error al procesar la solicitud. Por favor, intente nuevamente más tarde." });
     }
 };
+
 const getTrabajoByID = async (id) => {
     const [rows] = await db.execute(`
         SELECT 
@@ -152,11 +153,10 @@ const getTrabajoByID = async (id) => {
         LEFT JOIN trabajo_tribunal ttrib ON tt.id = ttrib.trabajo_id
         LEFT JOIN usuario tribunal ON ttrib.docente_id = tribunal.id
         WHERE tt.id = ?
-        GROUP BY 
-            tt.id, c.nombre, mt.nombre, ttor.nombre, cttor.nombre
+        GROUP BY tt.id, c.nombre, mt.nombre, ttor.nombre, cttor.nombre
     `, [id]);
 
-    // Convertir resultados de cadena a arrays
+    // Convertir resultados de cadena a arrays y ajustar la fecha
     if (rows?.length > 0) {
         if (rows[0]?.estudiantes) {
             rows[0].estudiantes = rows[0].estudiantes.split(',').map(e => e.trim());
@@ -164,11 +164,22 @@ const getTrabajoByID = async (id) => {
         if (rows[0]?.tribunal) {
             rows[0].tribunal = rows[0].tribunal.split(',').map(e => e.trim());
         }
+        if (rows[0]?.fecha_defensa) {
+            rows[0].fecha_defensa = new Date(rows[0].fecha_defensa).toLocaleString('es-EC', {
+                timeZone: 'America/Guayaquil',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hourCycle: 'h23' // Forzar formato de 24 horas
+            });
+        }
+        
     }
 
     return rows;
 };
-
 
 // Obtener un trabajo de titulación por su ID
 exports.obtenerTrabajo = async (req, res) => {
