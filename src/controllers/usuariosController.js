@@ -1,5 +1,11 @@
 // usuariosController.js
 const db = require('../config/db'); // Importa la conexión a la base de datos
+const axios = require('axios');
+const https = require('https');
+
+const agent = new https.Agent({
+  rejectUnauthorized: false
+});
 
 // Crear un nuevo usuario
 exports.crearUsuario = async (req, res) => {
@@ -104,3 +110,38 @@ exports.eliminarUsuario = async (req, res) => {
   }
 };
 
+exports.obtenerEstudianteByTrabajo = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [estudiante] = await db.execute('SELECT * FROM usuario u INNER JOIN trabajo_estudiante t WHERE u.id = t.estudiante_id AND t.trabajo_id = ?', [id]);
+    if (estudiante.length === 0) {
+      return res.status(404).json({ message: 'No hay estudiantes con ese trabajo' });
+    }
+    res.status(200).json(estudiante);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener el estudiante', message: error.message });
+  }
+}
+
+exports.obtenerFotoUsuario = async (req, res) => {
+  const { id } = req.params;
+  let userPhotoBase64 = null;
+  try {
+    const photoResponse = await axios.post(
+      "https://app.utm.edu.ec:3000/movil/obtener_foto_carnet",
+      { idpersonal: id }, {
+      httpsAgent: agent
+    }
+    );
+
+    const photoData = photoResponse.data[0]?.archivo_bin?.data;
+    if (photoData) {
+      // Convertir buffer a Base64
+      userPhotoBase64 = Buffer.from(photoData).toString('base64');
+    }
+
+    res.status(200).json(userPhotoBase64);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener la foto', message: error.message });
+  }
+};

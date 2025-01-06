@@ -12,6 +12,12 @@ router.get('/', usuariosController.obtenerUsuarios);
 // Obtener usuario por ID
 router.get('/:rol', usuariosController.obtenerUsuariosByRol);
 
+//Obtener estudiantes por trabajo ID
+router.get('/estudiantes/:id', usuariosController.obtenerEstudianteByTrabajo);
+
+//Obtener foto de Usuario
+router.get('/foto/:id', usuariosController.obtenerFotoUsuario);
+
 // Actualizar usuario
 router.put('/:id', usuariosController.actualizarUsuario);
 

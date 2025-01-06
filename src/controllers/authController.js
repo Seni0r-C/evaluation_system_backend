@@ -150,7 +150,7 @@ exports.loginUser = async (req, res) => {
             clave: password // Usa la contraseña proporcionada
         };
 
-        const apiData = await externAuth(body, true);
+        const apiData = await externAuth(body);
 
         // Verifica si el usuario existe en la base de datos
         const sql = "SELECT * FROM usuario WHERE usuario = ?";
