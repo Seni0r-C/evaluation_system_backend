@@ -6,7 +6,7 @@ const calificacionController = require('../controllers/calificacionController');
 // Rutas para tipo_evaluacion
 router.post('/tipo-evaluacion', calificacionController.createTipoEvaluacion);
 router.get('/tipo-evaluacion', calificacionController.getTiposEvaluacion);
-router.get('/tipo-evaluacion/:id', calificacionController.getTipoEvaluacionById);
+router.get('/tipo-evaluacion/:id', calificacionController.getTipoEvaluacionByModalidadId);
 router.put('/tipo-evaluacion/:id', calificacionController.updateTipoEvaluacion);
 router.delete('/tipo-evaluacion/:id', calificacionController.deleteTipoEvaluacion);
 

@@ -14,19 +14,29 @@ exports.createTipoEvaluacion = async (req, res) => {
 
 exports.getTiposEvaluacion = async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM tipo_evaluacion');
+        const [rows] = await db.query('SELECT * FROM sistema_tipo_evaluacion');
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-exports.getTipoEvaluacionById = async (req, res) => {
+exports.getTipoEvaluacionByModalidadId = async (req, res) => {
     const { id } = req.params;
     try {
-        const [rows] = await db.query('SELECT * FROM sistema_tipo_evaluacion WHERE id = ?', [id]);
+        const [rows] = await db.query(`SELECT 
+            ste.id AS tipo_evaluacion_id,
+            ste.nombre AS tipo_evaluacion_nombre
+        FROM 
+            rubrica r
+        INNER JOIN 
+            sistema_tipo_evaluacion ste 
+        ON 
+            r.tipo_evaluacion_id = ste.id
+        WHERE 
+            r.modalidad_id = ?;`, [id]);
         if (rows.length === 0) return res.status(404).json({ message: 'Tipo de evaluación no encontrado' });
-        res.json(rows[0]);
+        res.json(rows);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
