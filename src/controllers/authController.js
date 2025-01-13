@@ -3,48 +3,10 @@ const db = require('../config/db');
 const axios = require('axios');
 require('dotenv').config();
 const https = require('https');
-
+const { utmAuth, getOrInsertRol, insertCarreraIfNotExists } = require('../services/authService');
 const agent = new https.Agent({
     rejectUnauthorized: false
 });
-
-async function utmAuth(body) {
-    // Hace la petición al endpoint externo
-    const apiUrl = "https://app.utm.edu.ec/becas/api/publico/IniciaSesion";
-
-    const headers = {
-        'Content-Type': 'application/json',
-        'X-Api-Key': '3ecbcb4e62a00d2bc58080218a4376f24a8079e1'
-    };
-
-    const response = await axios.post(apiUrl, body, {
-        headers,
-        httpsAgent: agent
-    });
-
-    if (response.data.state !== 'success') {
-        return res.status(400).json({ exito: false, mensaje: 'Error en la autenticación externa. ' + response.data.error });
-    }
-
-    const apiData = response.data.value;
-
-    // Inserta las carreras asociadas si no existen
-    if (apiData.datos_estudio) {
-        const datos = JSON.parse(apiData.datos_estudio);
-        let isCienciasInformticas = false;
-        for (const carrera of datos) {
-            const facultad = carrera.facultad;
-            if (facultad.includes('CIENCIAS INFORMÁTICAS')) {
-                isCienciasInformticas = true;
-                break;
-            }
-        }
-        if (!isCienciasInformticas) {
-            return res.status(400).json({ exito: false, mensaje: 'Usted no pertenece a la carrera CIENCIAS INFORMÁTICAS' });
-        }
-    }
-    return await apiData;
-}
 
 exports.loginUser = async (req, res) => {
     try {
@@ -55,7 +17,7 @@ exports.loginUser = async (req, res) => {
             clave: password // Usa la contraseña proporcionada
         };
 
-        const apiData = await utmAuth(body);
+        const apiData = await utmAuth(body, agent, res);
 
         // Verifica si el usuario existe en la base de datos
         const sql = "SELECT * FROM usuario WHERE usuario = ?";
@@ -138,34 +100,7 @@ exports.loginUser = async (req, res) => {
     }
 };
 
-// Función para obtener o insertar un rol
-async function getOrInsertRol(tipoUsuario) {
-    const selectRolSql = "SELECT id FROM sistema_rol WHERE nombre = ?";
-    const [rol] = await db.query(selectRolSql, [tipoUsuario]);
-
-    if (rol.length > 0) {
-        return rol[0].id;
-    }
-
-    const insertRolSql = "INSERT INTO sistema_rol (nombre) VALUES (?)";
-    const result = await db.query(insertRolSql, [tipoUsuario]);
-    return result[0].insertId;
-}
-
-// Función para insertar carrera si no existe
-async function insertCarreraIfNotExists(nombreCarrera) {
-    const selectCarreraSql = "SELECT id FROM sistema_carrera WHERE nombre = ?";
-    const [carrera] = await db.query(selectCarreraSql, [nombreCarrera]);
-
-    if (carrera.length === 0) {
-        const insertCarreraSql = "INSERT INTO sistema_carrera (nombre) VALUES (?)";
-        const [result] = await db.query(insertCarreraSql, [nombreCarrera]);
-        return result.insertId;
-    }
-    return carrera[0].id;
-}
-
-exports.getAuthenticatedUser = async (req, res) => {
+exports.getUserInfo = async (req, res) => {
     try {
         const { userId } = req.user;
         const sql = "SELECT * FROM usuario WHERE id_personal = ?";
