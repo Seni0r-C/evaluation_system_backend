@@ -20,7 +20,7 @@ async function utmAuth(body) {
 
     const response = await axios.post(apiUrl, body, {
         headers,
-        // httpsAgent: agent
+        httpsAgent: agent
     });
 
     if (response.data.state !== 'success') {
@@ -359,7 +359,7 @@ exports.getAuthenticatedUser = async (req, res) => {
             const photoResponse = await axios.post(
                 "https://app.utm.edu.ec:3000/movil/obtener_foto_carnet",
                 { idpersonal: userId }, {
-                // httpsAgent: agent
+                httpsAgent: agent
             }
             );
 
