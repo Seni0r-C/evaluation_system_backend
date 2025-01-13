@@ -17,7 +17,7 @@ exports.crearTrabajo = async (req, res) => {
 
         // Verificar si la modalidad existe
         const [modalidad] = await db.execute(
-            'SELECT max_participantes FROM modalidad_titulacion WHERE id = ?',
+            'SELECT max_participantes FROM sistema_modalidad_titulacion WHERE id = ?',
             [modalidad_id]
         );
 
@@ -100,7 +100,7 @@ exports.listarTrabajos = async (req, res) => {
         const innerJoins = `
             JOIN sistema_carrera c ON tt.carrera_id = c.id
             JOIN trabajo_estado tte ON tt.estado_id = tte.id
-            JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
+            JOIN sistema_modalidad_titulacion mt ON tt.modalidad_id = mt.id
         `
         // Consulta para obtener los trabajos de titulación con filtros y paginación
         const [rows] = await db.execute(`
@@ -145,7 +145,7 @@ const getTrabajoByID = async (id) => {
             GROUP_CONCAT(DISTINCT tribunal.nombre) AS tribunal
         FROM trabajo_titulacion tt
         JOIN sistema_carrera c ON tt.carrera_id = c.id
-        JOIN modalidad_titulacion mt ON tt.modalidad_id = mt.id
+        JOIN sistema_modalidad_titulacion mt ON tt.modalidad_id = mt.id
         JOIN usuario ttor ON tt.tutor_id = ttor.id
         LEFT JOIN usuario cttor ON tt.cotutor_id = cttor.id
         LEFT JOIN trabajo_estudiante te ON tt.id = te.trabajo_id

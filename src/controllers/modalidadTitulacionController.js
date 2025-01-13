@@ -6,7 +6,7 @@ exports.crearModalidad = async (req, res) => {
     const { nombre, max_participantes } = req.body;
     try {
         const [result] = await db.execute(
-            'INSERT INTO modalidad_titulacion (nombre, max_participantes) VALUES (?, ?)',
+            'INSERT INTO sistema_modalidad_titulacion (nombre, max_participantes) VALUES (?, ?)',
             [nombre, max_participantes]
         );
         res.status(201).json({ id: result.insertId, nombre, max_participantes });
@@ -18,7 +18,7 @@ exports.crearModalidad = async (req, res) => {
 // Listar todas las modalidades de titulación
 exports.listarModalidades = async (req, res) => {
     try {
-        const [rows] = await db.execute('SELECT * FROM modalidad_titulacion');
+        const [rows] = await db.execute('SELECT * FROM sistema_modalidad_titulacion');
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -29,7 +29,7 @@ exports.listarModalidades = async (req, res) => {
 exports.obtenerModalidad = async (req, res) => {
     const { id } = req.params;
     try {
-        const [rows] = await db.execute('SELECT * FROM modalidad_titulacion WHERE id = ?', [id]);
+        const [rows] = await db.execute('SELECT * FROM sistema_modalidad_titulacion WHERE id = ?', [id]);
         if (rows.length === 0) {
             return res.status(404).json({ error: 'Modalidad no encontrada' });
         }
@@ -45,7 +45,7 @@ exports.actualizarModalidad = async (req, res) => {
     const { nombre, max_participantes } = req.body;
     try {
         const [result] = await db.execute(
-            'UPDATE modalidad_titulacion SET nombre = ?, max_participantes = ? WHERE id = ?',
+            'UPDATE sistema_modalidad_titulacion SET nombre = ?, max_participantes = ? WHERE id = ?',
             [nombre, max_participantes, id]
         );
         if (result.affectedRows === 0) {
@@ -61,7 +61,7 @@ exports.actualizarModalidad = async (req, res) => {
 exports.eliminarModalidad = async (req, res) => {
     const { id } = req.params;
     try {
-        const [result] = await db.execute('DELETE FROM modalidad_titulacion WHERE id = ?', [id]);
+        const [result] = await db.execute('DELETE FROM sistema_modalidad_titulacion WHERE id = ?', [id]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Modalidad no encontrada' });
         }
@@ -76,7 +76,7 @@ exports.asociarModalidadCarrera = async (req, res) => {
     const { id_carrera, id_modalidad_titulacion } = req.body;
     try {
         const [result] = await db.execute(
-            'INSERT INTO modalidad_titulacion_carrera (id_carrera, id_modalidad_titulacion) VALUES (?, ?)',
+            'INSERT INTO sistema_modalidad_titulacion_carrera (id_carrera, id_modalidad_titulacion) VALUES (?, ?)',
             [id_carrera, id_modalidad_titulacion]
         );
         res.status(201).json({ id: result.insertId, id_carrera, id_modalidad_titulacion });
@@ -90,7 +90,7 @@ exports.desasociarModalidadCarrera = async (req, res) => {
     const { id_carrera, id_modalidad_titulacion } = req.body;
     try {
         const [result] = await db.execute(
-            'DELETE FROM modalidad_titulacion_carrera WHERE id_carrera = ? AND id_modalidad_titulacion = ?',
+            'DELETE FROM sistema_modalidad_titulacion_carrera WHERE id_carrera = ? AND id_modalidad_titulacion = ?',
             [id_carrera, id_modalidad_titulacion]
         );
         if (result.affectedRows === 0) {
@@ -107,8 +107,8 @@ exports.listarModalidadesPorCarrera = async (req, res) => {
     const { id_carrera } = req.params;
     try {
         const [rows] = await db.execute(
-            `SELECT mt.* FROM modalidad_titulacion mt
-            INNER JOIN modalidad_titulacion_carrera mtc ON mt.id = mtc.id_modalidad_titulacion
+            `SELECT mt.* FROM sistema_modalidad_titulacion mt
+            INNER JOIN sistema_modalidad_titulacion_carrera mtc ON mt.id = mtc.id_modalidad_titulacion
             WHERE mtc.id_carrera = ?`,
             [id_carrera]
         );
