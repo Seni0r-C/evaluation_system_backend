@@ -22,16 +22,29 @@ exports.getRutas = async (req, res) => {
 };
 
 // Obtener una ruta específica
-exports.getRutaByRol = async (req, res) => {
+exports.hasAccess = async (req, res) => {
+    const { rol, ruta } = req.body;
+    try {
+        const [consulta] = await db.query("SELECT * FROM vista_rutas_rol WHERE rol = ? AND ruta = ?", [rol, ruta]);
+        if (consulta.length === 0) {
+            return res.status(404).json({ exito: false, mensaje: 'Sin acceso' });
+        }
+        res.status(200).json({ exito: true, mensaje: 'Acceso permitido' });
+    } catch (error) {
+        res.status(500).json({ exito: false, mensaje: 'Error al obtener la ruta', details: error });
+    }
+};
+// Obtener una ruta específica
+exports.getMenuByRol = async (req, res) => {
     const { rol } = req.params;
     try {
-        const [ruta] = await db.query("SELECT * FROM sistema_ruta WHERE nombre = ?", [rol]);
-        if (!ruta) {
-            return res.status(404).json({ error: 'Ruta no encontrada' });
+        const [menu] = await db.query("SELECT * FROM vista_menu_rol WHERE rol = ?", [rol]);
+        if (menu.length === 0) {
+            return res.status(404).json({ mensaje: 'Ruta no encontrada' });
         }
-        res.status(200).json(ruta[0]);
+        res.status(200).json(menu);
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener la ruta', details: error });
+        res.status(500).json({ mensaje: 'Error al obtener la ruta', details: error });
     }
 };
 
