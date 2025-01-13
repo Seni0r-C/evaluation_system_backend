@@ -110,7 +110,7 @@ exports.getUserInfo = async (req, res) => {
             return res.status(404).json({ exito: false, mensaje: 'Usuario no encontrado' });
         }
 
-        const rolesSql = "SELECT * FROM usuario_rol WHERE id_usuario = ?";
+        const rolesSql = "SELECT id, nombre FROM vista_roles_usuario WHERE id_usuario = ?";
         const [roles] = await db.query(rolesSql, [user[0].id]);
 
         const carreraSql = "SELECT * FROM usuario_carrera WHERE id_usuario = ?";
@@ -140,7 +140,7 @@ exports.getUserInfo = async (req, res) => {
             mensaje: 'Datos del usuario',
             datos: {
                 ...user[0],
-                roles: roles.map(rol => rol.id_rol), // Agregar los roles asociados
+                roles, // Agregar los roles asociados
                 carreras: carrera.map(c => c.id_carrera), // Agregar las carreras asociadas
                 fotoBase64: userPhotoBase64, // Agregar la foto en Base64
             }

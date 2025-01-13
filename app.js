@@ -16,7 +16,7 @@ setupSwaggerDocs(app);
 
 // Rutas de la API
 const authRoutes = require('./src/routes/authRoutes');
-const carrerasRoutes = require('./src/routes/carrerasControllers');
+const carrerasRoutes = require('./src/routes/carrerasRoutes');
 const modalidadTitulacionRoutes = require('./src/routes/modalidadTitulacionRoutes');
 const trabajoTitulacionRoutes = require('./src/routes/trabajoTitulacionRoutes');
 const calificacionRoutes = require('./src/routes/calificacionRoutes');
