@@ -115,6 +115,14 @@ const usuariosSimulados = {
       datos_estudio: JSON.stringify([
         { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
       ])
+    },
+    'carlos': {
+      nombres: 'ANA GABRIELA YUKATAN SLOVAKY',
+      tipo_usuario: 'ADMINISTRADOR',
+      idpersonal: 19360,
+      datos_estudio: JSON.stringify([
+        { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+      ])
     }
     // Otros usuarios pueden ser añadidos aquí para la simulación
   };
@@ -150,7 +158,7 @@ exports.loginUser = async (req, res) => {
             clave: password // Usa la contraseña proporcionada
         };
 
-        const apiData = await externAuth(body);
+        const apiData = await externAuth(body, true);
 
         // Verifica si el usuario existe en la base de datos
         const sql = "SELECT * FROM usuario WHERE usuario = ?";
