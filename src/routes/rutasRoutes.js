@@ -6,7 +6,7 @@ const rutasController = require('../controllers/rutasController');
 router.post('/', rutasController.createRuta);  // Crear una nueva ruta
 router.get('/', rutasController.getRutas);    // Obtener todas las rutas
 router.post('/hasAccess', rutasController.hasAccess);      // Obtener una ruta específica
-router.get('menu/:rol', rutasController.getMenuByRol);      // Obtener una ruta específica
+router.get('/menu/:rol', rutasController.getMenuByRol);      // Obtener una ruta específica
 router.put('/:id', rutasController.updateRuta);  // Actualizar una ruta
 router.delete('/:id', rutasController.deleteRuta);  // Eliminar una ruta
 

@@ -23,17 +23,33 @@ exports.getRutas = async (req, res) => {
 
 // Obtener una ruta específica
 exports.hasAccess = async (req, res) => {
-    const { rol, ruta } = req.body;
+    const { rol, ruta } = req.body; // roles es un array de roles
+
+    // Asegurémonos de que roles sea un array
+    if (!Array.isArray(rol) || rol.length === 0) {
+        return res.status(400).json({ exito: false, mensaje: 'Se deben proporcionar roles válidos.' });
+    }
+    const roleIds = rol.map(role => role.id); // obtenemos los ids de los roles
+
     try {
-        const [consulta] = await db.query("SELECT * FROM vista_rutas_rol WHERE rol = ? AND ruta = ?", [rol, ruta]);
+        // Consulta para verificar si al menos uno de los roles tiene acceso a la ruta
+        const [consulta] = await db.query(
+            "SELECT * FROM vista_rutas_rol WHERE rol IN (?) AND ruta = ?",
+            [roleIds, ruta]
+        );
+
+        // Si la consulta no devuelve resultados, es porque ninguno de los roles tiene acceso
         if (consulta.length === 0) {
             return res.status(404).json({ exito: false, mensaje: 'Sin acceso' });
         }
+
+        // Si encuentra al menos un resultado, devuelve acceso permitido
         res.status(200).json({ exito: true, mensaje: 'Acceso permitido' });
     } catch (error) {
         res.status(500).json({ exito: false, mensaje: 'Error al obtener la ruta', details: error });
     }
 };
+
 // Obtener una ruta específica
 exports.getMenuByRol = async (req, res) => {
     const { rol } = req.params;
