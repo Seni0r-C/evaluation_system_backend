@@ -402,7 +402,7 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   KEY `idx_nombre` (`nombre`)
 ) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.usuario: ~30 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.usuario: ~29 rows (aproximadamente)
 INSERT INTO `usuario` (`id`, `usuario`, `id_personal`, `nombre`) VALUES
 	(2, 'VArgas@Vargas.Vargas', '235657', 'Vargas'),
 	(3, 'xd', '104421', 'Joston'),
@@ -467,7 +467,7 @@ CREATE TABLE IF NOT EXISTS `usuario_rol` (
   CONSTRAINT `FK_id_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.usuario_rol: ~11 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.usuario_rol: ~12 rows (aproximadamente)
 INSERT INTO `usuario_rol` (`id_usuario`, `id_rol`) VALUES
 	(8, 3),
 	(14, 3),
@@ -504,7 +504,7 @@ CREATE TABLE `vista_roles_usuario` (
 -- Volcando estructura para vista gestion_titulacion.vista_rutas_rol
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `vista_rutas_rol` (
-	`rol` INT(11) NOT NULL,
+	`rol` INT(11) NULL,
 	`ruta` VARCHAR(1) NULL COLLATE 'utf8mb4_general_ci'
 ) ENGINE=MyISAM;
 
@@ -551,11 +551,14 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_rutas_rol` AS SELECT
     r.id AS rol,
     ruta.ruta AS ruta
 FROM
-    sistema_rol r
-JOIN
-    sistema_rol_ruta rr ON r.id = rr.rol_id
-JOIN
-    sistema_ruta ruta ON rr.ruta_id = ruta.id ;
+    sistema_ruta ruta
+LEFT JOIN sistema_rol_ruta rr ON ruta.id = rr.ruta_id
+LEFT JOIN sistema_rol r ON 
+    r.id = 1 OR -- Administrador tiene acceso a todas las rutas
+    ruta.id = 1 OR -- Todos los roles tienen acceso a la ruta "/"
+    r.id = rr.rol_id -- Acceso basado en las relaciones rol-ruta
+ORDER BY
+    ruta.id ;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

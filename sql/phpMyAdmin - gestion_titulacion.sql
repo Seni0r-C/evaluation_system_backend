@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-01-2025 a las 12:45:56
+-- Tiempo de generación: 14-01-2025 a las 03:08:32
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -612,7 +612,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vista_rutas_rol`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_rutas_rol`  AS SELECT `r`.`id` AS `rol`, `ruta`.`ruta` AS `ruta` FROM ((`sistema_rol` `r` join `sistema_rol_ruta` `rr` on(`r`.`id` = `rr`.`rol_id`)) join `sistema_ruta` `ruta` on(`rr`.`ruta_id` = `ruta`.`id`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_rutas_rol`  AS SELECT `r`.`id` AS `rol`, `ruta`.`ruta` AS `ruta` FROM ((`sistema_ruta` `ruta` left join `sistema_rol_ruta` `rr` on(`ruta`.`id` = `rr`.`ruta_id`)) left join `sistema_rol` `r` on(`r`.`id` = 1 or `ruta`.`id` = 1 or `r`.`id` = `rr`.`rol_id`)) ORDER BY `ruta`.`id` ASC ;
 
 --
 -- Índices para tablas volcadas
