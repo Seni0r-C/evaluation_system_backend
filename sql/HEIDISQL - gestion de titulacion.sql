@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS `rubrica_evaluacion` (
   CONSTRAINT `FK_trabajo_evaluacion_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.rubrica_evaluacion: ~23 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.rubrica_evaluacion: ~24 rows (aproximadamente)
 INSERT INTO `rubrica_evaluacion` (`id`, `trabajo_id`, `rubrica_id`, `rubrica_criterio_id`, `rubrica_nivel_id`, `docente_id`, `estudiante_id`, `puntaje_obtenido`) VALUES
 	(37, 10, 2, 9, 25, 27, 4, 30.00),
 	(38, 10, 2, 9, 25, 27, 3, 30.00),
@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS `sistema_menu` (
   CONSTRAINT `FK_padre_id` FOREIGN KEY (`padre_id`) REFERENCES `sistema_menu` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_menu: ~9 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_menu: ~10 rows (aproximadamente)
 INSERT INTO `sistema_menu` (`id`, `nombre`, `ruta_id`, `padre_id`, `orden`, `todos`, `icon`) VALUES
 	(1, 'Inicio', 1, NULL, 1, 1, 'home'),
 	(2, 'Items y Modalidades', NULL, NULL, 2, 1, 'items'),
@@ -249,9 +249,9 @@ CREATE TABLE IF NOT EXISTS `sistema_ruta` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ruta` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_ruta: ~9 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_ruta: ~12 rows (aproximadamente)
 INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
 	(1, '/'),
 	(3, '/modalidades'),
@@ -263,7 +263,8 @@ INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
 	(9, '/calificacion-de-trabajo-titulacion'),
 	(10, '/generacion-de-documento'),
 	(11, '/calificar'),
-	(12, '/trabajos-titulacion-realizados');
+	(12, '/trabajos-titulacion-realizados'),
+	(13, '/trabajos-titulacion');
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_tipo_evaluacion
 CREATE TABLE IF NOT EXISTS `sistema_tipo_evaluacion` (
@@ -360,9 +361,9 @@ CREATE TABLE IF NOT EXISTS `trabajo_titulacion` (
   CONSTRAINT `FK_tutor_id` FOREIGN KEY (`tutor_id`) REFERENCES `usuario` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.trabajo_titulacion: ~5 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.trabajo_titulacion: ~6 rows (aproximadamente)
 INSERT INTO `trabajo_titulacion` (`id`, `carrera_id`, `modalidad_id`, `tutor_id`, `cotutor_id`, `estado_id`, `fecha_defensa`, `titulo`, `link_anteproyecto`, `link_final`) VALUES
-	(10, 4, 3, 2, NULL, 2, '2025-01-06 00:00:00', 'JIJIJA', ':)))', ''),
+	(10, 4, 3, 2, NULL, 3, '2025-01-06 00:00:00', 'JIJIJA', ':)))', ''),
 	(11, 4, 3, 2, NULL, 1, NULL, 'JIIJA', 'sdfghsdfgjsdfg', ''),
 	(12, 4, 3, 14, 21, 1, NULL, 'dasdsa', 'asdasdasd', ''),
 	(13, 4, 3, 21, 14, 1, NULL, 'JIJIJA GAMING', 'sdasdas', ''),
@@ -402,7 +403,7 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   KEY `idx_nombre` (`nombre`)
 ) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.usuario: ~29 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.usuario: ~30 rows (aproximadamente)
 INSERT INTO `usuario` (`id`, `usuario`, `id_personal`, `nombre`) VALUES
 	(2, 'VArgas@Vargas.Vargas', '235657', 'Vargas'),
 	(3, 'xd', '104421', 'Joston'),
@@ -467,7 +468,7 @@ CREATE TABLE IF NOT EXISTS `usuario_rol` (
   CONSTRAINT `FK_id_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.usuario_rol: ~12 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.usuario_rol: ~11 rows (aproximadamente)
 INSERT INTO `usuario_rol` (`id_usuario`, `id_rol`) VALUES
 	(8, 3),
 	(14, 3),

@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 14-01-2025 a las 03:08:32
+-- Tiempo de generación: 16-01-2025 a las 17:33:44
 -- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
+-- Versión de PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -306,7 +306,8 @@ INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
 (9, '/calificacion-de-trabajo-titulacion'),
 (10, '/generacion-de-documento'),
 (11, '/calificar'),
-(12, '/trabajos-titulacion-realizados');
+(12, '/trabajos-titulacion-realizados'),
+(13, '/trabajos-titulacion');
 
 -- --------------------------------------------------------
 
@@ -415,7 +416,7 @@ CREATE TABLE `trabajo_titulacion` (
 --
 
 INSERT INTO `trabajo_titulacion` (`id`, `carrera_id`, `modalidad_id`, `tutor_id`, `cotutor_id`, `estado_id`, `fecha_defensa`, `titulo`, `link_anteproyecto`, `link_final`) VALUES
-(10, 4, 3, 2, NULL, 2, '2025-01-06 00:00:00', 'JIJIJA', ':)))', ''),
+(10, 4, 3, 2, NULL, 3, '2025-01-06 00:00:00', 'JIJIJA', ':)))', ''),
 (11, 4, 3, 2, NULL, 1, NULL, 'JIIJA', 'sdfghsdfgjsdfg', ''),
 (12, 4, 3, 14, 21, 1, NULL, 'dasdsa', 'asdasdasd', ''),
 (13, 4, 3, 21, 14, 1, NULL, 'JIJIJA GAMING', 'sdasdas', ''),
@@ -833,7 +834,7 @@ ALTER TABLE `sistema_rol`
 -- AUTO_INCREMENT de la tabla `sistema_ruta`
 --
 ALTER TABLE `sistema_ruta`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `sistema_tipo_evaluacion`
