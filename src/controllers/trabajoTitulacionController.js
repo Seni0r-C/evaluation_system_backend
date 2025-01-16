@@ -74,17 +74,17 @@ exports.listarTrabajos = async (req, res) => {
             whereClauses.push('tt.modalidad_id = ?');
             queryParams.push(modalidad_id);
         }
-        
-        if (Array.isArray(estado) && estado.length > 0) {            
+
+        if (Array.isArray(estado) && estado.length > 0) {
             // Generar marcadores de posición dinámicos
             const placeholders = estado.map(() => '?').join(', ');
             whereClauses.push(`tte.nombre IN (${placeholders})`);
             queryParams.push(...estado);  // Expandir el array de estados como valores individuales
-        } else if (estado) {            
+        } else if (estado) {
             whereClauses.push('tte.nombre = ?');
             queryParams.push(estado);
         }
-        
+
         if (titulo) {
             whereClauses.push('tt.titulo LIKE ?');
             queryParams.push(`%${titulo}%`);
@@ -175,7 +175,7 @@ const getTrabajoByID = async (id) => {
                 hourCycle: 'h23' // Forzar formato de 24 horas
             });
         }
-        
+
     }
 
     return rows;
@@ -183,7 +183,7 @@ const getTrabajoByID = async (id) => {
 
 // Obtener un trabajo de titulación por su ID
 exports.obtenerTrabajo = async (req, res) => {
-    const { id } = req.params;    
+    const { id } = req.params;
     try {
         const rows = await getTrabajoByID(id);
         if (rows.length === 0) {
@@ -351,26 +351,25 @@ exports.asignarTribunal = async (req, res) => {
     }
 };
 
-
 // Reasignar Tribunal (Inserta solo docentes no asignados previamente)
 exports.reasignarTribunal = async (req, res) => {
     const { trabajo_id, docente_ids, fecha_defensa, estado_id } = req.body;
 
     try {
         if (!trabajo_id) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 typeMsg: 'error',
                 message: 'Error al reasignar tribunal.',
                 error: 'El trabajo_id es obligatorio.'
-             });
+            });
         }
 
         if (!estado_id) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 typeMsg: 'error',
                 message: 'Error al reasignar tribunal.',
                 error: 'El estado_id es obligatorio.'
-             });
+            });
         }
 
         if (!Array.isArray(docente_ids) || docente_ids.length === 0) {
@@ -381,14 +380,14 @@ exports.reasignarTribunal = async (req, res) => {
         }
 
         if (!fecha_defensa) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 typeMsg: 'error',
                 message: 'Error al reasignar tribunal.',
                 error: 'La fecha de defensa es obligatoria.'
-             });
+            });
         }
 
-         // Actualizar la fecha de defensa en la tabla trabajo_titulacion
+        // Actualizar la fecha de defensa en la tabla trabajo_titulacion
         await db.execute(
             `UPDATE trabajo_titulacion 
              SET fecha_defensa = ?,
@@ -469,18 +468,17 @@ exports.reasignarTribunal = async (req, res) => {
     }
 };
 
-
-
 exports.obtenerTribunal = async (req, res) => {
     const { id } = req.params;
     const trabajo_id = id;
     try {
         // Validar la entrada
         if (!trabajo_id) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 typeMsg: 'error',
                 message: 'Error en el servidor al obtener datos del tribunal.',
-                error: 'El trabajo_id es obligatorio.' });
+                error: 'El trabajo_id es obligatorio.'
+            });
         }
 
         // Consulta para obtener los docentes asociados al trabajo con información de la tabla usuario
@@ -510,14 +508,13 @@ exports.obtenerTribunal = async (req, res) => {
 
     } catch (error) {
         console.error('Error al obtener el tribunal:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             typeMsg: 'error',
-            message: 'Error interno del servidor.' ,
-            error: 'Error interno del servidor.' 
+            message: 'Error interno del servidor.',
+            error: 'Error interno del servidor.'
         });
     }
 };
-
 
 // Remover un tribunal de un trabajo de titulación
 exports.removerTribunal = async (req, res) => {
