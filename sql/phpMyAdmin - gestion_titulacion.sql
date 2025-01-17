@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 16-01-2025 a las 17:33:44
+-- Tiempo de generación: 17-01-2025 a las 22:36:42
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -255,7 +255,8 @@ INSERT INTO `sistema_rol` (`id`, `nombre`) VALUES
 (4, 'ESTUDIANTE'),
 (9, 'VALIDADOR DE CONGRESO'),
 (10, 'VICEDECANATO'),
-(11, 'DECANATO');
+(11, 'DECANATO'),
+(12, 'TUTOR');
 
 -- --------------------------------------------------------
 
@@ -828,7 +829,7 @@ ALTER TABLE `sistema_modalidad_titulacion_carrera`
 -- AUTO_INCREMENT de la tabla `sistema_rol`
 --
 ALTER TABLE `sistema_rol`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `sistema_ruta`

@@ -213,9 +213,9 @@ CREATE TABLE IF NOT EXISTS `sistema_rol` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_rol: ~7 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_rol: ~8 rows (aproximadamente)
 INSERT INTO `sistema_rol` (`id`, `nombre`) VALUES
 	(1, 'ADMINISTRACIÓN'),
 	(2, 'SECRETARíA'),
@@ -223,7 +223,8 @@ INSERT INTO `sistema_rol` (`id`, `nombre`) VALUES
 	(4, 'ESTUDIANTE'),
 	(9, 'VALIDADOR DE CONGRESO'),
 	(10, 'VICEDECANATO'),
-	(11, 'DECANATO');
+	(11, 'DECANATO'),
+	(12, 'TUTOR');
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_rol_ruta
 CREATE TABLE IF NOT EXISTS `sistema_rol_ruta` (
