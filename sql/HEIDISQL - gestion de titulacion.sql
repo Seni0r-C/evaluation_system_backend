@@ -250,7 +250,7 @@ CREATE TABLE IF NOT EXISTS `sistema_ruta` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ruta` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_ruta: ~12 rows (aproximadamente)
 INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
@@ -265,7 +265,8 @@ INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
 	(10, '/generacion-de-documento'),
 	(11, '/calificar'),
 	(12, '/trabajos-titulacion-realizados'),
-	(13, '/trabajos-titulacion');
+	(13, '/trabajos-titulacion'),
+	(14, '/profile');
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_tipo_evaluacion
 CREATE TABLE IF NOT EXISTS `sistema_tipo_evaluacion` (
@@ -474,7 +475,7 @@ INSERT INTO `usuario_rol` (`id_usuario`, `id_rol`) VALUES
 	(8, 3),
 	(14, 3),
 	(21, 3),
-	(27, 1),
+	(27, 3),
 	(38, 9),
 	(39, 10),
 	(40, 4),
@@ -558,6 +559,7 @@ LEFT JOIN sistema_rol_ruta rr ON ruta.id = rr.ruta_id
 LEFT JOIN sistema_rol r ON 
     r.id = 1 OR -- Administrador tiene acceso a todas las rutas
     ruta.id = 1 OR -- Todos los roles tienen acceso a la ruta "/"
+    ruta.id = 14 OR -- Todos los roles tienen acceso a la ruta "/profile"
     r.id = rr.rol_id -- Acceso basado en las relaciones rol-ruta
 ORDER BY
     ruta.id ;
