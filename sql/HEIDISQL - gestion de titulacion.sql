@@ -88,7 +88,6 @@ CREATE TABLE IF NOT EXISTS `rubrica_evaluacion` (
   `trabajo_id` int(11) NOT NULL,
   `rubrica_id` int(11) NOT NULL,
   `rubrica_criterio_id` int(11) NOT NULL,
-  `rubrica_nivel_id` int(11) NOT NULL,
   `docente_id` int(11) NOT NULL,
   `estudiante_id` int(11) NOT NULL,
   `puntaje_obtenido` decimal(5,2) NOT NULL,
@@ -98,41 +97,37 @@ CREATE TABLE IF NOT EXISTS `rubrica_evaluacion` (
   KEY `FK_docente_id` (`docente_id`),
   KEY `FK_estudiante_evaluacion_id` (`estudiante_id`),
   KEY `FK_trabajo_evaluacion_id` (`trabajo_id`),
-  KEY `FK_rubrica_nivel` (`rubrica_nivel_id`),
   CONSTRAINT `FK_docente_id` FOREIGN KEY (`docente_id`) REFERENCES `usuario` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_estudiante_evaluacion_id` FOREIGN KEY (`estudiante_id`) REFERENCES `usuario` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_rubrica_criterio_id` FOREIGN KEY (`rubrica_criterio_id`) REFERENCES `rubrica_criterio` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_rubrica_id` FOREIGN KEY (`rubrica_id`) REFERENCES `rubrica` (`id`) ON UPDATE CASCADE,
-  CONSTRAINT `FK_rubrica_nivel` FOREIGN KEY (`rubrica_nivel_id`) REFERENCES `rubrica_nivel` (`id`),
   CONSTRAINT `FK_trabajo_evaluacion_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.rubrica_evaluacion: ~24 rows (aproximadamente)
-INSERT INTO `rubrica_evaluacion` (`id`, `trabajo_id`, `rubrica_id`, `rubrica_criterio_id`, `rubrica_nivel_id`, `docente_id`, `estudiante_id`, `puntaje_obtenido`) VALUES
-	(37, 10, 2, 9, 25, 27, 4, 30.00),
-	(38, 10, 2, 9, 25, 27, 3, 30.00),
-	(39, 10, 2, 9, 26, 27, 4, 24.00),
-	(40, 10, 2, 10, 30, 27, 4, 16.00),
-	(41, 10, 2, 11, 33, 27, 4, 10.00),
-	(42, 10, 2, 12, 37, 27, 4, 10.00),
-	(43, 10, 2, 13, 41, 27, 4, 30.00),
-	(44, 10, 2, 10, 29, 27, 3, 20.00),
-	(45, 10, 2, 12, 37, 27, 3, 10.00),
-	(46, 10, 2, 11, 36, 27, 3, 3.00),
-	(47, 10, 2, 13, 44, 27, 3, 9.00),
-	(48, 10, 1, 1, 2, 27, 3, 32.00),
-	(49, 10, 1, 5, 10, 27, 3, 8.00),
-	(50, 10, 1, 7, 18, 27, 3, 8.00),
-	(51, 10, 1, 8, 23, 27, 3, 10.00),
-	(52, 10, 1, 6, 16, 27, 3, 3.00),
-	(53, 10, 1, 2, 8, 27, 3, 3.00),
-	(54, 10, 1, 1, 1, 27, 4, 40.00),
-	(55, 10, 1, 2, 8, 27, 4, 3.00),
-	(56, 10, 1, 8, 24, 27, 4, 6.00),
-	(57, 10, 1, 7, 20, 27, 4, 3.00),
-	(58, 10, 1, 6, 16, 27, 4, 3.00),
-	(59, 10, 1, 5, 12, 27, 4, 3.00),
-	(60, 10, 2, 9, 28, 41, 4, 9.00);
+-- Volcando datos para la tabla gestion_titulacion.rubrica_evaluacion: ~22 rows (aproximadamente)
+INSERT INTO `rubrica_evaluacion` (`id`, `trabajo_id`, `rubrica_id`, `rubrica_criterio_id`, `docente_id`, `estudiante_id`, `puntaje_obtenido`) VALUES
+	(64, 10, 1, 1, 27, 3, 23.00),
+	(65, 10, 1, 2, 27, 3, 10.00),
+	(66, 10, 1, 5, 27, 3, 10.00),
+	(67, 10, 1, 6, 27, 3, 10.00),
+	(68, 10, 1, 7, 27, 3, 8.00),
+	(69, 10, 1, 8, 27, 3, 20.00),
+	(70, 10, 2, 9, 27, 3, 23.00),
+	(71, 10, 2, 10, 27, 3, 20.00),
+	(72, 10, 2, 11, 27, 3, 8.00),
+	(73, 10, 2, 12, 27, 3, 10.00),
+	(74, 10, 2, 13, 27, 3, 3.00),
+	(75, 10, 2, 9, 27, 4, 30.00),
+	(76, 10, 2, 10, 27, 4, 20.00),
+	(77, 10, 2, 11, 27, 4, 10.00),
+	(78, 10, 2, 12, 27, 4, 10.00),
+	(79, 10, 2, 13, 27, 4, 11.00),
+	(80, 10, 1, 1, 27, 4, 12.00),
+	(81, 10, 1, 2, 27, 4, 2.00),
+	(82, 10, 1, 5, 27, 4, 10.00),
+	(83, 10, 1, 6, 27, 4, 2.00),
+	(84, 10, 1, 7, 27, 4, 10.00),
+	(85, 10, 1, 8, 27, 4, 7.00);
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_carrera
 CREATE TABLE IF NOT EXISTS `sistema_carrera` (
@@ -252,7 +247,7 @@ CREATE TABLE IF NOT EXISTS `sistema_ruta` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_ruta: ~12 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_ruta: ~13 rows (aproximadamente)
 INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
 	(1, '/'),
 	(3, '/modalidades'),
@@ -475,7 +470,7 @@ INSERT INTO `usuario_rol` (`id_usuario`, `id_rol`) VALUES
 	(8, 3),
 	(14, 3),
 	(21, 3),
-	(27, 3),
+	(27, 1),
 	(38, 9),
 	(39, 10),
 	(40, 4),
