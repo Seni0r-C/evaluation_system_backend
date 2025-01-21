@@ -23,12 +23,6 @@ router.get('/rubrica-criterio/:id', calificacionController.getRubricaCriterioByI
 router.put('/rubrica-criterio/:id', calificacionController.updateRubricaCriterio);
 router.delete('/rubrica-criterio/:id', calificacionController.deleteRubricaCriterio);
 
-router.post('/rubrica-nivel', calificacionController.createRubricaNivel);
-router.get('/rubrica-nivel', calificacionController.getRubricaNiveles);
-router.get('/rubrica-nivel/:id', calificacionController.getRubricaNivelById);
-router.put('/rubrica-nivel/:id', calificacionController.updateRubricaNivel);
-router.delete('/rubrica-nivel/:id', calificacionController.deleteRubricaNivel);
-
 router.post('/rubrica-evaluacion', calificacionController.createRubricaEvaluacion);
 router.get('/rubrica-evaluacion', calificacionController.getRubricaEvaluaciones);
 router.get('/rubrica-evaluacion/:id', calificacionController.getRubricaEvaluacionById);

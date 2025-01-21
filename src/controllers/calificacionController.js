@@ -113,14 +113,6 @@ exports.getRubrica = async (req, res) => {
             [rubrica.id]
         );
 
-        // Obtener niveles para cada criterio de forma asincrónica
-        for (const criterio of criteriosRows) {
-            const [nivelesRows] = await db.query(
-                'SELECT * FROM rubrica_nivel WHERE rubrica_criterio_id = ?',
-                [criterio.id]
-            );
-            criterio.niveles = nivelesRows;
-        }
 
         return res.json({
             rubrica,
@@ -212,68 +204,12 @@ exports.deleteRubricaCriterio = async (req, res) => {
 };
 
 
-// Rubrica Nivel
-exports.createRubricaNivel = async (req, res) => {
-    const { rubrica_id, nombre, valor, nivel_id } = req.body;
-    try {
-        const result = await db.query('INSERT INTO rubrica_nivel (rubrica_id, nombre, valor, nivel_id) VALUES (?, ?, ?, ?)', [rubrica_id, nombre, valor, nivel_id]);
-        res.status(201).json({ id: result.insertId, rubrica_id, nombre, valor, nivel_id });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-exports.getRubricaNiveles = async (req, res) => {
-    try {
-        const [rows] = await db.query('SELECT * FROM rubrica_nivel');
-        res.json(rows);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-exports.getRubricaNivelById = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const [rows] = await db.query('SELECT * FROM rubrica_nivel WHERE id = ?', [id]);
-        if (rows.length === 0) return res.status(404).json({ message: 'Rubrica Nivel no encontrado' });
-        res.json(rows[0]);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-exports.updateRubricaNivel = async (req, res) => {
-    const { id } = req.params;
-    const { rubrica_id, nombre, valor, nivel_id } = req.body;
-    try {
-        const result = await db.query('UPDATE rubrica_nivel SET rubrica_id = ?, nombre = ?, valor = ?, nivel_id = ? WHERE id = ?', [rubrica_id, nombre, valor, nivel_id, id]);
-        if (result.affectedRows === 0) return res.status(404).json({ message: 'Rubrica Nivel no encontrado' });
-        res.json({ id, rubrica_id, nombre, valor, nivel_id });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-exports.deleteRubricaNivel = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const result = await db.query('DELETE FROM rubrica_nivel WHERE id = ?', [id]);
-        if (result.affectedRows === 0) return res.status(404).json({ message: 'Rubrica Nivel no encontrado' });
-        res.status(204).send();
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-
 // Rubrica Evaluacion
 exports.createRubricaEvaluacion = async (req, res) => {
     const {
         trabajo_id,          // Id del trabajo
         rubrica_id,          // Id de la rúbrica
         rubrica_criterio_id, // Id del criterio de la rúbrica
-        rubrica_nivel_id,    // Id del nivel de la rúbrica
         docente_id,          // Id del docente
         estudiante_id,       // Id del estudiante
         puntaje_obtenido     // Puntaje obtenido
@@ -282,8 +218,8 @@ exports.createRubricaEvaluacion = async (req, res) => {
     try {
         // Consulta de inserción
         const result = await db.query(
-            'INSERT INTO rubrica_evaluacion (trabajo_id, rubrica_id, rubrica_criterio_id, rubrica_nivel_id, docente_id, estudiante_id, puntaje_obtenido) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [trabajo_id, rubrica_id, rubrica_criterio_id, rubrica_nivel_id, docente_id, estudiante_id, puntaje_obtenido]
+            'INSERT INTO rubrica_evaluacion (trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido]
         );
 
         console.log('Rubrica Evaluacion creada:', result);
@@ -294,7 +230,6 @@ exports.createRubricaEvaluacion = async (req, res) => {
             trabajo_id,
             rubrica_id,
             rubrica_criterio_id,
-            rubrica_nivel_id,
             docente_id,
             estudiante_id,
             puntaje_obtenido
@@ -331,7 +266,6 @@ exports.updateRubricaEvaluacion = async (req, res) => {
         trabajo_id,          // Id del trabajo
         rubrica_id,          // Id de la rúbrica
         rubrica_criterio_id, // Id del criterio de la rúbrica
-        rubrica_nivel_id,    // Id del nivel de la rúbrica
         docente_id,          // Id del docente
         estudiante_id,       // Id del estudiante
         puntaje_obtenido     // Puntaje obtenido
@@ -340,8 +274,8 @@ exports.updateRubricaEvaluacion = async (req, res) => {
     try {
         // Consulta para actualizar el registro
         const result = await db.query(
-            'UPDATE rubrica_evaluacion SET trabajo_id = ?, rubrica_id = ?, rubrica_criterio_id = ?, rubrica_nivel_id = ?, docente_id = ?, estudiante_id = ?, puntaje_obtenido = ? WHERE id = ?',
-            [trabajo_id, rubrica_id, rubrica_criterio_id, rubrica_nivel_id, docente_id, estudiante_id, puntaje_obtenido, id]
+            'UPDATE rubrica_evaluacion SET trabajo_id = ?, rubrica_id = ?, rubrica_criterio_id = ?, docente_id = ?, estudiante_id = ?, puntaje_obtenido = ? WHERE id = ?',
+            [trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido, id]
         );
 
         // Verificar si se actualizó algún registro
@@ -355,7 +289,6 @@ exports.updateRubricaEvaluacion = async (req, res) => {
             trabajo_id,
             rubrica_id,
             rubrica_criterio_id,
-            rubrica_nivel_id,
             docente_id,
             estudiante_id,
             puntaje_obtenido
