@@ -218,7 +218,7 @@ exports.createRubricaEvaluacion = async (req, res) => {
     try {
         // Consulta de inserción
         const result = await db.query(
-            'INSERT INTO rubrica_evaluacion (trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO rubrica_evaluacion (trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido) VALUES (?, ?, ?, ?, ?, ?)',
             [trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido]
         );
 

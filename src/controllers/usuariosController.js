@@ -113,7 +113,7 @@ exports.eliminarUsuario = async (req, res) => {
 exports.obtenerEstudianteByTrabajo = async (req, res) => {
   const { id } = req.params;
   try {
-    const [estudiante] = await db.execute('SELECT * FROM usuario u INNER JOIN trabajo_estudiante t WHERE u.id = t.estudiante_id AND t.trabajo_id = ?', [id]);
+    const [estudiante] = await db.execute('SELECT u.* FROM usuario u INNER JOIN trabajo_estudiante t WHERE u.id = t.estudiante_id AND t.trabajo_id = ?', [id]);
     if (estudiante.length === 0) {
       return res.status(404).json({ message: 'No hay estudiantes con ese trabajo' });
     }
