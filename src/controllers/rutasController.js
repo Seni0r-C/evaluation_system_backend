@@ -148,3 +148,68 @@ exports.removeRoleFromRuta = async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar el rol de la ruta', details: error });
     }
 };
+
+exports.createMenu = async (req, res) => {
+    try {
+        const { nombre, ruta_id, padre_id, orden, todos, icon } = req.body;
+        const [nuevoMenu] = await db.query("INSERT INTO sistema_menu (nombre, ruta_id, padre_id, orden, todos, icon) VALUES (?, ?, ?, ?, ?, ?)", [nombre, ruta_id, padre_id, orden, todos, icon]);
+        if (nuevoMenu.affectedRows === 0) {
+            return res.status(500).json({ error: 'Error al crear el menú' });
+        } else {
+            res.status(200).json({ exito: true, mensaje: 'Menú creado correctamente', id: nuevoMenu.insertId });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Error al crear el menú', details: error });
+    }
+};
+
+exports.getMenus = async (req, res) => {
+    try {
+        const [menus] = await db.query("SELECT * FROM sistema_menu");
+        res.status(200).json(menus);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener los menú', details: error });
+    }
+}
+
+exports.updateMenu = async (req, res) => {
+    const { id } = req.params;
+    const { nombre, ruta_id, padre_id, orden, todos, icon } = req.body;
+    try {
+        const [sql] = await db.query("SELECT * FROM sistema_menu WHERE id = ?", [id]);
+        if (sql.length === 0) {
+            return res.status(404).json({ error: 'Menú no encontrada' });
+        }
+
+        const [resultado] = await db.query("UPDATE sistema_menu SET nombre = ?, ruta_id = ?, padre_id = ?, orden = ?, todos = ?, icon = ? WHERE id = ?", [
+            nombre,
+            ruta_id,
+            padre_id,
+            orden,
+            todos,
+            icon,
+            id
+        ]);
+
+        if (resultado.affectedRows === 0) {
+            return res.status(500).json({ error: 'Error al actualizar el menú' });
+        } else {
+            return res.status(200).json({ exito: true, mensaje: 'Menú actualizado correctamente' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar el menú', details: error });
+    }
+};
+
+exports.deleteMenu = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [resultado] = await db.query("DELETE FROM sistema_menu WHERE id = ?", [id]);
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ error: 'Menú no encontrada' });
+        }
+        res.status(200).json({ exito: true, mensaje: 'Menú eliminado correctamente' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar el menú', details: error });
+    }
+};  
