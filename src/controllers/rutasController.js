@@ -3,9 +3,13 @@ const db = require('../config/db'); // Suponiendo que tienes un modelo para la b
 // Crear una nueva ruta
 exports.createRuta = async (req, res) => {
     try {
-        const { nombre, ruta, padre, orden } = req.body;
-        const [nuevaRuta] = await db.query("INSERT INTO sistema_ruta (nombre, ruta, padre, orden) VALUES (?, ?, ?, ?)", [nombre, ruta, padre, orden]);
-        res.status(201).json(nuevaRuta);
+        const { ruta } = req.body;
+        const [nuevaRuta] = await db.query("INSERT INTO sistema_ruta (ruta) VALUES (?)", [ruta]);
+        if (nuevaRuta.affectedRows === 0) {
+            return res.status(500).json({ error: 'Error al crear la ruta' });
+        } else {
+            res.status(200).json({ exito: true, mensaje: 'Ruta creada correctamente', id: nuevaRuta.insertId });
+        }
     } catch (error) {
         res.status(500).json({ error: 'Error al crear la ruta', details: error });
     }
@@ -67,7 +71,7 @@ exports.getMenuByRol = async (req, res) => {
 // Actualizar una ruta
 exports.updateRuta = async (req, res) => {
     const { id } = req.params;
-    const { nombre, ruta, padre, orden } = req.body;
+    const { ruta } = req.body;
     try {
         const [sql] = await db.query("SELECT * FROM sistema_ruta WHERE id = ?", [id]);
         if (sql.length === 0) {
@@ -75,13 +79,13 @@ exports.updateRuta = async (req, res) => {
         }
 
         // Actualizar los campos
-        const [sql2] = await db.query("UPDATE sistema_ruta SET nombre = ?, ruta = ?, padre = ?, orden = ? WHERE id = ?", [nombre, ruta, padre, orden, id]);
+        const [sql2] = await db.query("UPDATE sistema_ruta SET ruta = ? WHERE id = ?", [ruta, id]);
 
         if (sql2.affectedRows === 0) {
             return res.status(404).json({ error: 'Ruta no encontrada' });
         }
 
-        res.status(200).json(sql2);
+        res.status(200).json({ message: 'Ruta actualizada correctamente' });
     } catch (error) {
         res.status(500).json({ error: 'Error al actualizar la ruta', details: error });
     }
