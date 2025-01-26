@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS `sistema_carrera` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_carrera: ~3 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_carrera: ~4 rows (aproximadamente)
 INSERT INTO `sistema_carrera` (`id`, `nombre`) VALUES
 	(4, 'INGENIERIA EN SISTEMAS INFORMATICOS'),
 	(5, 'GENERAL'),
@@ -156,9 +156,9 @@ CREATE TABLE IF NOT EXISTS `sistema_menu` (
   KEY `FK_padre_id` (`padre_id`) USING BTREE,
   CONSTRAINT `FK_id_ruta` FOREIGN KEY (`ruta_id`) REFERENCES `sistema_ruta` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_padre_id` FOREIGN KEY (`padre_id`) REFERENCES `sistema_menu` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_menu: ~11 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_menu: ~13 rows (aproximadamente)
 INSERT INTO `sistema_menu` (`id`, `nombre`, `ruta_id`, `padre_id`, `orden`, `todos`, `icon`) VALUES
 	(1, 'Inicio', 1, NULL, 1, 1, 'home'),
 	(2, 'Administrar Sistema', NULL, NULL, 2, 1, 'items'),
@@ -170,7 +170,9 @@ INSERT INTO `sistema_menu` (`id`, `nombre`, `ruta_id`, `padre_id`, `orden`, `tod
 	(8, 'Asignación Tribunal', 8, NULL, 5, 0, 'asignar'),
 	(9, 'Calificación Trabajos', 9, NULL, 6, 0, 'calificar'),
 	(10, 'Documento calificación', 10, NULL, 7, 0, 'reporte'),
-	(11, 'Carreras', 15, 2, 4, 0, NULL);
+	(12, 'Carreras', 15, 2, 4, 0, ''),
+	(14, 'Rutas', 19, 2, 5, 0, ''),
+	(15, 'Menu', 21, 2, 6, 0, '');
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_modalidad_titulacion
 CREATE TABLE IF NOT EXISTS `sistema_modalidad_titulacion` (
@@ -248,9 +250,9 @@ CREATE TABLE IF NOT EXISTS `sistema_ruta` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ruta` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_ruta: ~15 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_ruta: ~16 rows (aproximadamente)
 INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
 	(1, '/'),
 	(3, '/modalidades'),
@@ -266,7 +268,8 @@ INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
 	(13, '/trabajos-titulacion'),
 	(14, '/profile'),
 	(15, '/carreras'),
-	(19, '/rutas');
+	(19, '/rutas'),
+	(21, '/menu');
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_tipo_evaluacion
 CREATE TABLE IF NOT EXISTS `sistema_tipo_evaluacion` (
@@ -491,6 +494,7 @@ INSERT INTO `usuario_rol` (`id_usuario`, `id_rol`) VALUES
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `vista_menu_rol` (
 	`rol` INT(11) NOT NULL,
+	`id` INT(11) NOT NULL,
 	`menu_nombre` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`ruta` VARCHAR(1) NULL COLLATE 'utf8mb4_general_ci',
 	`icon` VARCHAR(1) NULL COLLATE 'utf8mb4_general_ci',
@@ -518,6 +522,7 @@ CREATE TABLE `vista_rutas_rol` (
 DROP TABLE IF EXISTS `vista_menu_rol`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_menu_rol` AS SELECT
     r.id AS rol,
+    m.id AS id,
     m.nombre AS menu_nombre,
     rt.ruta AS ruta,
     m.icon,
