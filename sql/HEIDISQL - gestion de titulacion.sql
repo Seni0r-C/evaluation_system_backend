@@ -2,7 +2,7 @@
 -- Host:                         127.0.0.1
 -- Versión del servidor:         10.4.32-MariaDB - mariadb.org binary distribution
 -- SO del servidor:              Win64
--- HeidiSQL Versión:             12.8.0.6908
+-- HeidiSQL Versión:             12.10.0.7000
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS `sistema_carrera` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_carrera: ~3 rows (aproximadamente)
 INSERT INTO `sistema_carrera` (`id`, `nombre`) VALUES
@@ -156,12 +156,12 @@ CREATE TABLE IF NOT EXISTS `sistema_menu` (
   KEY `FK_padre_id` (`padre_id`) USING BTREE,
   CONSTRAINT `FK_id_ruta` FOREIGN KEY (`ruta_id`) REFERENCES `sistema_ruta` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_padre_id` FOREIGN KEY (`padre_id`) REFERENCES `sistema_menu` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_menu: ~10 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_menu: ~11 rows (aproximadamente)
 INSERT INTO `sistema_menu` (`id`, `nombre`, `ruta_id`, `padre_id`, `orden`, `todos`, `icon`) VALUES
 	(1, 'Inicio', 1, NULL, 1, 1, 'home'),
-	(2, 'Items y Modalidades', NULL, NULL, 2, 1, 'items'),
+	(2, 'Administrar Sistema', NULL, NULL, 2, 1, 'items'),
 	(3, 'Modalidades de Titulación', 3, 2, 1, 0, NULL),
 	(4, 'Items de revista', 4, 2, 2, 0, NULL),
 	(5, 'Items de rúbrica', 5, 2, 3, 0, NULL),
@@ -169,7 +169,8 @@ INSERT INTO `sistema_menu` (`id`, `nombre`, `ruta_id`, `padre_id`, `orden`, `tod
 	(7, 'Registro Trabajo Final', 7, NULL, 4, 0, 'subir'),
 	(8, 'Asignación Tribunal', 8, NULL, 5, 0, 'asignar'),
 	(9, 'Calificación Trabajos', 9, NULL, 6, 0, 'calificar'),
-	(10, 'Documento calificación', 10, NULL, 7, 0, 'reporte');
+	(10, 'Documento calificación', 10, NULL, 7, 0, 'reporte'),
+	(11, 'Carreras', 15, 2, 4, 0, NULL);
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_modalidad_titulacion
 CREATE TABLE IF NOT EXISTS `sistema_modalidad_titulacion` (
@@ -177,13 +178,14 @@ CREATE TABLE IF NOT EXISTS `sistema_modalidad_titulacion` (
   `nombre` varchar(100) NOT NULL,
   `max_participantes` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_modalidad_titulacion: ~3 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_modalidad_titulacion: ~4 rows (aproximadamente)
 INSERT INTO `sistema_modalidad_titulacion` (`id`, `nombre`, `max_participantes`) VALUES
 	(1, 'Examen Complexivo', 1),
 	(2, 'Artículo Científico', 1),
-	(3, 'Propuesta Tecnológica', 2);
+	(3, 'Propuesta Tecnológica', 2),
+	(4, 'Robar un carro', 5);
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_modalidad_titulacion_carrera
 CREATE TABLE IF NOT EXISTS `sistema_modalidad_titulacion_carrera` (
@@ -195,7 +197,7 @@ CREATE TABLE IF NOT EXISTS `sistema_modalidad_titulacion_carrera` (
   KEY `FK_id_modalidad_titulacion` (`id_modalidad_titulacion`),
   CONSTRAINT `FK_id_modalidad_titulacion` FOREIGN KEY (`id_modalidad_titulacion`) REFERENCES `sistema_modalidad_titulacion` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_modalidad_titulacion_carrera_sistema_carrera` FOREIGN KEY (`id_carrera`) REFERENCES `sistema_carrera` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_modalidad_titulacion_carrera: ~3 rows (aproximadamente)
 INSERT INTO `sistema_modalidad_titulacion_carrera` (`id`, `id_carrera`, `id_modalidad_titulacion`) VALUES
@@ -231,13 +233,14 @@ CREATE TABLE IF NOT EXISTS `sistema_rol_ruta` (
   CONSTRAINT `FK_ruta_id` FOREIGN KEY (`ruta_id`) REFERENCES `sistema_ruta` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_rol_ruta: ~6 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_rol_ruta: ~7 rows (aproximadamente)
 INSERT INTO `sistema_rol_ruta` (`rol_id`, `ruta_id`) VALUES
 	(2, 6),
 	(3, 6),
 	(3, 7),
 	(3, 9),
 	(3, 11),
+	(3, 13),
 	(10, 10);
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_ruta
@@ -245,9 +248,9 @@ CREATE TABLE IF NOT EXISTS `sistema_ruta` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ruta` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_ruta: ~13 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_ruta: ~15 rows (aproximadamente)
 INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
 	(1, '/'),
 	(3, '/modalidades'),
@@ -261,7 +264,9 @@ INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
 	(11, '/calificar'),
 	(12, '/trabajos-titulacion-realizados'),
 	(13, '/trabajos-titulacion'),
-	(14, '/profile');
+	(14, '/profile'),
+	(15, '/carreras'),
+	(19, '/rutas');
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_tipo_evaluacion
 CREATE TABLE IF NOT EXISTS `sistema_tipo_evaluacion` (
@@ -398,9 +403,9 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   UNIQUE KEY `usuario` (`usuario`),
   UNIQUE KEY `id_personal` (`id_personal`),
   KEY `idx_nombre` (`nombre`)
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.usuario: ~30 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.usuario: ~31 rows (aproximadamente)
 INSERT INTO `usuario` (`id`, `usuario`, `id_personal`, `nombre`) VALUES
 	(2, 'VArgas@Vargas.Vargas', '235657', 'Vargas'),
 	(3, 'xd', '104421', 'Joston'),
@@ -431,7 +436,8 @@ INSERT INTO `usuario` (`id`, `usuario`, `id_personal`, `nombre`) VALUES
 	(41, 'carlos', '19360', 'ANA GABRIELA YUKATAN SLOVAKY'),
 	(43, 'tribunal', '12351', 'PEDRO MANOLO ANESTECIO ONETWO'),
 	(44, 'estudiante', '19351', 'TAMIÑAWI SUMI SUMIWKA MANIKO'),
-	(47, 'alumno', '19359', 'JAIME ENRIQUYE ALMIGUEZ GONZALEZ');
+	(47, 'alumno', '19359', 'JAIME ENRIQUYE ALMIGUEZ GONZALEZ'),
+	(48, 'cubillus2854', '165344', 'UBILLUS BUSTAMANTE CRISTOPHER ALEXANDER');
 
 -- Volcando estructura para tabla gestion_titulacion.usuario_carrera
 CREATE TABLE IF NOT EXISTS `usuario_carrera` (
@@ -443,7 +449,7 @@ CREATE TABLE IF NOT EXISTS `usuario_carrera` (
   CONSTRAINT `id_usuario_FK` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.usuario_carrera: ~8 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.usuario_carrera: ~9 rows (aproximadamente)
 INSERT INTO `usuario_carrera` (`id_usuario`, `id_carrera`) VALUES
 	(27, 4),
 	(38, 4),
@@ -452,7 +458,8 @@ INSERT INTO `usuario_carrera` (`id_usuario`, `id_carrera`) VALUES
 	(41, 4),
 	(43, 4),
 	(44, 4),
-	(47, 4);
+	(47, 4),
+	(48, 4);
 
 -- Volcando estructura para tabla gestion_titulacion.usuario_rol
 CREATE TABLE IF NOT EXISTS `usuario_rol` (
@@ -465,7 +472,7 @@ CREATE TABLE IF NOT EXISTS `usuario_rol` (
   CONSTRAINT `FK_id_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.usuario_rol: ~11 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.usuario_rol: ~12 rows (aproximadamente)
 INSERT INTO `usuario_rol` (`id_usuario`, `id_rol`) VALUES
 	(8, 3),
 	(14, 3),
@@ -477,7 +484,8 @@ INSERT INTO `usuario_rol` (`id_usuario`, `id_rol`) VALUES
 	(41, 1),
 	(43, 3),
 	(44, 3),
-	(47, 4);
+	(47, 4),
+	(48, 4);
 
 -- Volcando estructura para vista gestion_titulacion.vista_menu_rol
 -- Creando tabla temporal para superar errores de dependencia de VIEW
@@ -528,7 +536,8 @@ JOIN sistema_rol r ON
         WHERE rr.ruta_id = m.ruta_id
     )
 ORDER BY
-    m.orden ;
+    m.orden 
+;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `vista_roles_usuario`;
@@ -541,7 +550,8 @@ FROM
 JOIN 
     usuario_rol ur ON u.id = ur.id_usuario
 JOIN 
-    sistema_rol sr ON ur.id_rol = sr.id ;
+    sistema_rol sr ON ur.id_rol = sr.id 
+;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `vista_rutas_rol`;
@@ -557,7 +567,8 @@ LEFT JOIN sistema_rol r ON
     ruta.id = 14 OR -- Todos los roles tienen acceso a la ruta "/profile"
     r.id = rr.rol_id -- Acceso basado en las relaciones rol-ruta
 ORDER BY
-    ruta.id ;
+    ruta.id 
+;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
