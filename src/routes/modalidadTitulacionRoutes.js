@@ -5,7 +5,7 @@ const modalidadController = require('../controllers/modalidadTitulacionControlle
 // Rutas para CRUD de `modalidad_titulacion`
 router.post('/crear', modalidadController.crearModalidad);
 router.get('/listar', modalidadController.listarModalidades);
-router.get('/obtener/:id', modalidadController.obtenerModalidad);
+router.get('/listar/:id', modalidadController.obtenerModalidad);
 router.put('/actualizar/:id', modalidadController.actualizarModalidad);
 router.delete('/eliminar/:id', modalidadController.eliminarModalidad);
 
