@@ -132,11 +132,11 @@ exports.getRubrica = async (req, res) => {
 
 exports.updateRubrica = async (req, res) => {
     const { id } = req.params;
-    const { nombre, tipo_evaluacion_id } = req.body;
+    const { modalidad_id, tipo_evaluacion_id } = req.body;
     try {
-        const result = await db.query('UPDATE rubrica SET nombre = ?, tipo_evaluacion_id = ? WHERE id = ?', [nombre, tipo_evaluacion_id, id]);
+        const result = await db.query('UPDATE rubrica SET modalidad_id = ?, tipo_evaluacion_id = ? WHERE id = ?', [modalidad_id, tipo_evaluacion_id, id]);
         if (result.affectedRows === 0) return res.status(404).json({ message: 'Rubrica no encontrado' });
-        res.json({ id, nombre, tipo_evaluacion_id });
+        res.json({ id, nombre: modalidad_id, tipo_evaluacion_id });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
