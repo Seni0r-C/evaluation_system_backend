@@ -25,6 +25,15 @@ exports.getRutas = async (req, res) => {
     }
 };
 
+exports.getRutasRol = async (req, res) => {
+    try {
+        const [rutas] = await db.query("SELECT * FROM vista_rutas_rol");
+        res.status(200).json(rutas);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener las rutas', details: error });
+    }
+}
+
 // Obtener una ruta específica
 exports.hasAccess = async (req, res) => {
     const { rol, ruta } = req.body; // roles es un array de roles
