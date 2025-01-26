@@ -90,8 +90,13 @@ exports.getRubricas = async (req, res) => {
 exports.getRubrica = async (req, res) => {
     const { id_tipo_evaluacion, id_modalidad } = req.query;
 
+    if (!id_tipo_evaluacion && !id_modalidad) {
+        const [rows] = await db.query('SELECT * FROM vista_rubricas_detalle');
+        return res.json(rows);
+    }
+
     if (!id_tipo_evaluacion || !id_modalidad) {
-        return res.status(400).json({ message: 'Faltan parámetros: id_tipo_evaluacion o id_modalidad' });
+        return res.status(400).json({ error: 'Los parámetros id_tipo_evaluacion y id_modalidad son obligatorios' });
     }
 
     try {

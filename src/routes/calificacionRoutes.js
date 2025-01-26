@@ -1,32 +1,32 @@
-// calificacionRoutes.js
 const express = require('express');
 const router = express.Router();
-const calificacionController = require('../controllers/calificacionController');
+const controller = require('../controllers/calificacionController');
 
-// Rutas para tipo_evaluacion
-router.post('/tipo-evaluacion', calificacionController.createTipoEvaluacion);
-router.get('/tipo-evaluacion', calificacionController.getTiposEvaluacion);
-router.get('/tipo-evaluacion/:id', calificacionController.getTipoEvaluacionByModalidadId);
-router.put('/tipo-evaluacion/:id', calificacionController.updateTipoEvaluacion);
-router.delete('/tipo-evaluacion/:id', calificacionController.deleteTipoEvaluacion);
+// Rutas para tipos de evaluación
+router.post('/tipo-evaluacion', controller.createTipoEvaluacion);
+router.get('/tipo-evaluacion', controller.getTiposEvaluacion);
+router.get('/tipo-evaluacion/:id', controller.getTipoEvaluacionByModalidadId);
+router.put('/tipo-evaluacion/:id', controller.updateTipoEvaluacion);
+router.delete('/tipo-evaluacion/:id', controller.deleteTipoEvaluacion);
 
 // Rutas para rubrica
-router.post('/rubrica', calificacionController.createRubrica);
-router.get('/rubrica', calificacionController.getRubrica);
-router.put('/rubrica/:id', calificacionController.updateRubrica);
-router.delete('/rubrica/:id', calificacionController.deleteRubrica);
+router.post('/rubrica', controller.createRubrica);
+router.get('/rubrica', controller.getRubrica);
+router.put('/rubrica/:id', controller.updateRubrica);
+router.delete('/rubrica/:id', controller.deleteRubrica);
 
-// Similar para rubrica_criterio, rubrica_nivel y rubrica_evaluacion
-router.post('/rubrica-criterio', calificacionController.createRubricaCriterio);
-router.get('/rubrica-criterio', calificacionController.getRubricaCriterios);
-router.get('/rubrica-criterio/:id', calificacionController.getRubricaCriterioById);
-router.put('/rubrica-criterio/:id', calificacionController.updateRubricaCriterio);
-router.delete('/rubrica-criterio/:id', calificacionController.deleteRubricaCriterio);
+// Rutas para rubrica_criterio
+router.post('/rubrica-criterio', controller.createRubricaCriterio);
+router.get('/rubrica-criterio', controller.getRubricaCriterios);
+router.get('/rubrica-criterio/:id', controller.getRubricaCriterioById);
+router.put('/rubrica-criterio/:id', controller.updateRubricaCriterio);
+router.delete('/rubrica-criterio/:id', controller.deleteRubricaCriterio);
 
-router.post('/rubrica-evaluacion', calificacionController.createRubricaEvaluacion);
-router.get('/rubrica-evaluacion', calificacionController.getRubricaEvaluaciones);
-router.get('/rubrica-evaluacion/:id', calificacionController.getRubricaEvaluacionById);
-router.put('/rubrica-evaluacion/:id', calificacionController.updateRubricaEvaluacion)
+// Rutas para rubrica_evaluación
+router.post('/rubrica-evaluacion', controller.createRubricaEvaluacion);
+router.get('/rubrica-evaluacion', controller.getRubricaEvaluaciones);
+router.get('/rubrica-evaluacion/:id', controller.getRubricaEvaluacionById);
+router.put('/rubrica-evaluacion/:id', controller.updateRubricaEvaluacion)
 
 // Exportar las rutas
 module.exports = router;
