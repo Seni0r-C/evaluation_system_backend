@@ -69,10 +69,10 @@ exports.deleteTipoEvaluacion = async (req, res) => {
 
 // Rubrica
 exports.createRubrica = async (req, res) => {
-    const { nombre, tipo_evaluacion_id } = req.body;
+    const { modalidad_id, tipo_evaluacion_id } = req.body;
     try {
-        const result = await db.query('INSERT INTO rubrica (nombre, tipo_evaluacion_id) VALUES (?, ?)', [nombre, tipo_evaluacion_id]);
-        res.status(201).json({ id: result.insertId, nombre, tipo_evaluacion_id });
+        const result = await db.query('INSERT INTO rubrica (modalidad_id, tipo_evaluacion_id) VALUES (?, ?)', [modalidad_id, tipo_evaluacion_id]);
+        res.status(201).json({ id: result.insertId, modalidad_id, tipo_evaluacion_id });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
