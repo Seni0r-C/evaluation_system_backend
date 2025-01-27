@@ -42,14 +42,15 @@ CREATE TABLE IF NOT EXISTS `rubrica` (
   KEY `FK_tipo_evaluacion_id` (`tipo_evaluacion_id`),
   CONSTRAINT `FK_tipo_evaluacion_id` FOREIGN KEY (`tipo_evaluacion_id`) REFERENCES `sistema_tipo_evaluacion` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `rubrica_ibfk_1` FOREIGN KEY (`modalidad_id`) REFERENCES `sistema_modalidad_titulacion` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.rubrica: ~4 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.rubrica: ~5 rows (aproximadamente)
 INSERT INTO `rubrica` (`id`, `tipo_evaluacion_id`, `modalidad_id`) VALUES
 	(1, 2, 3),
 	(2, 1, 3),
 	(3, 1, 2),
-	(4, 2, 2);
+	(4, 2, 2),
+	(5, 3, 1);
 
 -- Volcando estructura para tabla gestion_titulacion.rubrica_criterio
 CREATE TABLE IF NOT EXISTS `rubrica_criterio` (
@@ -136,7 +137,7 @@ CREATE TABLE IF NOT EXISTS `sistema_carrera` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_carrera: ~4 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_carrera: ~3 rows (aproximadamente)
 INSERT INTO `sistema_carrera` (`id`, `nombre`) VALUES
 	(4, 'INGENIERIA EN SISTEMAS INFORMATICOS'),
 	(5, 'GENERAL'),
@@ -155,24 +156,23 @@ CREATE TABLE IF NOT EXISTS `sistema_menu` (
   KEY `FK_ruta_id` (`ruta_id`) USING BTREE,
   KEY `FK_padre_id` (`padre_id`) USING BTREE,
   CONSTRAINT `FK_id_ruta` FOREIGN KEY (`ruta_id`) REFERENCES `sistema_ruta` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_padre_id` FOREIGN KEY (`padre_id`) REFERENCES `sistema_menu` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CONSTRAINT `FK_padre_id` FOREIGN KEY (`padre_id`) REFERENCES `sistema_menu` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_menu: ~13 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_menu: ~12 rows (aproximadamente)
 INSERT INTO `sistema_menu` (`id`, `nombre`, `ruta_id`, `padre_id`, `orden`, `todos`, `icon`) VALUES
 	(1, 'Inicio', 1, NULL, 1, 1, 'home'),
 	(2, 'Administrar Sistema', NULL, NULL, 2, 1, 'items'),
-	(3, 'Modalidades de Titulación', 3, 2, 1, 0, NULL),
-	(4, 'Items de revista', 4, 2, 2, 0, NULL),
+	(3, 'Modalidades de Titulación', 3, 2, 2, 0, NULL),
 	(5, 'Items de rúbrica', 5, 2, 3, 0, NULL),
 	(6, 'Registro Anteproyecto', 6, NULL, 3, 0, 'subir'),
 	(7, 'Registro Trabajo Final', 7, NULL, 4, 0, 'subir'),
 	(8, 'Asignación Tribunal', 8, NULL, 5, 0, 'asignar'),
 	(9, 'Calificación Trabajos', 9, NULL, 6, 0, 'calificar'),
 	(10, 'Documento calificación', 10, NULL, 7, 0, 'reporte'),
-	(12, 'Carreras', 15, 2, 4, 0, ''),
-	(14, 'Rutas', 19, 2, 5, 0, ''),
-	(15, 'Menu', 21, 2, 6, 0, '');
+	(12, 'Carreras', 15, 2, 1, 0, ''),
+	(14, 'Rutas', 19, 2, 4, 0, ''),
+	(15, 'Menu', 21, 2, 5, 0, '');
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_modalidad_titulacion
 CREATE TABLE IF NOT EXISTS `sistema_modalidad_titulacion` (
@@ -180,14 +180,14 @@ CREATE TABLE IF NOT EXISTS `sistema_modalidad_titulacion` (
   `nombre` varchar(100) NOT NULL,
   `max_participantes` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_modalidad_titulacion: ~4 rows (aproximadamente)
 INSERT INTO `sistema_modalidad_titulacion` (`id`, `nombre`, `max_participantes`) VALUES
 	(1, 'Examen Complexivo', 1),
 	(2, 'Artículo Científico', 1),
 	(3, 'Propuesta Tecnológica', 2),
-	(4, 'Robar un carro', 5);
+	(6, 'tirarse de un puente', 1);
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_modalidad_titulacion_carrera
 CREATE TABLE IF NOT EXISTS `sistema_modalidad_titulacion_carrera` (
@@ -199,7 +199,7 @@ CREATE TABLE IF NOT EXISTS `sistema_modalidad_titulacion_carrera` (
   KEY `FK_id_modalidad_titulacion` (`id_modalidad_titulacion`),
   CONSTRAINT `FK_id_modalidad_titulacion` FOREIGN KEY (`id_modalidad_titulacion`) REFERENCES `sistema_modalidad_titulacion` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_modalidad_titulacion_carrera_sistema_carrera` FOREIGN KEY (`id_carrera`) REFERENCES `sistema_carrera` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_modalidad_titulacion_carrera: ~3 rows (aproximadamente)
 INSERT INTO `sistema_modalidad_titulacion_carrera` (`id`, `id_carrera`, `id_modalidad_titulacion`) VALUES
@@ -252,11 +252,10 @@ CREATE TABLE IF NOT EXISTS `sistema_ruta` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_ruta: ~16 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_ruta: ~15 rows (aproximadamente)
 INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
 	(1, '/'),
 	(3, '/modalidades'),
-	(4, '/items-revista'),
 	(5, '/items-rubrica'),
 	(6, '/registro-anteproyecto'),
 	(7, '/registro-proyecto-titulacion'),
@@ -276,7 +275,7 @@ CREATE TABLE IF NOT EXISTS `sistema_tipo_evaluacion` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_tipo_evaluacion: ~3 rows (aproximadamente)
 INSERT INTO `sistema_tipo_evaluacion` (`id`, `nombre`) VALUES
@@ -408,7 +407,7 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   KEY `idx_nombre` (`nombre`)
 ) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.usuario: ~31 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.usuario: ~30 rows (aproximadamente)
 INSERT INTO `usuario` (`id`, `usuario`, `id_personal`, `nombre`) VALUES
 	(2, 'VArgas@Vargas.Vargas', '235657', 'Vargas'),
 	(3, 'xd', '104421', 'Joston'),
@@ -452,7 +451,7 @@ CREATE TABLE IF NOT EXISTS `usuario_carrera` (
   CONSTRAINT `id_usuario_FK` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.usuario_carrera: ~9 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.usuario_carrera: ~8 rows (aproximadamente)
 INSERT INTO `usuario_carrera` (`id_usuario`, `id_carrera`) VALUES
 	(27, 4),
 	(38, 4),
@@ -475,7 +474,7 @@ CREATE TABLE IF NOT EXISTS `usuario_rol` (
   CONSTRAINT `FK_id_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.usuario_rol: ~12 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.usuario_rol: ~11 rows (aproximadamente)
 INSERT INTO `usuario_rol` (`id_usuario`, `id_rol`) VALUES
 	(8, 3),
 	(14, 3),
@@ -497,6 +496,7 @@ CREATE TABLE `vista_menu_rol` (
 	`id` INT(11) NOT NULL,
 	`menu_nombre` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`ruta` VARCHAR(1) NULL COLLATE 'utf8mb4_general_ci',
+	`ruta_id` INT(11) NULL,
 	`icon` VARCHAR(1) NULL COLLATE 'utf8mb4_general_ci',
 	`padre` INT(11) NULL,
 	`orden` INT(11) NULL,
@@ -509,6 +509,18 @@ CREATE TABLE `vista_roles_usuario` (
 	`id_usuario` INT(11) NOT NULL,
 	`id` INT(11) NOT NULL,
 	`nombre` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_general_ci'
+) ENGINE=MyISAM;
+
+-- Volcando estructura para vista gestion_titulacion.vista_rubricas_detalle
+-- Creando tabla temporal para superar errores de dependencia de VIEW
+CREATE TABLE `vista_rubricas_detalle` (
+	`rubrica_id` INT(11) NOT NULL,
+	`tipo_evaluacion_id` INT(11) NOT NULL,
+	`tipo_evaluacion_nombre` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`modalidad_id` INT(11) NOT NULL,
+	`modalidad_nombre` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`criterio_nombre` VARCHAR(1) NULL COLLATE 'utf8mb4_general_ci',
+	`puntaje_maximo` DECIMAL(5,2) NULL
 ) ENGINE=MyISAM;
 
 -- Volcando estructura para vista gestion_titulacion.vista_rutas_rol
@@ -525,6 +537,7 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_menu_rol` AS SELECT
     m.id AS id,
     m.nombre AS menu_nombre,
     rt.ruta AS ruta,
+    rt.id AS ruta_id, 
     m.icon,
     m.padre_id AS padre,
     m.orden,
@@ -556,6 +569,26 @@ JOIN
     usuario_rol ur ON u.id = ur.id_usuario
 JOIN 
     sistema_rol sr ON ur.id_rol = sr.id 
+;
+
+-- Eliminando tabla temporal y crear estructura final de VIEW
+DROP TABLE IF EXISTS `vista_rubricas_detalle`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vista_rubricas_detalle` AS SELECT 
+    r.id AS rubrica_id,
+    r.tipo_evaluacion_id,
+    te.nombre AS tipo_evaluacion_nombre,
+    r.modalidad_id,
+    mt.nombre AS modalidad_nombre,
+    rcr.nombre AS criterio_nombre,
+    rcr.puntaje_maximo
+FROM 
+    rubrica r
+JOIN 
+    sistema_tipo_evaluacion te ON r.tipo_evaluacion_id = te.id
+JOIN 
+    sistema_modalidad_titulacion mt ON r.modalidad_id = mt.id
+LEFT JOIN 
+    rubrica_criterio rcr ON r.id = rcr.rubrica_id 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
