@@ -23,7 +23,7 @@ router.get('/menu', rutasController.getMenus);
 // Obtener el menu de un rol
 router.get('/menu/:rol', rutasController.getMenuByRol);
 
-router.patch('/menu/:id', rutasController.updateMenu);
+router.put('/menu/:id', rutasController.updateMenu);
 
 router.patch('/menu/reorder', rutasController.reorderMenu);
 

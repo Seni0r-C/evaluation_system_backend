@@ -160,8 +160,23 @@ exports.removeRoleFromRuta = async (req, res) => {
 
 exports.createMenu = async (req, res) => {
     try {
-        const { nombre, ruta_id, padre_id, orden, todos, icon } = req.body;
-        const [nuevoMenu] = await db.query("INSERT INTO sistema_menu (nombre, ruta_id, padre_id, orden, todos, icon) VALUES (?, ?, ?, ?, ?, ?)", [nombre, ruta_id, padre_id, orden, todos, icon]);
+        const { nombre, ruta_id, padre_id, todos, icon } = req.body;
+
+        let nuevoOrden;
+
+        if (padre_id) {
+            // Si tiene un padre, obtenemos el último orden para ese padre
+            const [ultimoOrden] = await db.query("SELECT MAX(orden) AS ultimoOrden FROM sistema_menu WHERE padre_id = ?", [padre_id]);
+            nuevoOrden = ultimoOrden ? ultimoOrden[0].ultimoOrden + 1 : 1; // Si no existe ningún menú con ese padre, lo asignamos como 1
+        } else {
+            // Si no tiene un padre, obtenemos el último orden de los menús sin padre
+            const [ultimoOrden] = await db.query("SELECT MAX(orden) AS ultimoOrden FROM sistema_menu WHERE padre_id IS NULL");
+            nuevoOrden = ultimoOrden ? ultimoOrden[0].ultimoOrden + 1 : 1; // Si no existen menús sin padre, lo asignamos como 1
+        }
+
+        // Insertamos el nuevo menú con el orden calculado
+        const [nuevoMenu] = await db.query("INSERT INTO sistema_menu (nombre, ruta_id, padre_id, orden, todos, icon) VALUES (?, ?, ?, ?, ?, ?)", [nombre, ruta_id, padre_id, nuevoOrden, todos, icon]);
+
         if (nuevoMenu.affectedRows === 0) {
             return res.status(500).json({ error: 'Error al crear el menú' });
         } else {
