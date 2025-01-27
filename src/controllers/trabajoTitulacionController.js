@@ -214,18 +214,18 @@ exports.obtenerEstados = async (req, res) => {
 // Actualizar un trabajo de titulación
 exports.actualizarTrabajo = async (req, res) => {
     const { id } = req.params;
-    const { titulo, estado, fecha_defensa, link_archivo } = req.body;
+    const { link_final } = req.body;
     try {
         const [result] = await db.execute(`
             UPDATE trabajo_titulacion 
-            SET titulo = ?, estado = ?, fecha_defensa = ?, link_archivo = ?
+            SET link_final = ?, estado_id = 2
             WHERE id = ?`,
-            [titulo, estado, fecha_defensa || null, link_archivo, id]
+            [link_final, id]
         );
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Trabajo no encontrado' });
         }
-        res.json({ id, titulo });
+        res.json({ id, link_final });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

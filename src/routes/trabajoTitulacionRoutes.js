@@ -7,7 +7,7 @@ router.post('/crear', trabajoController.crearTrabajo);
 router.get('/listar', trabajoController.listarTrabajos);
 router.get('/obtener/:id', trabajoController.obtenerTrabajo);
 router.get('/estados', trabajoController.obtenerEstados);
-router.put('/actualizar/:id', trabajoController.actualizarTrabajo);
+router.patch('/actualizar/:id', trabajoController.actualizarTrabajo);
 router.delete('/eliminar/:id', trabajoController.eliminarTrabajo);
 
 // Gestión de estudiantes en trabajos de titulación
