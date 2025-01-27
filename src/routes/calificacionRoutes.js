@@ -23,7 +23,7 @@ router.put('/rubrica-criterio/:id', controller.updateRubricaCriterio);
 router.delete('/rubrica-criterio/:id', controller.deleteRubricaCriterio);
 
 // Rutas para rubrica_evaluación
-router.post('/rubrica-evaluacion', controller.createRubricaEvaluacion);
+router.post('/rubrica-evaluacion', controller.createRubricaEvaluaciones);
 router.get('/rubrica-evaluacion', controller.getRubricaEvaluaciones);
 router.get('/rubrica-evaluacion/:id', controller.getRubricaEvaluacionById);
 router.put('/rubrica-evaluacion/:id', controller.updateRubricaEvaluacion)

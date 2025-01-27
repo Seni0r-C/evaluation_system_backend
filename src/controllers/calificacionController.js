@@ -210,38 +210,44 @@ exports.deleteRubricaCriterio = async (req, res) => {
 
 
 // Rubrica Evaluacion
-exports.createRubricaEvaluacion = async (req, res) => {
-    const {
-        trabajo_id,          // Id del trabajo
-        rubrica_id,          // Id de la rúbrica
-        rubrica_criterio_id, // Id del criterio de la rúbrica
-        docente_id,          // Id del docente
-        estudiante_id,       // Id del estudiante
-        puntaje_obtenido     // Puntaje obtenido
-    } = req.body;
+exports.createRubricaEvaluaciones = async (req, res) => {
+    const { calificaciones } = req.body;
+
+    if (!Array.isArray(calificaciones) || calificaciones.length === 0) {
+        return res.status(400).json({ error: "El array de calificaciones es inválido o está vacío." });
+    }
+
+    const connection = await db.getConnection(); // Asegúrate de usar un pool de conexiones
 
     try {
-        // Consulta de inserción
-        const result = await db.query(
-            'INSERT INTO rubrica_evaluacion (trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido) VALUES (?, ?, ?, ?, ?, ?)',
-            [trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido]
+        await connection.beginTransaction();
+
+        const insertPromises = calificaciones.map(({ trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido }) => {
+            return connection.query(
+                'INSERT INTO rubrica_evaluacion (trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido) VALUES (?, ?, ?, ?, ?, ?)',
+                [trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido]
+            );
+        });
+
+        // Ejecutar todas las inserciones
+        await Promise.all(insertPromises);
+
+        const trabajo_id = calificaciones[0].trabajo_id;
+
+        // Cambiar el estado del trabajo a "DEFENDIDO" o sea 4
+        await connection.query(
+            'UPDATE trabajo_titulacion SET estado_id = 4 WHERE id = ?',
+            [trabajo_id]
         );
 
-        console.log('Rubrica Evaluacion creada:', result);
+        await connection.commit();
 
-        // Responder con la nueva entrada
-        res.status(201).json({
-            id: result[0].insertId,
-            trabajo_id,
-            rubrica_id,
-            rubrica_criterio_id,
-            docente_id,
-            estudiante_id,
-            puntaje_obtenido
-        });
+        res.status(201).json({ message: "Calificaciones guardadas exitosamente." });
     } catch (error) {
-        // En caso de error, responder con el mensaje
-        res.status(500).json({ error: error.message });
+        await connection.rollback();
+        res.status(500).json({ error: "Error al guardar las calificaciones: " + error.message });
+    } finally {
+        connection.release();
     }
 };
 
