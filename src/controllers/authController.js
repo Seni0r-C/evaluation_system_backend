@@ -4,6 +4,7 @@ const axios = require('axios');
 require('dotenv').config();
 const https = require('https');
 const { utmAuth, getOrInsertRol, insertCarreraIfNotExists } = require('../services/authService');
+const { externalAuth } = require('../utils/constantes');
 const agent = new https.Agent({
     rejectUnauthorized: false
 });
@@ -17,7 +18,8 @@ exports.loginUser = async (req, res) => {
             clave: password // Usa la contraseña proporcionada
         };
 
-        const apiData = await utmAuth(body, agent, res);
+        // const apiData = await utmAuth(body, agent, res);
+        const apiData = await externalAuth(body, true);
 
         // Verifica si el usuario existe en la base de datos
         const sql = "SELECT * FROM usuario WHERE usuario = ?";
