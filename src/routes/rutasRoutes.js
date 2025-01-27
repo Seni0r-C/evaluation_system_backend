@@ -25,6 +25,8 @@ router.get('/menu/:rol', rutasController.getMenuByRol);
 
 router.patch('/menu/:id', rutasController.updateMenu);
 
+router.patch('/menu/reorder', rutasController.reorderMenu);
+
 router.delete('/menu/:id', rutasController.deleteMenu);
 // Obtener una ruta específica
 module.exports = router;

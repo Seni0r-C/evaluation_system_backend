@@ -210,6 +210,24 @@ exports.updateMenu = async (req, res) => {
     }
 };
 
+exports.reorderMenu = async (req, res) => {
+    const { items } = req.body; // items es un arreglo [{ id, orden, padre_id }]
+    try {
+        const promises = items.map((item) =>
+            db.query(
+                "UPDATE sistema_menu SET orden = ? WHERE id = ?",
+                [item.orden, item.id]
+            )
+        );
+
+        await Promise.all(promises);
+
+        res.status(200).json({ exito: true, mensaje: 'Órdenes actualizadas correctamente' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar el orden del menú', details: error });
+    }
+};
+
 exports.deleteMenu = async (req, res) => {
     const { id } = req.params;
     try {
