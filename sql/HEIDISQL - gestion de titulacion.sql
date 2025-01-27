@@ -103,32 +103,32 @@ CREATE TABLE IF NOT EXISTS `rubrica_evaluacion` (
   CONSTRAINT `FK_rubrica_criterio_id` FOREIGN KEY (`rubrica_criterio_id`) REFERENCES `rubrica_criterio` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_rubrica_id` FOREIGN KEY (`rubrica_id`) REFERENCES `rubrica` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_trabajo_evaluacion_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.rubrica_evaluacion: ~22 rows (aproximadamente)
 INSERT INTO `rubrica_evaluacion` (`id`, `trabajo_id`, `rubrica_id`, `rubrica_criterio_id`, `docente_id`, `estudiante_id`, `puntaje_obtenido`) VALUES
-	(64, 10, 1, 1, 27, 3, 23.00),
-	(65, 10, 1, 2, 27, 3, 10.00),
-	(66, 10, 1, 5, 27, 3, 10.00),
-	(67, 10, 1, 6, 27, 3, 10.00),
-	(68, 10, 1, 7, 27, 3, 8.00),
-	(69, 10, 1, 8, 27, 3, 20.00),
-	(70, 10, 2, 9, 27, 3, 23.00),
-	(71, 10, 2, 10, 27, 3, 20.00),
-	(72, 10, 2, 11, 27, 3, 8.00),
-	(73, 10, 2, 12, 27, 3, 10.00),
-	(74, 10, 2, 13, 27, 3, 3.00),
-	(75, 10, 2, 9, 27, 4, 30.00),
-	(76, 10, 2, 10, 27, 4, 20.00),
-	(77, 10, 2, 11, 27, 4, 10.00),
-	(78, 10, 2, 12, 27, 4, 10.00),
-	(79, 10, 2, 13, 27, 4, 11.00),
-	(80, 10, 1, 1, 27, 4, 12.00),
-	(81, 10, 1, 2, 27, 4, 2.00),
-	(82, 10, 1, 5, 27, 4, 10.00),
-	(83, 10, 1, 6, 27, 4, 2.00),
-	(84, 10, 1, 7, 27, 4, 10.00),
-	(85, 10, 1, 8, 27, 4, 7.00);
+	(1, 10, 2, 9, 27, 3, 30.00),
+	(2, 10, 2, 10, 27, 3, 20.00),
+	(3, 10, 2, 11, 27, 3, 10.00),
+	(4, 10, 2, 12, 27, 3, 10.00),
+	(5, 10, 2, 13, 27, 3, 30.00),
+	(6, 10, 1, 1, 27, 3, 37.00),
+	(7, 10, 1, 2, 27, 3, 10.00),
+	(8, 10, 1, 5, 27, 3, 10.00),
+	(9, 10, 1, 6, 27, 3, 10.00),
+	(10, 10, 1, 7, 27, 3, 10.00),
+	(11, 10, 1, 8, 27, 3, 20.00),
+	(12, 10, 2, 9, 27, 4, 30.00),
+	(13, 10, 2, 10, 27, 4, 20.00),
+	(14, 10, 2, 11, 27, 4, 10.00),
+	(15, 10, 2, 12, 27, 4, 10.00),
+	(16, 10, 2, 13, 27, 4, 30.00),
+	(17, 10, 1, 1, 27, 4, 40.00),
+	(18, 10, 1, 2, 27, 4, 10.00),
+	(19, 10, 1, 5, 27, 4, 10.00),
+	(20, 10, 1, 6, 27, 4, 10.00),
+	(21, 10, 1, 7, 27, 4, 10.00),
+	(22, 10, 1, 8, 27, 4, 20.00);
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_carrera
 CREATE TABLE IF NOT EXISTS `sistema_carrera` (
@@ -166,7 +166,7 @@ INSERT INTO `sistema_menu` (`id`, `nombre`, `ruta_id`, `padre_id`, `orden`, `tod
 	(3, 'Modalidades de Titulación', 3, 2, 2, 0, NULL),
 	(5, 'Items de rúbrica', 5, 2, 3, 0, NULL),
 	(6, 'Registro Anteproyecto', 6, NULL, 3, 0, 'subir'),
-	(7, 'Registro Trabajo Final', 7, NULL, 4, 0, 'subir'),
+	(7, 'Registro Trabajo Final', 22, NULL, 4, 0, 'subir'),
 	(8, 'Asignación Tribunal', 8, NULL, 5, 0, 'asignar'),
 	(9, 'Calificación Trabajos', 9, NULL, 6, 0, 'calificar'),
 	(10, 'Documento calificación', 10, NULL, 7, 0, 'reporte'),
@@ -250,9 +250,9 @@ CREATE TABLE IF NOT EXISTS `sistema_ruta` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ruta` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_ruta: ~15 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_ruta: ~16 rows (aproximadamente)
 INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
 	(1, '/'),
 	(3, '/modalidades'),
@@ -268,7 +268,8 @@ INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
 	(14, '/profile'),
 	(15, '/carreras'),
 	(19, '/rutas'),
-	(21, '/menu');
+	(21, '/menu'),
+	(22, '/registro-trabajo-final');
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_tipo_evaluacion
 CREATE TABLE IF NOT EXISTS `sistema_tipo_evaluacion` (
@@ -367,8 +368,8 @@ CREATE TABLE IF NOT EXISTS `trabajo_titulacion` (
 
 -- Volcando datos para la tabla gestion_titulacion.trabajo_titulacion: ~6 rows (aproximadamente)
 INSERT INTO `trabajo_titulacion` (`id`, `carrera_id`, `modalidad_id`, `tutor_id`, `cotutor_id`, `estado_id`, `fecha_defensa`, `titulo`, `link_anteproyecto`, `link_final`) VALUES
-	(10, 4, 3, 2, NULL, 3, '2025-01-06 00:00:00', 'JIJIJA', ':)))', ''),
-	(11, 4, 3, 2, NULL, 1, NULL, 'JIIJA', 'sdfghsdfgjsdfg', ''),
+	(10, 4, 3, 2, NULL, 4, '2025-01-06 00:00:00', 'JIJIJA', ':)))', ''),
+	(11, 4, 3, 2, NULL, 3, '2025-01-27 04:01:00', 'JIIJA', 'sdfghsdfgjsdfg', 'google.com'),
 	(12, 4, 3, 14, 21, 1, NULL, 'dasdsa', 'asdasdasd', ''),
 	(13, 4, 3, 21, 14, 1, NULL, 'JIJIJA GAMING', 'sdasdas', ''),
 	(18, 4, 3, 21, 21, 1, NULL, 'dasd', 'asdsad', ''),
@@ -384,16 +385,19 @@ CREATE TABLE IF NOT EXISTS `trabajo_tribunal` (
   KEY `FK_docente_tribunal_id` (`docente_id`),
   CONSTRAINT `FK_docente_tribunal_id` FOREIGN KEY (`docente_id`) REFERENCES `usuario` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_trabajo_tribunal_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.trabajo_tribunal: ~6 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.trabajo_tribunal: ~9 rows (aproximadamente)
 INSERT INTO `trabajo_tribunal` (`id`, `trabajo_id`, `docente_id`) VALUES
 	(1, 10, 21),
 	(2, 10, 14),
 	(3, 10, 8),
 	(4, 19, 21),
 	(5, 19, 8),
-	(6, 19, 43);
+	(6, 19, 43),
+	(7, 11, 8),
+	(8, 11, 21),
+	(9, 11, 14);
 
 -- Volcando estructura para tabla gestion_titulacion.usuario
 CREATE TABLE IF NOT EXISTS `usuario` (
