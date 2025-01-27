@@ -198,18 +198,17 @@ exports.getMenus = async (req, res) => {
 
 exports.updateMenu = async (req, res) => {
     const { id } = req.params;
-    const { nombre, ruta_id, padre_id, orden, todos, icon } = req.body;
+    const { nombre, ruta_id, padre_id, todos, icon } = req.body;
     try {
         const [sql] = await db.query("SELECT * FROM sistema_menu WHERE id = ?", [id]);
         if (sql.length === 0) {
             return res.status(404).json({ error: 'Menú no encontrada' });
         }
 
-        const [resultado] = await db.query("UPDATE sistema_menu SET nombre = ?, ruta_id = ?, padre_id = ?, orden = ?, todos = ?, icon = ? WHERE id = ?", [
+        const [resultado] = await db.query("UPDATE sistema_menu SET nombre = ?, ruta_id = ?, padre_id = ?,  todos = ?, icon = ? WHERE id = ?", [
             nombre,
             ruta_id,
             padre_id,
-            orden,
             todos,
             icon,
             id
