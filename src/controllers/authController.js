@@ -19,7 +19,7 @@ exports.loginUser = async (req, res) => {
         };
 
         // const apiData = await utmAuth(body, agent, res);
-        const apiData = await externalAuth(body, true);
+        const apiData = await externalAuth(body, false);
 
         // Verifica si el usuario existe en la base de datos
         const sql = "SELECT * FROM usuario WHERE usuario = ?";

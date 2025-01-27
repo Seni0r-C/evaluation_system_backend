@@ -1,6 +1,8 @@
 const { utmAuth } = require("../services/authService");
+const https = require('https');
 
 // Simulamos un conjunto de usuarios con sus contraseñas
+//LA VERDAD NOS E SI ESTO FUNCIONE CORRECTAMENTE  :) pero es loq ue esatba antes xd
 const usuariosSimulados = {
     'vicedecano': {
         nombres: 'KATTY GARCIA BARREIRO VERA',
@@ -67,7 +69,24 @@ const usuariosSimulados = {
         datos_estudio: JSON.stringify([
             { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
         ])
+    },
+    'admin': {
+        nombres: 'VERGAS ANTONIO RESABALA CHICUNGUNYIA',
+        tipo_usuario: 'ADMINISTRACIÓN',
+        idpersonal: 15390,
+        datos_estudio: JSON.stringify([
+            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+        ])
+    },
+    'manicho': {
+        nombres: 'MANITA RESABALA DE CHARCA VIEJA',
+        tipo_usuario: 'ADMINISTRACIÓN',
+        idpersonal: 15620,
+        datos_estudio: JSON.stringify([
+            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+        ])
     }
+
     // Otros usuarios pueden ser añadidos aquí para la simulación
 };
 
@@ -86,9 +105,13 @@ const truchaAuth = async ({ usuario, clave }) => {
     }
 };
 
+const agent = new https.Agent({
+    rejectUnauthorized: false
+});
+
 exports.externalAuth = async function (body, truchaMode = false) {
     if (truchaMode) {
         return await truchaAuth(body);
     }
-    return await utmAuth(body);
+    return await utmAuth(body, agent);
 }
