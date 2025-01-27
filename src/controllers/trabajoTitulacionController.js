@@ -278,7 +278,7 @@ exports.desasociarEstudiante = async (req, res) => {
 
 // Asignar Tribunal (Verifica si ya existen docentes asignados)
 exports.asignarTribunal = async (req, res) => {
-    const { trabajo_id, docente_ids, fecha_defensa, estado_id } = req.body;
+    const { trabajo_id, docente_ids, fecha_defensa } = req.body;
 
     try {
         if (!trabajo_id) {
@@ -286,14 +286,6 @@ exports.asignarTribunal = async (req, res) => {
                 typeMsg: 'error',
                 message: 'Error en el servidor al asignar tribunal.',
                 error: 'El trabajo_id es obligatorio.'
-            });
-        }
-
-        if (!estado_id) {
-            return res.status(400).json({
-                typeMsg: 'error',
-                message: 'Error en el servidor al asignar tribunal.',
-                error: 'El estado_id es obligatorio.'
             });
         }
 
@@ -335,7 +327,7 @@ exports.asignarTribunal = async (req, res) => {
              SET fecha_defensa = ?,
              estado_id = ?
              WHERE id = ?`,
-            [fecha_defensa, estado_id, trabajo_id]
+            [fecha_defensa, 3, trabajo_id]
         );
 
         // Si no hay docentes previos, proceder con la asignación
@@ -353,7 +345,7 @@ exports.asignarTribunal = async (req, res) => {
 
 // Reasignar Tribunal (Inserta solo docentes no asignados previamente)
 exports.reasignarTribunal = async (req, res) => {
-    const { trabajo_id, docente_ids, fecha_defensa, estado_id } = req.body;
+    const { trabajo_id, docente_ids, fecha_defensa } = req.body;
 
     try {
         if (!trabajo_id) {
@@ -361,14 +353,6 @@ exports.reasignarTribunal = async (req, res) => {
                 typeMsg: 'error',
                 message: 'Error al reasignar tribunal.',
                 error: 'El trabajo_id es obligatorio.'
-            });
-        }
-
-        if (!estado_id) {
-            return res.status(400).json({
-                typeMsg: 'error',
-                message: 'Error al reasignar tribunal.',
-                error: 'El estado_id es obligatorio.'
             });
         }
 
@@ -390,10 +374,9 @@ exports.reasignarTribunal = async (req, res) => {
         // Actualizar la fecha de defensa en la tabla trabajo_titulacion
         await db.execute(
             `UPDATE trabajo_titulacion 
-             SET fecha_defensa = ?,
-             estado_id = ?
+             SET fecha_defensa = ?
              WHERE id = ?`,
-            [fecha_defensa, estado_id, trabajo_id]
+            [fecha_defensa, trabajo_id]
         );
 
         // Obtener los docentes actualmente asignados al trabajo
