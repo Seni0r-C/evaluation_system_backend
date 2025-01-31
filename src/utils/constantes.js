@@ -79,7 +79,7 @@ const usuariosSimulados = {
         ])
     },
     'manicho': {
-        nombres: 'MANITA RESABALA DE CHARCA VIEJA',
+        nombres: 'MANITA RESABALA DECHAR CALABASA',
         tipo_usuario: 'ADMINISTRACIÓN',
         idpersonal: 15620,
         datos_estudio: JSON.stringify([

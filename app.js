@@ -23,6 +23,7 @@ const calificacionRoutes = require('./src/routes/calificacionRoutes');
 const usuariosRoutes = require('./src/routes/usuariosRoutes');
 const rutasRoutes = require('./src/routes/rutasRoutes');
 const rolesRoutes = require('./src/routes/rolesRoutes');
+const actaRoutes = require('./src/routes/actaRoutes');
 
 app.use('/auth', authRoutes);
 app.use('/carrera', carrerasRoutes);
@@ -32,6 +33,7 @@ app.use('/calificacion', calificacionRoutes);
 app.use('/usuarios', usuariosRoutes);
 app.use('/rutas', rutasRoutes);
 app.use('/roles', rolesRoutes);
+app.use('/acta', actaRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
