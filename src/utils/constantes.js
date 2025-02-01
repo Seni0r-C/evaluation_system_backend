@@ -116,22 +116,3 @@ exports.externalAuth = async function (body, truchaMode = false) {
     }
     return await utmAuth(body, agent);
 }
-
-function getWorkDirPath() {
-    return __dirname.split(path.sep).slice(0, -2).join(path.sep);
-}
-
-const WORK_DIR = getWorkDirPath();
-const FILE_DIR = path.join(WORK_DIR, 'doc');
-
-
-exports.buildStaticPath = function (aditionalPath) {
-    const filePath = path.join(WORK_DIR, aditionalPath);
-    return filePath;   
-}
-
-exports.buildDocPath = function (nameFile) {
-    const filePath = path.join(FILE_DIR, nameFile);
-    return filePath;   
-}
-

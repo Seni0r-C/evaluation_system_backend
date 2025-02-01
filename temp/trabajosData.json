@@ -1,0 +1,50 @@
+[
+    {
+        "id": 1,
+        "tituloActa": "ACTA DE DEFENSA DEL TRABAJO DE TITULACIÓN",
+        "numeroActa": "013–2024",
+        "lugar": "el aula 102",
+        "ciudad": "Portoviejo",
+        "fechaHora": "a los seis días del mes de agosto del año dos mil veinticuatro, a las ocho horas",
+        "facultad": "Facultad de Ciencias Informáticas",
+        "vicedecano": "Ing. Loor Zamora Patricio, Mg.",
+        "delgadoConsejoDirectivo": "Ing. Ordoñez Ávila Ricardo, Mg.",
+        "docenteDeArea": "Ing. Vera Pico Leopoldo, Mg.",
+        "delegadoComisionCientifica": "Ing. Macías Arias Enrique, Mg.",
+        "tutorTrabajoTitulacion": "Ing. Quimiz Moreira Mauricio, Mg.",
+        "secretarioAsesorJuridico": "Abg. Macías Cano David",
+        "temaTrabajoTitulacion": null,
+        "modalidadTrabajoTitulacion": "Examen Complexivo",
+        "estudiantes": [
+            3
+        ],
+        "tituloTrabajoTitulacion": "INGENIERO(A) EN SISTEMAS DE INFORMACIÓN",
+        "carrera": "SISTEMAS DE INFORMACIÓN",
+        "modalidadEstudioCarrera": "PRESENCIAL",
+        "nivelTituloCarrera": "TERCER NIVEL"
+    },
+    {
+        "id": 2,
+        "tituloActa": "ACTA DE DEFENSA DEL TRABAJO DE TITULACIÓN",
+        "numeroActa": "048–2024",
+        "ciudad": "Portoviejo",
+        "fechaHora": "a los seis días del mes de agosto del año dos mil veinticuatro, a las ocho horas",
+        "facultad": "Facultad de Ciencias Informáticas",
+        "vicedecano": "Ing. Loor Zamora Patricio, Mg.",
+        "delgadoConsejoDirectivo": "Ing. Ordoñez Ávila Ricardo, Mg.",
+        "docenteDeArea": "Ing. Vera Pico Leopoldo, Mg.",
+        "delegadoComisionCientifica": "Ing. Macías Arias Enrique, Mg.",
+        "tutorTrabajoTitulacion": "Ing. Quimiz Moreira Mauricio, Mg.",
+        "secretarioAsesorJuridico": "Abg. Macías Cano David",
+        "temaTrabajoTitulacion": "“IMPLEMENTACIÓN DE UN CENTRO DE OPERACIONES DE CIBERSEGURIDAD SOC PARA LA DETECCIÓN Y ANÁLISIS DE INCIDENCIAS DEL ISP PORTONET”",
+        "modalidadTrabajoTitulacion": "Propuesta Tecnológica",
+        "estudiantes": [
+            1,
+            2
+        ],
+        "tituloTrabajoTitulacion": "INGENIERO(A) EN SISTEMAS DE INFORMACIÓN",
+        "carrera": "SISTEMAS DE INFORMACIÓN",
+        "modalidadEstudioCarrera": "PRESENCIAL",
+        "nivelTituloCarrera": "TERCER NIVEL"
+    }
+]

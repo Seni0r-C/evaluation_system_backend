@@ -1,0 +1,84 @@
+[
+    {
+        "id": 3,
+        "nombres": "ALDAIR JADYIK JESUS VENEZUELA",
+        "cedula": "13456778899",
+        "lugar": "el aula 102",
+        "notas": [
+            {
+                "componentes": {
+                    "nombre": "COMPONENTES EXAMEN PRÁCTICO:",
+                    "listado": [
+                        {
+                            "nombre": "INFORME FINAL (A)",
+                            "valor": 15,
+                            "base": 40
+                        },
+                        {
+                            "nombre": "DEFENZA (B)",
+                            "valor": 15,
+                            "base": 20
+                        }
+                    ]
+                },
+                "nombre": "EXAMEN PRÁCTICO (A+B)",
+                "valor": 30,
+                "base": 60
+            },
+            {
+                "nombre": "EXAMEN TEÓRICO",
+                "valor": 16,
+                "base": 40
+            }
+        ],
+        "promedioTotal": {
+            "nombre": "PROMEDIO TOTAL",
+            "valor": 46,
+            "base": 100
+        }
+    },
+    {
+        "id": 1,
+        "nombres": "CASANOVA SABANDO JOSE ANTONIO",
+        "cedula": "1312861295",
+        "notas": [
+            {
+                "nombre": "TRABAJO ESCRITO",
+                "valor": 100,
+                "base": 100
+            },
+            {
+                "nombre": "SUSTENTACIÓN",
+                "valor": 100,
+                "base": 100
+            }
+        ],
+        "promedioTotal": {
+            "nombre": "PROMEDIO TOTAL",
+            "valor": 100,
+            "base": 100
+        }
+    },
+    {
+        "id": 2,
+        "nombres": "MORA REYNA GINGER ALEXANDRA",
+        "cedula": "1315041127",
+        "notas": [
+            {
+                "nombre": "TRABAJO ESCRITO",
+                "valor": 100,
+                "base": 100
+            },
+            {
+                "nombre": "SUSTENTACIÓN",
+                "valor": 100,
+                "base": 100
+            }
+        ],
+        "promedioTotal": {
+            "nombre": "PROMEDIO TOTAL",
+            "valor": 100,
+            "base": 100
+        }
+    }
+]

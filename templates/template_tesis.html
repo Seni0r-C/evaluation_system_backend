@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{tituloDocumentoActa}}</title>
+    <style>
+        :root {
+            --font-size-titles: 14px;
+            --font-size-paragraph: 14px;
+            --font-student-signature: 12px;
+            --font-secretary-signature: 10px;
+            --signature-student-title-font-size: 12px;
+            --siganture-student-title-font-weight-normal: 200;
+            --signature-font-weight: bold;
+            --font-size-notas: 14px;
+            --signature-student-margin-top: 30px;
+            --signature-margin-top: 40px;
+            --font-weight-bold: 600;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, "Times New Roman", Times, serif;
+            background-image: url("../templates/assets/background_acta.png");
+            background-size: contain;
+            margin: 50px;
+        }
+
+        * {
+            font-weight: normal;
+        }
+
+        h1 {
+            text-align: center;
+            text-decoration: underline;
+        }
+
+        p {
+            text-align: justify;
+            line-height: 1.5;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 50px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .page {
+            page-break-inside: avoid;
+            margin-top: 210px;
+            padding-left: 80px;
+            padding-right: 80px;
+        }
+    </style>
+    <style>
+        .acta-body {}
+
+        .acta-tema-trabajo-titulacion {
+            font-weight: bold;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .acta-header-title {
+            text-align: center;
+            /* font-size: small; */
+        }
+
+        .acta-p {
+            /* font-size: medium; */
+            font-size: var(--font-size-paragraph);
+        }
+
+        .acta-titulo {
+            /* font-weight: bold; */
+            font-weight: 600;
+            font-size: var(--font-size-titles);
+            display: block;
+        }
+
+        .acta-id {
+            text-align: right;
+            margin-bottom: 20px;
+            font-size: var(--font-size-titles);
+        }
+
+        /* APARTADO DE NOTAS */
+        .acta-notas {
+            font-family: Arial, sans-serif;
+            font-size: var(--font-size-notas);
+            line-height: 1.5;
+            margin: 20px;
+            page-break-after: always;
+        }
+
+        .nextline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .estudiante-nombre {
+            font-weight: bold;
+        }
+
+        .estudiante-cedula {
+            margin-left: 20px;
+            font-weight: normal;
+        }
+
+        .estudiante-nota,
+        .estudiante-nota-componente {
+            font-weight: normal;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .estudiante-notas {
+            margin-top: 20px;
+        }
+
+
+        .estudiante-nota-valor {
+            font-weight: normal;
+            margin-left: 20px;
+        }
+
+        .estudiante-nota-componente {
+            margin-left: 50px;
+        }
+
+        .dots {
+            flex-grow: 1;
+            border-bottom: 2px dotted #000;
+            margin: 0 10px;
+            height: 1px;
+        }
+
+        .dasheds {
+            flex-grow: 1;
+            border-bottom: 2px dashed #000;
+            margin: 0 10px;
+            height: 1px;
+        }
+    </style>
+
+    <style>
+        .acta-p {
+            text-align: center;
+        }
+
+        .acta-signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+
+        }
+
+        .acta-signature {
+            text-align: center;
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .acta-gap {
+            margin-left: 25px;
+            margin-right: 25px;
+        }
+
+        .acta-signature span {
+            display: block;
+            font-weight: var(--signature-font-weight);
+        }
+
+        .acta-signature-estudiantes {
+            display: block;
+            text-align: left;
+            font-size: var(--font-size-paragraph);
+            margin: 10px 0;
+        }
+
+        .acta-signature-estudiantes span {
+            margin-right: 30px;
+        }
+
+        .acta-signature-section span,
+        .acta-signature-section-estudiantes span {
+            margin-top: var(--signature-margin-top);
+            /* font-weight: bold; */
+        }
+
+        .acta-signature-section-estudiantes {
+            margin-bottom: 40px;
+        }
+
+        .secretaria-nombre {
+            font-size: var(--font-secretary-signature);
+            font-style: italic;
+            text-align: right;
+            display: block;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .title-signature-students {
+            display: block;
+            text-align: left !important;
+            text-decoration: underline;
+            font-weight: var(--signature-student-title-font-weight-normal);
+            font-size: var(--signature-student-title-font-size);
+            margin-top: var(--signature-student-margin-top);
+        }
+
+        .label-signature-student {
+            text-align: left;
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-student-signature);
+            margin-top: var(--signature-student-margin-top);
+        }
+
+        .label-signature-student::after {
+            display: block;
+            text-align: right;
+            content: "_________________________";
+            margin-top: -14px;
+            margin-right: 50px;
+            font-size: var(--font-student-signature);
+            color: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="acta-body">
+        <div class="page">
+            <div class="acta-id">
+                <span>ACTA No. {{numeroActa}}</span>
+            </div>
+            <div class="acta-header-title">
+                <span class="acta-titulo" style="margin-bottom: 10px;">ACTA DE SUSTENTACIÓN PARA OBTENER EL TÍTULO
+                    DE</span>
+                <span class="acta-titulo">{{tituloTrabajoTitulacion}}</span>
+            </div>
+            <div class="acta-p">
+                <p>
+                    En la ciudad de {{ciudad}}, {{fechaHora}}, en {{lugar}} de la
+                    {{facultad}} de la Universidad Técnica de Manabí, se instala el {{tribunalTipo}} designado por el H.
+                    Consejo Directivo, con la presencia del {{vicedecano}}
+                    delegado por la Decana de la {{facultad}}, quien preside {{delgadoConsejoDirectivo}}, delegado del
+                    H.
+                    Consejo
+                    Directivo, {{docenteDeArea}} Docente de área, {{delegadoComisionCientifica}}, delegado de la
+                    Comisión de
+                    Investigación Científica, {{tutorTrabajoTitulacion}} Tutor del Trabajo de Titulación y
+                    {{secretarioAsesorJuridico}},
+                    Secretario Asesor Jurídico (E), con el objeto de receptar la defensa del trabajo de titulación <span
+                        class="acta-tema-trabajo-titulacion">{{temaTrabajoTitulacion}}</span>, bajo la modalidad de
+                    {{modalidadTrabajoTitulacion}}, elaborada por {{preEstudiantes}} {{estudiantes}} previo a la
+                    obtención
+                    del título de {{tituloTrabajoTitulacion}}, en la carrera {{carrera}} en la modalidad de estudios
+                    {{modalidadEstudioCarrera}} de {{nivelTituloCarrera}}.
+                </p>
+                <p>
+                    Instalado el Tribunal, se solicita a {{preEstudiantes}} antes mencionado{{pluralDo}}
+                    exponga{{pluralA}}
+                    su trabajo y luego responda{{pluralA}} a las preguntas que han preparado para el efecto los señores
+                    Miembros del Tribunal.
+                </p>
+                <p>
+                    Luego de haberse formulado y respondido las preguntas reglamentarias, los señores Miembros del
+                    Tribunal
+                    proceden a inscribir la siguiente calificación promedio obtenida por:
+                </p>
+            </div>
+            <div class="acta-notas">
+                {{notasEstudiantes}}
+            </div>
+        </div>
+        <div class="page">
+            <div class="acta-p">
+                <p>
+                    Notas que habilita a los mencionados estudiantes para recibir el título de
+                    <b>{{tituloTrabajoTitulacion}}</b>, de acuerdo a lo que dispone el Reglamento General de Graduación
+                    de
+                    la
+                    Universidad Técnica de Manabí, de la Facultad y de la Carrera.
+                </p>
+                <p>
+                    El Tribunal examinador declara aprobada la defensa y procede a suscribir la presente acta, firmando
+                    para
+                    constancia y en unidad de acto, el Sr. Presidente, los miembros del Tribunal, el tutor, el
+                    estudiante y
+                    el
+                    Secretario Asesor Jurídico, que certifica.
+                </p>
+            </div>
+            <div class="acta-p">
+                <div class="acta-signature-section">
+                    <div class="acta-signature">
+                        <span>{{vicedecano}}</span>
+                        DELEGADO/PRESIDENTE
+                    </div>
+                    <span class="acta-gap"></span>
+                    <div class="acta-signature">
+                        <span>{{delgadoConsejoDirectivo}}</span>
+                        DELEGADO H. CONSEJO DIRECTIVO
+                    </div>
+                </div>
+                <div class="acta-signature-section">
+                    <div class="acta-signature">
+                        <span>{{docenteDeArea}}</span>
+                        DOCENTE DEL ÁREA
+                    </div>
+                    <span class="acta-gap"></span>
+                    <div class="acta-signature">
+                        <span>{{delegadoComisionCientifica}}</span>
+                        DELEGADO COM. INVESTIGACIÓN CIENTIFÍCA
+                    </div>
+                </div>
+                <div class="acta-signature-section">
+                    <div class="acta-signature">
+                        <span>{{tutorTrabajoTitulacion}}</span>
+                        TUTOR DEL TRABAJO DE TITULACIÓN
+                    </div>
+                </div>
+                <div class="acta-signature-section-estudiantes">
+                    <span class="title-signature-students">ESTUDIANTE:</span>
+                    {{actaSignatureEstudiantes}}
+                </div>
+                <div class="acta-signature-section">
+                    <div class="acta-signature">
+                        <span>{{secretarioAsesorJuridico}}</span>
+                        SECRETARIO - ASESOR JURÍDICO (E)
+                    </div>
+                </div>
+                <p>
+                    <span class="secretaria-nombre">
+                        {{secretariaNombre}}
+                    </span>
+                </p>
+            </div>
+        </div>
+        <footer class="acta-footer">
+        </footer>
+</body>
+
+</html>
