@@ -125,9 +125,12 @@ const buildDataActaComplexivo = async (estudiantesNotasData, trabajoData) => {
 
 exports.GenerateActaService = async (trabajoId) => {
     const trabajoData = await getTrabajo(trabajoId);
-    console.debug(trabajoData)
+    // console.debug("-----------------------------trabajoData-----------------------------")
+    // console.debug(trabajoData)
     const estudiantesNotasData = await getEstudiantesNotas(trabajoData.estudiantes);
     const actaComplexivoData = await buildDataActaComplexivo(estudiantesNotasData, trabajoData);
+    // console.debug("-----------------------------actaComplexivoData-----------------------------")
+    // console.debug(actaComplexivoData)
     const dynamicData = { ...trabajoData, ...actaComplexivoData };
     
     const htmlTemplatePath = buildTemplatePath(dynamicData.nameTamplate + ".html");
