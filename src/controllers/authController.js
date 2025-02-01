@@ -16,7 +16,7 @@ exports.loginUser = async (req, res) => {
         const body = {
             usuario: usuario, // Usa el email como usuario
             clave: password // Usa la contraseña proporcionada
-        };
+        };  
 
         // const apiData = await utmAuth(body, agent, res);
         const apiData = await externalAuth(body, false);
