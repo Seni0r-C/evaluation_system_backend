@@ -280,6 +280,7 @@ exports.asignarTribunal = async (req, res) => {
              SET fecha_defensa = ?,
              estado_id = ?
              WHERE id = ?`,
+            //  3: "CON TRIBUNAL"
             [fecha_defensa, 3, trabajo_id]
         );
 
