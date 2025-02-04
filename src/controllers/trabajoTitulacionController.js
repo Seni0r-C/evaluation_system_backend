@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { formatFechaDefensa } = require('../utils/formatUtility.js')
 const { GetByIdTrabajoService } = require('../services/trabajoTitulacionService.js');
 
 // Crear un nuevo trabajo de titulación
@@ -274,15 +275,6 @@ exports.asignarTribunal = async (req, res) => {
             });
         }
 
-        // Actualizar la fecha de defensa en la tabla trabajo_titulacion
-        await db.execute(
-            `UPDATE trabajo_titulacion 
-             SET fecha_defensa = ?,
-             estado_id = ?
-             WHERE id = ?`,
-            //  3: "CON TRIBUNAL"
-            [fecha_defensa, 3, trabajo_id]
-        );
 
         // Si no hay docentes previos, proceder con la asignación
         return await module.exports.reasignarTribunal(req, res);
@@ -325,37 +317,67 @@ exports.reasignarTribunal = async (req, res) => {
             });
         }
 
-        // Actualizar la fecha de defensa en la tabla trabajo_titulacion
+        // Validar y formatear antes de la actualización
+        const formattedFechaDefensa = formatFechaDefensa(fecha_defensa);
+        console.log("---------- formattedFechaDefensa");
+        console.log(formattedFechaDefensa);
+        if (!formattedFechaDefensa) {
+            return res.json({
+                typeMsg: "error",
+                message: "El formato de la fecha proporcionada es incorrecto.",
+            });
+        }
+        if (formattedFechaDefensa) {
+            // Actualizar la fecha de defensa en la tabla trabajo_titulacion
+            await db.execute(
+                `UPDATE trabajo_titulacion 
+                         SET fecha_defensa = ?,
+                         estado_id = ?
+                         WHERE id = ?`,
+                //  3: "CON TRIBUNAL"
+                [fecha_defensa, 3, trabajo_id]
+            );
+        }
         await db.execute(
             `UPDATE trabajo_titulacion 
-             SET fecha_defensa = ?
-             WHERE id = ?`,
-            [fecha_defensa, trabajo_id]
+                     SET estado_id = ?
+                     WHERE id = ?`,
+            //  3: "CON TRIBUNAL"
+            [3, trabajo_id]
         );
-
         // Obtener los docentes actualmente asignados al trabajo
         const [existingRows] = await db.execute(
-            `SELECT docente_id FROM trabajo_tribunal WHERE trabajo_id = ?`,
+            `SELECT docente_id, tribunal_rol_id FROM trabajo_tribunal WHERE trabajo_id = ?`,
             [trabajo_id]
         );
-        const existingDocenteIds = existingRows.map(row => row.docente_id);
+        const existingDocenteIds = existingRows.map(row => ({ docente_id: row.docente_id, tribunal_rol_id: row.tribunal_rol_id }));
 
-        // Obtener los ids de la solicitud
-        const requestedDocenteIds = docente_ids.map(docente => docente.id);
+        // Obtener los ids de la solicitud junto con tribunal_rol_id
+        const requestedDocenteIds = docente_ids.map((docente, index) => ({
+            docente_id: docente?.id,
+            tribunal_rol_id: index + 2, // tribunal_rol_id comienza desde 2
+        }));
 
         // Verificar si se debe realizar un reemplazo completo
-        const idsAreDifferent = requestedDocenteIds.some(id => !existingDocenteIds.includes(id));
+        const idsAreDifferent = requestedDocenteIds.some(
+            req => !existingDocenteIds.some(
+                existing => existing.docente_id === req.docente_id && existing.tribunal_rol_id === req.tribunal_rol_id
+            )
+        );
         const sameLength = requestedDocenteIds.length === existingDocenteIds.length;
 
-        if (idsAreDifferent && sameLength) {
+        if (idsAreDifferent || !sameLength) {
             // Reemplazo completo: eliminar y volver a insertar
             await db.execute(`DELETE FROM trabajo_tribunal WHERE trabajo_id = ?`, [trabajo_id]);
 
-            const placeholders = docente_ids.map(() => '(?, ?)').join(', ');
-            const flattenedValues = docente_ids.map(docente => [trabajo_id, docente.id]).flat();
+            // Preparar los valores para la inserción
+            const placeholders = requestedDocenteIds.map(() => '(?, ?, ?)').join(', ');
+            const flattenedValues = requestedDocenteIds
+                .map(({ docente_id, tribunal_rol_id }) => [trabajo_id, docente_id, tribunal_rol_id])
+                .flat();
 
             const query = `
-                INSERT INTO trabajo_tribunal (trabajo_id, docente_id) 
+                INSERT INTO trabajo_tribunal (trabajo_id, docente_id, tribunal_rol_id) 
                 VALUES ${placeholders}`;
 
             const [result] = await db.execute(query, flattenedValues);
@@ -366,34 +388,37 @@ exports.reasignarTribunal = async (req, res) => {
                 insertedCount: result.affectedRows
             });
         }
+        else {
+            // Filtrar e insertar solo los docentes no existentes
+            const newValues = requestedDocenteIds
+                .filter(docente => docente?.docente_id && docente?.tribunal_rol_id && !existingDocenteIds.some(
+                    existing => existing.docente_id === docente.docente_id && existing.tribunal_rol_id === docente.tribunal_rol_id
+                ))
+                .map((docente) => [trabajo_id, docente.docente_id, docente.tribunal_rol_id]);
 
-        // Filtrar e insertar solo los docentes no existentes
-        const newValues = docente_ids
-            .filter(docente => docente?.id && !existingDocenteIds.includes(docente.id))
-            .map(docente => [trabajo_id, docente.id]);
+            if (newValues.length > 0) {
+                const placeholders = newValues.map(() => '(?, ?, ?)').join(', ');
+                const flattenedValues = newValues.flat();
 
-        if (newValues.length > 0) {
-            const placeholders = newValues.map(() => '(?, ?)').join(', ');
-            const flattenedValues = newValues.flat();
+                const query = `
+                    INSERT INTO trabajo_tribunal (trabajo_id, docente_id, tribunal_rol_id) 
+                    VALUES ${placeholders}`;
 
-            const query = `
-                INSERT INTO trabajo_tribunal (trabajo_id, docente_id) 
-                VALUES ${placeholders}`;
+                const [result] = await db.execute(query, flattenedValues);
 
-            const [result] = await db.execute(query, flattenedValues);
+                return res.status(200).json({
+                    typeMsg: 'success',
+                    message: 'Se han actualizado los miembros del tribunal.',
+                    insertedCount: result.affectedRows
+                });
+            }
 
+            // Ningún cambio realizado
             return res.status(200).json({
                 typeMsg: 'success',
-                message: 'Se han actualizado los miembros del tribunal.',
-                insertedCount: result.affectedRows
+                message: 'Los docentes ya estaban correctamente asignados y la fecha ha sido actualizada.'
             });
         }
-
-        // Ningún cambio realizado
-        res.status(200).json({
-            typeMsg: 'success',
-            message: 'Los docentes ya estaban correctamente asignados y la fecha ha sido actualizada.'
-        });
 
     } catch (error) {
         console.error('Error al reasignar tribunal:', error);

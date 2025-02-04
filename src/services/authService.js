@@ -25,7 +25,16 @@ exports.utmAuth = async (body, agent, res) => {
         });
 
         if (response.data.state !== 'success') {
-            return res.status(400).json({ exito: false, mensaje: 'Error en la autenticación externa. ' + response.data.error });
+            let mensajeUsuario;
+            // Analizar el estado devuelto por la API externa
+            if (response.data.error && response.data.error.includes("accesos fallidos")) {
+                mensajeUsuario = "Se detectaron varios intentos de acceso fallidos en tu cuenta. Por favor, cambia tu contraseña. Si eres estudiante, solicita un reinicio de clave en la secretaría de tu escuela.";
+            } else {
+                mensajeUsuario = "Error en la autenticación externa. Por favor, intenta nuevamente más tarde.";
+            }
+
+            // Devolver un mensaje claro al usuario
+            return res.status(400).json({ exito: false, mensaje: mensajeUsuario });
         }
 
         const apiData = response.data.value;

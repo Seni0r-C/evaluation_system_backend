@@ -66,7 +66,7 @@ const usuariosSimulados = {
     'tutora': {
         nombres: 'ANA GABRIELA YUKATAN SLOVAKY',
         tipo_usuario: 'DOCENTE',
-        idpersonal: 19360,
+        idpersonal: 22360,
         datos_estudio: JSON.stringify([
             { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
         ])
@@ -110,9 +110,9 @@ const agent = new https.Agent({
     rejectUnauthorized: false
 });
 
-exports.externalAuth = async function (body, truchaMode = false) {
+exports.externalAuth = async function (body, truchaMode = false, res) {
     if (truchaMode) {
         return await truchaAuth(body);
     }
-    return await utmAuth(body, agent);
+    return await utmAuth(body, agent, res);
 }

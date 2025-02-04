@@ -16,11 +16,10 @@ exports.loginUser = async (req, res) => {
         const body = {
             usuario: usuario, // Usa el email como usuario
             clave: password // Usa la contraseña proporcionada
-        };  
+        };
 
         // const apiData = await utmAuth(body, agent, res);
-        const apiData = await externalAuth(body, false);
-
+        const apiData = await externalAuth(body, true, res);
         // Verifica si el usuario existe en la base de datos
         const sql = "SELECT * FROM usuario WHERE usuario = ?";
         const [usuarioExiste] = await db.query(sql, [usuario]);
@@ -96,7 +95,7 @@ exports.loginUser = async (req, res) => {
         await db.query("ROLLBACK");
         res.status(500).json({
             exito: false,
-            mensaje: 'Error del servidor',
+            mensaje: 'Error del servidor al iniciar sesión',
             error: error.message
         });
     }
@@ -151,7 +150,7 @@ exports.getUserInfo = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             exito: false,
-            mensaje: 'Error del servidor',
+            mensaje: 'Error del servidor al obtener usuario',
             error: error.message
         });
     }
