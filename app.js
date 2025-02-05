@@ -1,18 +1,26 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');  // Importar morgan
-const app = express();
-require('dotenv').config();
+const {PORT, FRONT_URL} = require('./src/config/env.js');
 
+const app = express();
+
+// Swagger
+// const setupSwaggerDocs = require('./src/config/swagger.js');
+// setupSwaggerDocs(app);
+
+// const corsOptions = {
+//     origin: FRONT_URL,
+//     methods: ['GET', 'POST'],
+//     // allowedHeaders: ['Content-Type', 'Authorization']
+// };
+// app.use(cors(corsOptions));
 app.use(cors());
 app.use(express.json());
 
 // Usar morgan para registrar las solicitudes HTTP
 app.use(morgan('dev'));  // 'dev' es un formato de log predefinido
 
-// Swagger
-const setupSwaggerDocs = require('./src/config/swagger');
-setupSwaggerDocs(app);
 
 // Rutas de la API
 const authRoutes = require('./src/routes/authRoutes');
@@ -34,9 +42,8 @@ app.use('/usuarios', usuariosRoutes);
 app.use('/rutas', rutasRoutes);
 app.use('/roles', rolesRoutes);
 app.use('/acta', actaRoutes);
-
-const PORT = process.env.PORT || 3000;
+app.get('/', (req, res)=>res.json({gretting: "Hello world!"}));
 app.listen(PORT, () => {
     console.log(`Servidor en puerto ${PORT}`);
-    console.log(`http://localhost:${PORT}/api-docs`);
+    console.log(`/api-docs`);
 });
