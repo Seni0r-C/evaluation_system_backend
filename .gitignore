@@ -2,7 +2,7 @@
 node_modules/
 
 # Lock files
-package-lock.json
+# package-lock.json
 
 # Logs
 logs/
@@ -34,3 +34,7 @@ Thumbs.db
 *.njsproj
 *.sln
 localdata/
+
+# Docker
+.dockerignore
+Dockerfile
