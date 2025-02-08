@@ -22,7 +22,10 @@ exports.getActaFile = async (req, res) => {
         }
 
         // Crear un navegador Puppeteer
-        const browser = await puppeteer.launch();
+        // const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        });
         const page = await browser.newPage();
 
         // Cargar el archivo HTML temporal con la ruta local
@@ -36,12 +39,14 @@ exports.getActaFile = async (req, res) => {
         });
 
         await browser.close();
-
+        // res.setHeader('Content-Disposition', 'attachment; filename=' + fileName);
+        // res.setHeader('Content-Type', 'application/pdf');
         // Enviar el PDF generado como descarga
         res.download(tempPdfFilePath, fileName, async (err) => {
             if (err) {
                 console.error("Error enviando el PDF:", err);
-                res.status(400).json({
+                // res.status(400).json({
+                res.json({
                     typeMsg: 'error',
                     message: 'Error en el servidor al descargar acta.',
                     error: err
@@ -54,7 +59,10 @@ exports.getActaFile = async (req, res) => {
             console.log("Archivos temporales eliminados");
         });
     } catch (error) {
-        return res.status(400).json({
+        console.log('Error en el servidor al obtener acta.')
+        console.log(error)
+        // return res.status(400).json({
+        return res.json({
             typeMsg: 'error',
             message: 'Error en el servidor al obtener acta.',
             error: error

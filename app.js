@@ -9,13 +9,13 @@ const app = express();
 // const setupSwaggerDocs = require('./src/config/swagger.js');
 // setupSwaggerDocs(app);
 
-// const corsOptions = {
-//     origin: FRONT_URL,
-//     methods: ['GET', 'POST'],
-//     // allowedHeaders: ['Content-Type', 'Authorization']
-// };
-// app.use(cors(corsOptions));
-app.use(cors());
+const corsOptions = {
+    origin: FRONT_URL,
+    methods: ['GET', 'POST'],
+    // allowedHeaders: ['Content-Type', 'Authorization']
+};
+app.use(cors(corsOptions));
+// app.use(cors());
 app.use(express.json());
 
 // Usar morgan para registrar las solicitudes HTTP
