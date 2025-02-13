@@ -25,7 +25,11 @@
             font-family: Arial, "Times New Roman", Times, serif;
             background-image: url("../templates/assets/background_acta.png");
             background-size: contain;
-            margin: 50px;
+            /* margin: 50px; */
+            margin-top: 190px;
+            /* margin-bottom: 50px; */
+            margin-left: 50px;
+            margin-right: 50px;
         }
 
         * {
@@ -50,10 +54,12 @@
         }
 
         .page {
-            page-break-inside: avoid;
-            margin-top: 210px;
+            /* page-break-inside: avoid; */
+            /* margin-top: 210px; */
+            /* margin-top: 80px; */
             padding-left: 80px;
             padding-right: 80px;
+            /* padding-bottom: 80px; */
         }
     </style>
     <style>
@@ -72,6 +78,7 @@
         .acta-p {
             /* font-size: medium; */
             font-size: var(--font-size-paragraph);
+            page-break-inside: avoid;
         }
 
         .acta-titulo {
@@ -88,12 +95,19 @@
         }
 
         /* APARTADO DE NOTAS */
+        
         .acta-notas {
             font-family: Arial, sans-serif;
             font-size: var(--font-size-notas);
             line-height: 1.5;
             margin: 20px;
-            page-break-after: always;
+            /* page-break-after: auto; */
+        }
+
+        .acta-notas-section {
+            page-break-inside: avoid;
+            page-break-before: auto;
+            page-break-after: auto;
         }
 
         .nextline {

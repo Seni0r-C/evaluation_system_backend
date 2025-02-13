@@ -5,7 +5,7 @@ const fs = require("fs-extra");
 const { GetFullActaService } = require("./actaService");
 
 
-function crearEstudianteNotas(estudiante) {
+function crearEstudianteNotas(estudiante, index = null) {
     const promedioTotal = estudiante.promedioTotal;
     const notasStr = estudiante.notas.map(nota => {
         let componentesStr = '';
@@ -15,7 +15,8 @@ function crearEstudianteNotas(estudiante) {
                     <span class="nextline estudiante-nota">
                         ${nota.componentes.nombre}
                         <span class="estudiante-nota-valor"></span>
-                    </span>`
+                    </span>
+                `
             }
             componentesStr += nota.componentes.listado.map(nota => {
                 return `
@@ -35,6 +36,8 @@ function crearEstudianteNotas(estudiante) {
     }
     ).join('');
     return `
+        notastudent.${index}
+        <div class="acta-notas-section">
         <div class="estudiante-notas">
                 <span class="nextline estudiante-nombre">
                     ${estudiante.nombres}
@@ -47,16 +50,18 @@ function crearEstudianteNotas(estudiante) {
                     <span class="estudiante-nota-valor">${promedioTotal.valor}/${promedioTotal.base}</span>
                 </span>
         </div>
+        </div>
     `;
 }
 
 const renderNotasEstudiantes = (estudiantes) => {
     const actaNotas = [];
-    estudiantes.forEach(estudiante => {
+    estudiantes.forEach((estudiante, index) => {
         // Obtener el contenedor donde se insertará el contenido
-        const estudianteHTML = crearEstudianteNotas(estudiante);
+        const estudianteHTML = crearEstudianteNotas(estudiante, index);
         actaNotas.push(estudianteHTML);
     })
+    actaNotas.push(`notastudent.${estudiantes.length}`);
     return actaNotas.join('');
 }
 
@@ -91,6 +96,52 @@ const nombreEstudianteList = (estudiantes) => {
     return estudiantes.map(estudiante => estudiante.nombres);
 }
 
+const adjustPages = (notasEstudiantesHtmlStr, trabajoData, estudiantes, isComplexivo) => {
+
+    const temaTesis = trabajoData?.temaTrabajoTitulacion?.split(" ");
+
+    const nWordsTopicTesis = temaTesis?.length ?? 0;
+    const marginTop = `<div style="margin-top: -15px;"></div>`;
+    const marginBottom = `<div style="padding-bottom: 180px;"></div>`;
+    const nextPage = `<div style="page-break-after: always;"></div>`;
+    console.log("nWordsTopicTesis");
+    console.log(nWordsTopicTesis);
+    try {
+        if (estudiantes.length == 1 && !isComplexivo) {
+            notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.0", "");
+            notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.1", nextPage);
+            return notasEstudiantesHtmlStr;
+        }
+        if (estudiantes.length == 1 && isComplexivo) {
+            notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.0", marginTop);
+            notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.1", nextPage);
+            return notasEstudiantesHtmlStr;
+        }
+        if (nWordsTopicTesis < 16) {
+            notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.0", "");
+            notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.1", "");
+            notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.2", nextPage);
+        }
+        else
+            if (nWordsTopicTesis >= 16 && nWordsTopicTesis <= 26) {
+                notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.0", marginTop);
+                notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.1", "");
+                notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.2", nextPage + marginBottom);
+            } else {
+                notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.0", nextPage);
+                notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.1", "");
+                notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.2", marginTop);
+            }
+
+    } catch (error) {
+        console.log("buildDataActa error");
+        console.log(error);
+    }
+    console.log("notasEstudiantesHtmlStr");
+    console.log(notasEstudiantesHtmlStr);
+    return notasEstudiantesHtmlStr;
+}
+
 const buildDataActaComplexivo = async (estudiantesNotasData, trabajoData) => {
     const actaComplexivoData = {};
     const estudianteNombreList = nombreEstudianteList(estudiantesNotasData);
@@ -107,13 +158,13 @@ const buildDataActaComplexivo = async (estudiantesNotasData, trabajoData) => {
     // Signature data section
     // actaComplexivoData.secretariaNombre = "Elizabeth";
     actaComplexivoData.secretariaNombre = "";
-    const renderSignatureStudent = (name)=>
-    `<div class="label-signature-student acta-signature-estudiantes">
+    const renderSignatureStudent = (name) =>
+        `<div class="label-signature-student acta-signature-estudiantes">
         ${name}
         <span class="dasheds"></span>
     </div>`;
     actaComplexivoData.actaSignatureEstudiantes = estudianteNombreList.map(renderSignatureStudent).join("");
-    const notasEstudiantesHtmlStr = renderNotasEstudiantes(estudiantesNotasData);
+    const notasEstudiantesHtmlStr = adjustPages(renderNotasEstudiantes(estudiantesNotasData), trabajoData, estudianteNombreList, isComplexivo);
     actaComplexivoData.notasEstudiantes = notasEstudiantesHtmlStr;
 
     // verbose data
@@ -127,11 +178,11 @@ const buildDataActaComplexivo = async (estudiantesNotasData, trabajoData) => {
 exports.GenerateActaService = async (trabajoId) => {
     // const trabajoData = await getTrabajo(trabajoId);
     const trabajoData = await GetFullActaService(trabajoId);
-    console.log("GenerateActaService");	
-    console.log({trabajoId});	
-    
+    console.log("GenerateActaService");
+    console.log({ trabajoId });
+
     // const trabajoData = await GetNotasService(trabajoId);
-    console.log({trabajoData});	
+    console.log({ trabajoData });
     // console.debug("-----------------------------trabajoData-----------------------------")
     // console.debug(trabajoData)
     // const estudiantesNotasData = await getEstudiantesNotas(trabajoData);
@@ -140,7 +191,7 @@ exports.GenerateActaService = async (trabajoId) => {
     // console.debug("-----------------------------actaComplexivoData-----------------------------")
     // console.debug(actaComplexivoData)
     const dynamicData = { ...trabajoData, ...actaComplexivoData };
-    
+
     const htmlTemplatePath = buildTemplatePath(dynamicData.nameTamplate + ".html");
     let htmlContent = await fs.readFile(htmlTemplatePath, "utf-8");
     // const tempFilePath = buildTempFilesPath(dynamicData.tituloDocumentoActa + ".pdf");
@@ -151,7 +202,6 @@ exports.GenerateActaService = async (trabajoId) => {
         const regex = new RegExp(`{{${key}}}`, "g"); // Busca la variable con {{variable}}
         htmlContent = htmlContent.replace(regex, dynamicData[key]);
     });
-    console.debug(dynamicData)
 
     // Escribir el archivo HTML modificado en un archivo temporal
     await fs.writeFile(tempHtmlPath, htmlContent);

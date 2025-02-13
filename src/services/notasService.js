@@ -72,15 +72,13 @@ exports.GetNotasService = async (trabajo_id) => {
         const data = await GetNotasTrabajoService(trabajo_id);
         const modalidad = await GetModalidadTrabajoService(trabajo_id);
         const modalidad_id = modalidad?.id;
-        console.log("GetIdModalidadTrabajoService");
-        console.log("modalidad");
-        console.log(modalidad);
         // Obtener el esquema de notas
         const esquema = await GetNotasSchemeActaService(modalidad_id); 
-        console.log("GetNotasSchemeActaService");
-        console.log("esquema");
-        console.log(esquema);
-        const groupedData = reduceNotasData(data, esquema);
+        const groupedData = reduceNotasData(data, esquema)?.map(nota => {
+            nota.promedioTotal.valor = (nota.promedioTotal.valor / nota.promedioTotal.base)*100;
+            nota.promedioTotal.base = 100;
+            return nota;
+        });
         return groupedData;
     } catch (error) {
         const msg = { message: 'Error al obtener notas de estudiantes.', error }
