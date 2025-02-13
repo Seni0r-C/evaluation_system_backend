@@ -2,6 +2,7 @@ const db = require('../config/db');
 const { getServerDate, describirFecha } = require('../utils/dateUtility');
 const { GetNombreUsuarioService } = require('./usuarioService');
 const { GetByIdTrabajoService } = require('./trabajoTitulacionService');
+const { asIngMg, asIngPhd } = require('../utils/strUtility');
 
 // Servicio para obtener la última información del acta
 exports.GetLastInfoActaService = async () => {
@@ -53,13 +54,12 @@ const getTribunalFromTesisFull = (tesisData) => {
     //       ]
     // }
     // convierte tribunal en un objeto:
-    
     console.log("tesisData.tribunal")
     console.log(tesisData.tribunal)
     return {
-        delegadoComisionCientifica: tesisData.tribunal[0].split(sep)[1],
-        delegadoConsejoDirectivo: tesisData.tribunal[1].split(sep)[1],
-        docenteDeArea: tesisData.tribunal[2].split(sep)[1]
+        delegadoComisionCientifica: asIngMg(tesisData.tribunal[0].split(sep)[1]),
+        delegadoConsejoDirectivo: asIngMg(tesisData.tribunal[1].split(sep)[1]),
+        docenteDeArea: asIngMg(tesisData.tribunal[2].split(sep)[1])
     };
 };
 
@@ -119,7 +119,7 @@ exports.GetFullActaService = async (trabajo_id) => {
     actaInfoFull.tituloTrabajoTitulacion = carreraInfo?.titulo ?? getDefaultTitulo(tesisData.carrera);
     actaInfoFull.modalidadEstudioCarrera = carreraInfo?.modalidad ?? "PRESENCIAL";
     actaInfoFull.nivelTituloCarrera = carreraInfo?.nivel ?? "TERCER NIVEL";
-    actaInfoFull.tutorTrabajoTitulacion = tesisData.tutor ?? "TUTOR SIN ESPECIFICAR";
+    actaInfoFull.tutorTrabajoTitulacion = asIngPhd(tesisData.tutor) ?? "TUTOR SIN ESPECIFICAR";
 
     return actaInfoFull;
 };
