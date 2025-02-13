@@ -1,11 +1,7 @@
 const { buildTempFilesPath, buildTemplatePath } = require("../utils/fileUtility");
-
-// const express = require("express");
+const db = require('../config/db');
 const fs = require("fs-extra");
-// const path = require("path");
-// const app = express();
 
-// app.use(express.static(__dirname));
 
 function crearEstudianteNotas(estudiante) {
     const promedioTotal = estudiante.promedioTotal;

@@ -32,6 +32,7 @@ const usuariosRoutes = require('./src/routes/usuariosRoutes');
 const rutasRoutes = require('./src/routes/rutasRoutes');
 const rolesRoutes = require('./src/routes/rolesRoutes');
 const actaRoutes = require('./src/routes/actaRoutes');
+const notasRoutes = require('./src/routes/notasRoutes');
 
 app.use('/auth', authRoutes);
 app.use('/carrera', carrerasRoutes);
@@ -42,6 +43,7 @@ app.use('/usuarios', usuariosRoutes);
 app.use('/rutas', rutasRoutes);
 app.use('/roles', rolesRoutes);
 app.use('/acta', actaRoutes);
+app.use('/notas', notasRoutes);
 app.get('/', (req, res)=>res.json({gretting: "Hello world!"}));
 app.listen(PORT, () => {
     console.log(`Servidor en puerto ${PORT}`);

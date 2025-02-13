@@ -47,3 +47,48 @@ exports.GetByIdTrabajoService = async (id) => {
 
     return rows;
 };
+
+// Servicio para obtener el esquema de notas con nombres en lugar de IDs
+exports.GetNotasTrabajoService = async (trabajo_id) => {
+    const query = `
+        SELECT 
+            docente.nombre AS docente,
+            estudiante.id AS est_id,
+            estudiante.nombre AS estudiante,
+            te.nombre AS tipo_evaluacion, 
+            SUM(re.puntaje_obtenido) AS nota,
+            SUM(rc.puntaje_maximo) AS base
+        FROM 
+            rubrica_evaluacion re
+        INNER JOIN 
+            rubrica_criterio rc ON re.rubrica_criterio_id = rc.id
+        INNER JOIN 
+            usuario docente ON re.docente_id = docente.id
+        INNER JOIN 
+            usuario estudiante ON re.estudiante_id = estudiante.id
+        INNER JOIN  rubrica r ON rc.rubrica_id = r.id
+        INNER JOIN 
+            sistema_tipo_evaluacion te ON r.tipo_evaluacion_id = te.id
+        INNER JOIN 
+            sistema_modalidad_titulacion m ON r.modalidad_id = m.id
+        INNER JOIN trabajo_titulacion tt ON re.trabajo_id = tt.id
+        WHERE tt.id = ?
+        GROUP BY te.id, docente.id, estudiante.id ORDER BY estudiante.id`;
+
+    const [rows] = await db.query(query, [trabajo_id]);
+    return rows;
+};
+
+exports.GetModalidadTrabajoService = async (trabajo_id) => {
+    const query = `
+        SELECT 
+            m.id
+        FROM 
+            sistema_modalidad_titulacion m
+        INNER JOIN trabajo_titulacion tt ON m.id = tt.modalidad_id
+        WHERE tt.id = ?
+        `;
+
+    const [rows] = await db.query(query, [trabajo_id]);
+    return rows[0];
+};

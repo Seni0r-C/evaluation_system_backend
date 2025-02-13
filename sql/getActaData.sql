@@ -84,27 +84,80 @@ GROUP BY re.id;
 
 -- POSIBLE CONSULTA DE DATOS CUANDO SE PRETENDA GENERAR PROMEDIOS POR TIPO RUBRICA/EVALUACION DE UN TRABAJO DE TITULACION
     -- rc.nombre AS criterio,
+    SELECT 
+        -- tt.id,
+        docente.nombre AS docente,
+        estudiante.id AS est_id,
+        estudiante.nombre AS estudiante,
+        te.nombre AS tipo_evaluacion, 
+        SUM(re.puntaje_obtenido) AS nota,
+        SUM(rc.puntaje_maximo) AS base
+    FROM 
+        rubrica_evaluacion re
+    INNER JOIN 
+        rubrica_criterio rc ON re.rubrica_criterio_id = rc.id
+    INNER JOIN 
+        usuario docente ON re.docente_id = docente.id
+    INNER JOIN 
+        usuario estudiante ON re.estudiante_id = estudiante.id
+    INNER JOIN  rubrica r ON rc.rubrica_id = r.id
+    INNER JOIN 
+        sistema_tipo_evaluacion te ON r.tipo_evaluacion_id = te.id
+    INNER JOIN 
+        sistema_modalidad_titulacion m ON r.modalidad_id = m.id
+    INNER JOIN trabajo_titulacion tt ON re.trabajo_id = tt.id
+    WHERE tt.id = 10
+    GROUP BY te.id, estudiante.id;
+
 SELECT 
-    docente.nombre AS docente,
-    estudiante.id AS est_id,
-    estudiante.nombre AS estudiante,
-    te.nombre AS tipo_evaluacion, 
-    SUM(re.puntaje_obtenido) AS nota,
-    SUM(rc.puntaje_maximo) AS base
-FROM 
-    rubrica_evaluacion re
-INNER JOIN 
-    rubrica_criterio rc ON re.rubrica_criterio_id = rc.id
-INNER JOIN 
-    usuario docente ON re.docente_id = docente.id
-INNER JOIN 
-    usuario estudiante ON re.estudiante_id = estudiante.id
-INNER JOIN  rubrica r ON rc.rubrica_id = r.id
-INNER JOIN 
-    sistema_tipo_evaluacion te ON r.tipo_evaluacion_id = te.id
-INNER JOIN 
-    sistema_modalidad_titulacion m ON r.modalidad_id = m.id
-INNER JOIN trabajo_titulacion tt ON re.trabajo_id = tt.id
-GROUP BY te.id, estudiante.id;
+            docente.nombre AS docente,
+            estudiante.id AS est_id,
+            estudiante.nombre AS estudiante,
+            te.nombre AS tipo_evaluacion, 
+            SUM(re.puntaje_obtenido) AS nota,
+            SUM(rc.puntaje_maximo) AS base
+        FROM 
+            rubrica_evaluacion re
+        INNER JOIN 
+            rubrica_criterio rc ON re.rubrica_criterio_id = rc.id
+        INNER JOIN 
+            usuario docente ON re.docente_id = docente.id
+        INNER JOIN 
+            usuario estudiante ON re.estudiante_id = estudiante.id
+        INNER JOIN  rubrica r ON rc.rubrica_id = r.id
+        INNER JOIN 
+            sistema_tipo_evaluacion te ON r.tipo_evaluacion_id = te.id
+        INNER JOIN 
+            sistema_modalidad_titulacion m ON r.modalidad_id = m.id
+        INNER JOIN trabajo_titulacion tt ON re.trabajo_id = tt.id
+        WHERE tt.id = 10
+        GROUP BY te.id, docente.id, estudiante.id ORDER BY estudiante.id
 
-
+acta_cfg = (
+       id,
+      year,
+      count_per_year,
+      ciudad
+  )
+    
+ #  define jerarquia de notas y compomentes de notas basado en rubrica_evaluacion_id en comp's'
+  acta_notas_scheme = (
+      id,
+      comp_id,
+      comp_parent_id(sistema_tipo_evaluacion.id | null),
+      trabajo_modalidad_id(sistema_modalidad_titulacion.id)
+  )
+  
+#  asesor y secretaria, vicedecano asociados con usuario.id, acta_cfg
+ acta = (
+    id,
+    year,
+    num_year_count,
+    trabajo_id(trabajo_estudiante.id),
+    secretaria_id(usuario.id),
+    vicedecano_id(usuario.id),
+    asesor_juridico_id(usuario.id),
+    fecha_hora_verbose,
+    ciudad_id (acta_cfg.id),
+    lugar_id
+ )
