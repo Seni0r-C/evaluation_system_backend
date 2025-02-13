@@ -10,5 +10,6 @@ router.get('/notas-scheme/:trabajo_modalidad_id', actaController.getNotasSchemeA
 router.get('/last-info', actaController.getLastInfoActa);
 router.post('/info', actaController.postInfoActa);
 router.get('/:trabajo_id', actaController.getActa);
+router.get('/full/:trabajo_id', actaController.getActaFull);
 
 module.exports = router;

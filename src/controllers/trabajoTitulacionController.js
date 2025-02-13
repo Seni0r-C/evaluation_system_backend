@@ -1,5 +1,5 @@
 const db = require('../config/db');
-const { formatFechaDefensa } = require('../utils/formatUtility.js')
+const { formatDateSelector } = require('../utils/dateUtility.js')
 const { GetByIdTrabajoService } = require('../services/trabajoTitulacionService.js');
 
 // Crear un nuevo trabajo de titulación
@@ -318,7 +318,7 @@ exports.reasignarTribunal = async (req, res) => {
         }
 
         // Validar y formatear antes de la actualización
-        const formattedFechaDefensa = formatFechaDefensa(fecha_defensa);
+        const formattedFechaDefensa = formatDateSelector(fecha_defensa);
         console.log("---------- formattedFechaDefensa");
         console.log(formattedFechaDefensa);
         if (!formattedFechaDefensa) {

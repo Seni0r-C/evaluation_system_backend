@@ -1,4 +1,4 @@
-const db = require('../config/db'); // Suponiendo que tienes un modelo para la base de datos
+const db = require('../config/db'); 
 
 // Crear una nueva ruta
 exports.createRuta = async (req, res) => {

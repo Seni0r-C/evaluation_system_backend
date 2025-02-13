@@ -1,6 +1,8 @@
 const { buildTempFilesPath, buildTemplatePath } = require("../utils/fileUtility");
+const { GetNotasService } = require("../services/notasService");
 const db = require('../config/db');
 const fs = require("fs-extra");
+const { GetFullActaService } = require("./actaService");
 
 
 function crearEstudianteNotas(estudiante) {
@@ -57,8 +59,10 @@ const renderNotasEstudiantes = (estudiantes) => {
     })
     return actaNotas.join('');
 }
-const getEstudiantesNotas = async (estudianteIds) => {
+
+const getEstudiantesNotas = async (trabajoData) => {
     try {
+        const estudianteIds = trabajoData.estudiantes;
         const nameFile = buildTempFilesPath('notasData.json')
         // Leer el archivo JSON
         const data = await fs.readFile(nameFile, 'utf8');
@@ -101,7 +105,8 @@ const buildDataActaComplexivo = async (estudiantesNotasData, trabajoData) => {
     const nameTamplate = isComplexivo ? "template_complexivo" : "template_tesis";
 
     // Signature data section
-    actaComplexivoData.secretariaNombre = "Elizabeth";
+    // actaComplexivoData.secretariaNombre = "Elizabeth";
+    actaComplexivoData.secretariaNombre = "";
     const renderSignatureStudent = (name)=>
     `<div class="label-signature-student acta-signature-estudiantes">
         ${name}
@@ -120,10 +125,17 @@ const buildDataActaComplexivo = async (estudiantesNotasData, trabajoData) => {
 }
 
 exports.GenerateActaService = async (trabajoId) => {
-    const trabajoData = await getTrabajo(trabajoId);
+    // const trabajoData = await getTrabajo(trabajoId);
+    const trabajoData = await GetFullActaService(trabajoId);
+    console.log("GenerateActaService");	
+    console.log({trabajoId});	
+    
+    // const trabajoData = await GetNotasService(trabajoId);
+    console.log({trabajoData});	
     // console.debug("-----------------------------trabajoData-----------------------------")
     // console.debug(trabajoData)
-    const estudiantesNotasData = await getEstudiantesNotas(trabajoData.estudiantes);
+    // const estudiantesNotasData = await getEstudiantesNotas(trabajoData);
+    const estudiantesNotasData = await GetNotasService(trabajoId);
     const actaComplexivoData = await buildDataActaComplexivo(estudiantesNotasData, trabajoData);
     // console.debug("-----------------------------actaComplexivoData-----------------------------")
     // console.debug(actaComplexivoData)

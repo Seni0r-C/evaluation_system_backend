@@ -1,6 +1,7 @@
 const db = require('../config/db');
+const { parseToLocale } = require('../utils/dateUtility');
 
-exports.GetByIdTrabajoService = async (id) => {
+exports.GetByIdTrabajoService = async (id, unpack=false) => {
     const [rows] = await db.execute(`
         SELECT 
             tt.*, 
@@ -9,7 +10,7 @@ exports.GetByIdTrabajoService = async (id) => {
             ttor.nombre AS tutor, 
             cttor.nombre AS cotutor,
             GROUP_CONCAT(DISTINCT est.nombre) AS estudiantes,
-            GROUP_CONCAT(DISTINCT tribunal.nombre) AS tribunal
+            GROUP_CONCAT(DISTINCT trol.nombre, ':<br> ', tribunal.nombre) AS tribunal
         FROM trabajo_titulacion tt
         JOIN sistema_carrera c ON tt.carrera_id = c.id
         JOIN sistema_modalidad_titulacion mt ON tt.modalidad_id = mt.id
@@ -18,6 +19,7 @@ exports.GetByIdTrabajoService = async (id) => {
         LEFT JOIN trabajo_estudiante te ON tt.id = te.trabajo_id
         LEFT JOIN usuario est ON te.estudiante_id = est.id
         LEFT JOIN trabajo_tribunal ttrib ON tt.id = ttrib.trabajo_id
+        LEFT JOIN tribunal_rol trol ON ttrib.tribunal_rol_id = trol.id
         LEFT JOIN usuario tribunal ON ttrib.docente_id = tribunal.id
         WHERE tt.id = ?
         GROUP BY tt.id, c.nombre, mt.nombre, ttor.nombre, cttor.nombre
@@ -32,20 +34,12 @@ exports.GetByIdTrabajoService = async (id) => {
             rows[0].tribunal = rows[0].tribunal.split(',').map(e => e.trim());
         }
         if (rows[0]?.fecha_defensa) {
-            rows[0].fecha_defensa = new Date(rows[0].fecha_defensa).toLocaleString('es-EC', {
-                timeZone: 'America/Guayaquil',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                hourCycle: 'h23' // Forzar formato de 24 horas
-            });
+            rows[0].fecha_defensa = parseToLocale(rows[0].fecha_defensa);
         }
 
     }
 
-    return rows;
+    return unpack ? rows[0] : rows;
 };
 
 // Servicio para obtener el esquema de notas con nombres en lugar de IDs
@@ -54,6 +48,7 @@ exports.GetNotasTrabajoService = async (trabajo_id) => {
         SELECT 
             docente.nombre AS docente,
             estudiante.id AS est_id,
+            estudiante.id AS cedula,
             estudiante.nombre AS estudiante,
             te.nombre AS tipo_evaluacion, 
             SUM(re.puntaje_obtenido) AS nota,

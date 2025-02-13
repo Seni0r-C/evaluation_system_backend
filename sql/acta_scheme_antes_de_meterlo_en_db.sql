@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `acta` (
     `secretaria_id` INT(11) NOT NULL,  -- Referencia a usuario.id
     `vicedecano_id` INT(11) NOT NULL,  -- Referencia a usuario.id
     `asesor_juridico_id` INT(11) NOT NULL,  -- Referencia a usuario.id
-    `fecha_hora_verbose` DATETIME NOT NULL,
+    `fecha_hora` DATETIME NOT NULL,
     `ciudad` VARCHAR(150) NOT NULL,  -- Referencia a acta_cfg.id
     `lugar` VARCHAR(255) NOT NULL, -- Asumimos que hay un lugar que se referencia
     PRIMARY KEY (`id`),
@@ -31,9 +31,11 @@ CREATE TABLE IF NOT EXISTS `acta` (
     FOREIGN KEY (`asesor_juridico_id`) REFERENCES `usuario` (`id`) 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO sistema_tipo_evaluacion (id, nombre) VALUES (7, 'EXAMEN TEORICO');
 UPDATE  sistema_tipo_evaluacion SET nombre="DEFENSA" WHERE id=1;
 UPDATE  sistema_tipo_evaluacion SET nombre="INFORME FINAL" WHERE id=2;
 UPDATE  sistema_tipo_evaluacion SET nombre="EXAMEN PRACTICO" WHERE id=3;
+UPDATE  sistema_tipo_evaluacion SET nombre="EXAMEN TEORICO" WHERE id=7;
 
 DELETE FROM sistema_modalidad_titulacion WHERE id=6;
 
