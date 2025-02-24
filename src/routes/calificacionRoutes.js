@@ -9,6 +9,12 @@ router.get('/tipo-evaluacion/:id', controller.getTipoEvaluacionByModalidadId);
 router.put('/tipo-evaluacion/:id', controller.updateTipoEvaluacion);
 router.delete('/tipo-evaluacion/:id', controller.deleteTipoEvaluacion);
 
+//jerarquia de tipos de evaluación
+router.post('/tipo-evaluacion-jerarquia', controller.createJerarquia);
+router.get('/tipo-evaluacion-jerarquia', controller.getJerarquias);
+router.put('/tipo-evaluacion-jerarquia/:id', controller.updateJerarquia);
+router.delete('/tipo-evaluacion-jerarquia/:id', controller.deleteJerarquia);
+
 // Rutas para rubrica
 router.post('/rubrica', controller.createRubrica);
 router.get('/rubrica', controller.getRubrica);

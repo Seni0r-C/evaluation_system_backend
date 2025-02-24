@@ -319,4 +319,65 @@ exports.deleteRubricaEvaluacion = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-};  
+};
+
+exports.getJerarquias = async (req, res) => {
+    try {
+        const [rows] = await db.query(`
+            SELECT 
+                ans.id,
+                te_hijo.id AS comp_id,
+                te_hijo.nombre AS nombre_hijo,
+                te_padre.id AS comp_parent_id,
+                te_padre.nombre AS nombre_padre,
+                smt.id AS trabajo_modalidad_id,
+                smt.nombre AS modalidad
+            FROM acta_notas_scheme ans
+            JOIN sistema_tipo_evaluacion te_hijo ON ans.comp_id = te_hijo.id
+            LEFT JOIN sistema_tipo_evaluacion te_padre ON ans.comp_parent_id = te_padre.id
+            JOIN sistema_modalidad_titulacion smt ON ans.trabajo_modalidad_id = smt.id;
+        `);
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.createJerarquia = async (req, res) => {
+    const { comp_id, comp_parent_id, trabajo_modalidad_id } = req.body;
+    try {
+        const result = await db.query(
+            'INSERT INTO acta_notas_scheme (comp_id, comp_parent_id, trabajo_modalidad_id) VALUES (?, ?, ?)',
+            [comp_id, comp_parent_id || null, trabajo_modalidad_id]
+        );
+        res.status(201).json({ id: result.insertId, comp_id, comp_parent_id, trabajo_modalidad_id });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.updateJerarquia = async (req, res) => {
+    const { id } = req.params;
+    const { comp_id, comp_parent_id, trabajo_modalidad_id } = req.body;
+    try {
+        await db.query(
+            'UPDATE acta_notas_scheme SET comp_id = ?, comp_parent_id = ?, trabajo_modalidad_id = ? WHERE id = ?',
+            [comp_id, comp_parent_id || null, trabajo_modalidad_id, id]
+        );
+        res.json({ id, comp_id, comp_parent_id, trabajo_modalidad_id });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.deleteJerarquia = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await db.query('DELETE FROM acta_notas_scheme WHERE id = ?', [id]);
+        if (result.affectedRows === 0) return res.status(404).json({ message: 'Jerarquía no encontrada' });
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
