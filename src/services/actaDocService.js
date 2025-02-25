@@ -109,7 +109,7 @@ const adjustPages = (notasEstudiantesHtmlStr, trabajoData, estudiantes, isComple
     try {
         if (estudiantes.length == 1 && !isComplexivo) {
             notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.0", "");
-            notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.1", nextPage);
+            notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.1", nextPage+ marginBottom);
             return notasEstudiantesHtmlStr;
         }
         if (estudiantes.length == 1 && isComplexivo) {

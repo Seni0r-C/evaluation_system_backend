@@ -101,7 +101,7 @@ exports.GetNotasByEvalTypeTrabajoService = async (trabajo_id, eval_type) => {
         INNER JOIN 
             sistema_modalidad_titulacion m ON r.modalidad_id = m.id
         INNER JOIN trabajo_titulacion tt ON re.trabajo_id = tt.id
-        WHERE tt.id = ? AND te.nombre = ? 
+        WHERE tt.id = ? AND te.id = ? 
         ORDER BY estudiante, tipo_evaluacion`;
 
     const [rows] = await db.query(query, [trabajo_id, eval_type]);

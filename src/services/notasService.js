@@ -75,7 +75,7 @@ exports.GetNotasService = async (trabajo_id) => {
         // Obtener el esquema de notas
         const esquema = await GetNotasSchemeActaService(modalidad_id); 
         const groupedData = reduceNotasData(data, esquema)?.map(nota => {
-            nota.promedioTotal.valor = (nota.promedioTotal.valor / nota.promedioTotal.base)*100;
+            nota.promedioTotal.valor = ((nota.promedioTotal.valor / nota.promedioTotal.base)*100).toFixed(2);
             nota.promedioTotal.base = 100;
             return nota;
         });

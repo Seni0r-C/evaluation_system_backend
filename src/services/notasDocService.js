@@ -182,12 +182,14 @@ exports.GenerateByEvalTypeNotasDocService = async (trabajoId, evalTypeId) => {
         notasEstudiantes: "NOTAS-ESTUDIANTES",
     };
 
-    // const content = await GetByEvalTypeNotasService(trabajoId, evalTypeId);
+    const content = await GetByEvalTypeNotasService(trabajoId, evalTypeId);
 
     const htmlTemplatePath = buildTemplatePath(dynamicData.nameTamplate + ".html");
     let htmlContent = await fs.readFile(htmlTemplatePath, "utf-8");
+
     // const tempFilePath = buildTempFilesPath(dynamicData.tituloDocumentoActa + ".pdf");
     const tempHtmlPath = buildTempFilesPath(dynamicData.tituloDocumentoActa + ".html"); // Ruta para el archivo HTML temporal        
+    htmlContent = htmlContent.replace("{{CONTENT}}", JSON.stringify(content, null, 2).replace("\n", "<br>"));
 
     // htmlContent = htmlContent.replace("<!--NOTAS-ESTUDIANTES-->", notasEstudiantesHtmlStr);
     // Reemplazar las partes dinámicas con los datos

@@ -100,8 +100,9 @@ exports.getNotasFile = async (req, res) => {
 
 exports.getNotasFileName = async (req, res) => {
     try {
-        const trabajoId = Number(req.params.id_trabajo);
+        const trabajoId = Number(req.params.trabajo_id);
         const evalTypeId = Number(req.params.eval_type_id);
+        console.log(JSON.stringify({trabajoId, evalTypeId}))
         // Datos dinámicos que deseas reemplazar
         const fileName = await GenerateByEvalTypeNotasDocService(trabajoId, evalTypeId);
         
