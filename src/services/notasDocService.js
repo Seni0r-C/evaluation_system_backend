@@ -178,18 +178,29 @@ const buildDataActaComplexivo = async (estudiantesNotasData, trabajoData) => {
 exports.GenerateByEvalTypeNotasDocService = async (trabajoId, evalTypeId) => {
     const dynamicData = {
         nameTamplate: "template_notas",
+        // nameTamplate: "template_notas_defensa",
+        // nameTamplate: "template_notas_head",
         tituloDocumentoActa: "Notas de estudiantes",
         notasEstudiantes: "NOTAS-ESTUDIANTES",
     };
 
     const content = await GetByEvalTypeNotasService(trabajoId, evalTypeId);
 
+    const headHtmlTemplatePath = buildTemplatePath("rubrica/template_notas_head.html");
+    const tableDefensaHtmlTemplatePath = buildTemplatePath("rubrica/template_notas_defensa.html");
+    const tableEscritoHtmlTemplatePath = buildTemplatePath("rubrica/template_notas_escrito.html");
     const htmlTemplatePath = buildTemplatePath(dynamicData.nameTamplate + ".html");
+    const hadHtmlContent = await fs.readFile(headHtmlTemplatePath, "utf-8");
+    const tableEscritoHtmlContent = await fs.readFile(tableEscritoHtmlTemplatePath, "utf-8");
+    const tableDefensaHtmlContent = await fs.readFile(tableDefensaHtmlTemplatePath, "utf-8");
     let htmlContent = await fs.readFile(htmlTemplatePath, "utf-8");
 
     // const tempFilePath = buildTempFilesPath(dynamicData.tituloDocumentoActa + ".pdf");
     const tempHtmlPath = buildTempFilesPath(dynamicData.tituloDocumentoActa + ".html"); // Ruta para el archivo HTML temporal        
     htmlContent = htmlContent.replace("{{CONTENT}}", JSON.stringify(content, null, 2).replace("\n", "<br>"));
+    htmlContent = htmlContent.replace("{{head}}", hadHtmlContent);
+    htmlContent = htmlContent.replace("{{tables}}", tableEscritoHtmlContent);
+    // htmlContent = htmlContent.replace("{{TABLE-DEFENSA}}", tableDefensaHtmlContent);
 
     // htmlContent = htmlContent.replace("<!--NOTAS-ESTUDIANTES-->", notasEstudiantesHtmlStr);
     // Reemplazar las partes dinámicas con los datos

@@ -36,6 +36,16 @@ exports.getNotasFile = async (req, res) => {
             path: tempPdfFilePath,
             format: "A4",
             printBackground: true,
+            omitBackground: false,
+            displayHeaderFooter: false,  
+            footerTemplate: '<div style="text-align: center;">Página <span class="pageNumber"></span> de <span class="totalPages"></span></div>',
+            headerTemplate: '<div style="text-align: center;">Header Página <span class="pageNumber"></span> de <span class="totalPages"></span></div>',
+            margin: {
+                top: "60px",
+                bottom: "60px",
+                left: "40px",
+                right: "40px",
+            },
         });
 
         await browser.close();
