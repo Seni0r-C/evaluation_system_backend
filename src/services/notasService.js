@@ -1,4 +1,4 @@
-const { GetNotasTrabajoService, GetModalidadTrabajoService } = require('../services/trabajoTitulacionService');
+const { GetNotasTrabajoService, GetModalidadTrabajoService, GetNotasByEvalTypeTrabajoService } = require('../services/trabajoTitulacionService');
 const { GetNotasSchemeActaService } = require('../services/schemeActaService');
 
 const reduceNotasData = (data, esquema) => {
@@ -82,6 +82,17 @@ exports.GetNotasService = async (trabajo_id) => {
         return groupedData;
     } catch (error) {
         const msg = { message: 'Error al obtener notas de estudiantes.', error }
+        console.log(msg)
+        throw new Error(msg);
+    }
+};
+
+exports.GetByEvalTypeNotasService = async (trabajo_id, eval_type_id) => {
+    try {
+        const data = await GetNotasByEvalTypeTrabajoService(trabajo_id, eval_type_id);       
+        return data;
+    } catch (error) {
+        const msg = { message: 'Error al obtener notas de estudiantes por tipo de evaluación.', error }
         console.log(msg)
         throw new Error(msg);
     }
