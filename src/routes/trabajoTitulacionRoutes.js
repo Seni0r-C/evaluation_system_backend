@@ -5,6 +5,7 @@ const trabajoController = require('../controllers/trabajoTitulacionController');
 // CRUD de trabajos de titulación
 router.post('/crear', trabajoController.crearTrabajo);
 router.get('/listar', trabajoController.listarTrabajos);
+router.get('/listar-tri', trabajoController.listarTrabajosForTribunal);
 router.get('/obtener/:id', trabajoController.obtenerTrabajo);
 router.get('/estados', trabajoController.obtenerEstados);
 router.patch('/actualizar/:id', trabajoController.actualizarTrabajo);

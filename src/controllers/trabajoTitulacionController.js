@@ -43,11 +43,11 @@ exports.crearTrabajo = async (req, res) => {
     }
 };
 
+
 // Listar todos los trabajos de titulación
 exports.listarTrabajos = async (req, res) => {
     try {
         const { page = 1, limit = 10, carrera_id, modalidad_id, estado, titulo, fecha_defensa } = req.query;
-
         // Validación y conversión de parámetros de paginación
         const pageNumber = parseInt(page, 10);
         const limitNumber = parseInt(limit, 10);
@@ -103,7 +103,7 @@ exports.listarTrabajos = async (req, res) => {
             JOIN sistema_carrera c ON tt.carrera_id = c.id
             JOIN trabajo_estado tte ON tt.estado_id = tte.id
             JOIN sistema_modalidad_titulacion mt ON tt.modalidad_id = mt.id
-        `
+        `;
         // Consulta para obtener los trabajos de titulación con filtros y paginación
         const [rows] = await db.execute(`
             SELECT tt.*, tte.nombre AS estado, c.nombre AS carrera, mt.nombre AS modalidad
@@ -121,6 +121,132 @@ exports.listarTrabajos = async (req, res) => {
             ${whereQuery}
         `, queryParams);
 
+        // Enviar la respuesta con los trabajos y el total de registros
+        res.json({
+            data: rows,
+            total: totalRows[0].total,
+            page: pageNumber,
+            totalPages: Math.ceil(totalRows[0].total / limitNumber)
+        });
+
+    } catch (error) {
+        console.error("Error al listar trabajos de titulación:", error.message);
+        res.status(500).json({ error: "Ocurrió un error al procesar la solicitud. Por favor, intente nuevamente más tarde." });
+    }
+};
+
+
+const listThesisGradesByIdDocentStatement = () => {
+    return `
+       SELECT     
+		    tt.id AS id_trabajo		    
+		FROM 
+		    rubrica_evaluacion re
+		INNER JOIN 
+		    rubrica_criterio rc ON re.rubrica_criterio_id = rc.id
+		INNER JOIN 
+		    usuario docente ON re.docente_id = docente.id
+		INNER JOIN 
+		    usuario estudiante ON re.estudiante_id = estudiante.id
+		INNER JOIN  
+		    rubrica r ON rc.rubrica_id = r.id
+		INNER JOIN 
+		    sistema_tipo_evaluacion te ON r.tipo_evaluacion_id = te.id
+		INNER JOIN 
+		    trabajo_titulacion tt ON re.trabajo_id = tt.id
+		WHERE docente.id = ?
+        `;
+}
+
+// Listar todos los trabajos de titulación para el tribunal
+exports.listarTrabajosForTribunal = async (req, res) => {
+    try {
+        const { user } = req.query;
+        const { page = 1, limit = 10, carrera_id, modalidad_id, estado, titulo, fecha_defensa } = req.query;
+        // Validación y conversión de parámetros de paginación
+        const pageNumber = parseInt(page, 10);
+        const limitNumber = parseInt(limit, 10);
+
+        if (isNaN(pageNumber) || pageNumber < 1) {
+            return res.status(400).json({ error: "El parámetro 'page' debe ser un número mayor o igual a 1." });
+        }
+
+        if (isNaN(limitNumber) || limitNumber < 1) {
+            return res.status(400).json({ error: "El parámetro 'limit' debe ser un número mayor o igual a 1." });
+        }
+
+        // Calculando el offset para la paginación
+        const offset = (pageNumber - 1) * limitNumber;
+
+        // Generando la cláusula WHERE dinámica según los filtros
+        let whereClauses = [];
+        let queryParams = [];
+
+        if (carrera_id) {
+            whereClauses.push('tt.carrera_id = ?');
+            queryParams.push(carrera_id);
+        }
+
+        if (modalidad_id) {
+            whereClauses.push('tt.modalidad_id = ?');
+            queryParams.push(modalidad_id);
+        }
+
+        if (Array.isArray(estado) && estado.length > 0) {
+            // Generar marcadores de posición dinámicos
+            const placeholders = estado.map(() => '?').join(', ');
+            whereClauses.push(`tte.nombre IN (${placeholders})`);
+            queryParams.push(...estado);  // Expandir el array de estados como valores individuales
+        } else if (estado) {
+            whereClauses.push('tte.nombre = ?');
+            queryParams.push(estado);
+        }
+
+        if (titulo) {
+            whereClauses.push('tt.titulo LIKE ?');
+            queryParams.push(`%${titulo}%`);
+        }
+
+        if (fecha_defensa) {
+            whereClauses.push('tt.fecha_defensa = ?');
+            queryParams.push(fecha_defensa);
+        }
+
+        if (user?.id) {
+            whereClauses.push('ttb.docente_id = ?');
+            queryParams.push(user.id);
+            whereClauses.push(`tt.id NOT IN (${listThesisGradesByIdDocentStatement()})`);
+            queryParams.push(user.id);
+        }
+        // Unir todas las cláusulas WHERE si existen
+        const whereQuery = whereClauses.length ? 'WHERE ' + whereClauses.join(' AND ') : '';
+        const innerJoins = `
+            JOIN sistema_carrera c ON tt.carrera_id = c.id
+            JOIN trabajo_estado tte ON tt.estado_id = tte.id
+            JOIN sistema_modalidad_titulacion mt ON tt.modalidad_id = mt.id
+            JOIN trabajo_tribunal ttb ON tt.id = ttb.trabajo_id
+        `;
+
+        // Consulta para obtener los trabajos de titulación con filtros y paginación
+        const [rows] = await db.execute(`
+            SELECT tt.*, tte.nombre AS estado, c.nombre AS carrera, mt.nombre AS modalidad
+            FROM trabajo_titulacion tt
+            ${innerJoins}
+            ${whereQuery}
+            ORDER BY tt.titulo
+            LIMIT ? OFFSET ?
+        `, [...queryParams, limitNumber, offset]);
+
+        // Consulta para contar el total de trabajos sin paginación, solo con filtros
+        const [totalRows] = await db.execute(`
+            SELECT COUNT(*) AS total
+            FROM trabajo_titulacion tt
+            ${innerJoins}
+            ${whereQuery}
+        `, queryParams);
+
+        console.log("Total de trabajos: ", totalRows[0].total);
+        console.log(rows);
         // Enviar la respuesta con los trabajos y el total de registros
         res.json({
             data: rows,
