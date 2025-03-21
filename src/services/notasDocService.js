@@ -3,6 +3,9 @@ const { GetByEvalTypeNotasService } = require("../services/notasService");
 const db = require('../config/db');
 const fs = require("fs-extra");
 const { GetFullActaService } = require("./actaService");
+const { GetTribunalMembersGradesService } = require("./tribunalMambersGradeService");
+const { GetByIdTrabajoService } = require("./trabajoTitulacionService");
+const { GetTribunalFromTesisFullDT0 } = require("../dto/tribunalMembersDTO");
 
 
 function crearEstudianteNotas(estudiante, index = null) {
@@ -64,33 +67,6 @@ const renderNotasEstudiantes = (estudiantes) => {
     actaNotas.push(`notastudent.${estudiantes.length}`);
     return actaNotas.join('');
 }
-
-const getEstudiantesNotas = async (trabajoData) => {
-    try {
-        const estudianteIds = trabajoData.estudiantes;
-        const nameFile = buildTempFilesPath('notasData.json')
-        // Leer el archivo JSON
-        const data = await fs.readFile(nameFile, 'utf8');
-        // Parsear el contenido como JSON
-        return JSON.parse(data).filter(estudiante => estudianteIds.includes(estudiante.id));
-    } catch (error) {
-        console.error('Error al leer el archivo:', error);
-        return null;
-    }
-};
-
-const getTrabajo = async (id) => {
-    try {
-        const nameFile = buildTempFilesPath('trabajosData.json')
-        // Leer el archivo JSON
-        const data = await fs.readFile(nameFile, 'utf8');
-        // Parsear el contenido como JSON
-        return JSON.parse(data).find(trabajo => trabajo.id === id);
-    } catch (error) {
-        console.error('Error al leer el archivo:', error);
-        return null;
-    }
-};
 
 const nombreEstudianteList = (estudiantes) => {
     return estudiantes.map(estudiante => estudiante.nombres);
@@ -175,6 +151,103 @@ const buildDataActaComplexivo = async (estudiantesNotasData, trabajoData) => {
     return actaComplexivoData;
 }
 
+/**
+ * Given an object with tribunal members as values, returns a string with
+ * a fragment of HTML that represents an ordered list of tribunal members.
+ *
+ * @param {object} data - An object with tribunal members as values.
+ * @return {string} A string with a fragment of HTML that represents an ordered list of tribunal members.
+ */
+const buildTribunalMembersFragmentHtml = (data, normalizeFunc = (item) => item ) => {
+    const membersHtmlStr = Object.values(data).map((item) => {
+        item = normalizeFunc(item);
+        return `
+        <li>${item}</li>
+    `;
+    }).join("");
+    return `
+        <ol>
+            ${membersHtmlStr}
+        </ol>
+    `;
+};
+
+const buildStudentsFragmentHtml = (nameStudentsList, normalizeFunc) => {
+    const membersHtmlStr = nameStudentsList.map((item) => {
+        item = normalizeFunc(item);
+        return `
+        <li>${item}</li>
+    `;
+    }).join("");
+    return `
+        <ul>
+            ${membersHtmlStr}
+        </ul>
+    `;
+};
+
+const buildHeadHtml = async (hadHtmlContent, trabajoId) => {
+    const thesisWorkRows = await GetByIdTrabajoService(trabajoId);
+    if (!thesisWorkRows) {
+        throw new Error("Trabajo not found");
+    }
+    const trabajoData = thesisWorkRows[0];
+    console.log("trabajoData");
+    console.log(trabajoData);
+    const facultad = "FACULTAD DE CIENCIAS INFORMÁTICAS";
+    const carrera = trabajoData.carrera;
+    const nameStudentsList = trabajoData.estudiantes;
+    const topicThesisWork = trabajoData.titulo;
+    const dateThesisWorkAgreement = "Misssing, need be implemented in \"Registro Trabajo Final\" option dialog";
+    const dateTimeThesisWorkDefense = trabajoData.fecha_defensa ?? "N/A";
+    const nameTribunalMembers = GetTribunalFromTesisFullDT0(trabajoData);
+    // const nameTribunalMembers =trabajoData.tribunal;
+    console.log("Facultad");
+    console.log(facultad);
+    console.log("Carrera");
+    console.log(carrera);
+    console.log("nameStudentsList");
+    console.log(nameStudentsList);
+    console.log("topicThesisWork");
+    console.log(topicThesisWork);
+    console.log("dateThesisWorkAgreement");
+    console.log(dateThesisWorkAgreement);
+    console.log("dateThesisWorkDefense");
+    console.log(dateTimeThesisWorkDefense);
+    console.log("nameTribunalMembers");
+    console.log(nameTribunalMembers);
+    const excludesCapitalization = [
+        "de", "la", "el", "los", "las", "un", "una", "unos", "unas", "en", "del"
+    ];
+    const normalizeText = (text) => {
+        text = text.trim();
+        console.log("text");
+        console.log(text);
+        return text
+            .split(' ') // Split the text into words
+            .map(word => {
+                if (excludesCapitalization.includes(word.toLowerCase())) {
+                    return word.toLowerCase();
+                }
+                // Capitalize the first letter of each word and make the rest lowercase
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            })
+            .join(' '); // Join the words back together with spaces
+    };
+
+    const replaceHtml = (key, value, normalize = true) => hadHtmlContent.replace("{{" + key + "}}", !normalize?value: normalizeText(value));
+    hadHtmlContent = replaceHtml("facultad", facultad);
+    hadHtmlContent = replaceHtml("carrera", carrera);
+    hadHtmlContent = replaceHtml("nameStudentsList", buildStudentsFragmentHtml(nameStudentsList, normalizeText), false);
+    hadHtmlContent = replaceHtml("topicThesisWork", topicThesisWork);
+    hadHtmlContent = replaceHtml("dateThesisWorkAgreement", dateThesisWorkAgreement, false);
+    // date and time, separated by comma, takes the first part (date)
+    hadHtmlContent = replaceHtml("dateTimeThesisWorkDefense", dateTimeThesisWorkDefense.split(",")[0], false);
+    hadHtmlContent = replaceHtml("nameTribunalMembers", buildTribunalMembersFragmentHtml(nameTribunalMembers, normalizeText), false);
+    return hadHtmlContent;
+}
+
+
 exports.GenerateByEvalTypeNotasDocService = async (trabajoId, evalTypeId) => {
     const dynamicData = {
         nameTamplate: "template_notas",
@@ -183,6 +256,14 @@ exports.GenerateByEvalTypeNotasDocService = async (trabajoId, evalTypeId) => {
         tituloDocumentoActa: "Notas de estudiantes",
         notasEstudiantes: "NOTAS-ESTUDIANTES",
     };
+
+
+
+    // console.log("trabajoData-jiji");
+    // console.log(trabajoData);
+
+    // const tribunalMembersGrades = await GetTribunalMembersGradesService(trabajoId);
+    // console.log(tribunalMembersGrades);
 
     const content = await GetByEvalTypeNotasService(trabajoId, evalTypeId);
 
@@ -194,11 +275,10 @@ exports.GenerateByEvalTypeNotasDocService = async (trabajoId, evalTypeId) => {
     const tableEscritoHtmlContent = await fs.readFile(tableEscritoHtmlTemplatePath, "utf-8");
     const tableDefensaHtmlContent = await fs.readFile(tableDefensaHtmlTemplatePath, "utf-8");
     let htmlContent = await fs.readFile(htmlTemplatePath, "utf-8");
-
     // const tempFilePath = buildTempFilesPath(dynamicData.tituloDocumentoActa + ".pdf");
     const tempHtmlPath = buildTempFilesPath(dynamicData.tituloDocumentoActa + ".html"); // Ruta para el archivo HTML temporal        
     htmlContent = htmlContent.replace("{{CONTENT}}", JSON.stringify(content, null, 2).replace("\n", "<br>"));
-    htmlContent = htmlContent.replace("{{head}}", hadHtmlContent);
+    htmlContent = htmlContent.replace("{{head}}", await buildHeadHtml(hadHtmlContent, trabajoId));
     htmlContent = htmlContent.replace("{{tables}}", tableEscritoHtmlContent);
     // htmlContent = htmlContent.replace("{{TABLE-DEFENSA}}", tableDefensaHtmlContent);
 

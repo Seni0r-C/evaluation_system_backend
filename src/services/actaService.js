@@ -2,7 +2,8 @@ const db = require('../config/db');
 const { getServerDate, describirFecha } = require('../utils/dateUtility');
 const { GetNombreUsuarioService } = require('./usuarioService');
 const { GetByIdTrabajoService } = require('./trabajoTitulacionService');
-const { asIngMg, asIngPhd } = require('../utils/strUtility');
+const { asIngPhd } = require('../utils/strUtility');
+const { GetTribunalFromTesisFullDT0: GetTribunalFromTesisFullDTO } = require('../dto/tribunalMembersDTO');
 
 // Servicio para obtener la última información del acta
 exports.GetLastInfoActaService = async () => {
@@ -43,25 +44,6 @@ exports.GetActaService = async (trabajo_id) => {
     return rows.length > 0 ? rows[0] : this.GetLastInfoActaService();
 };
 
-const getTribunalFromTesisFull = (tesisData) => {
-    const sep = ":<br> ";
-    // Contenido de tribunal ejemplo:
-    // {
-    //     "tribunal": [
-    //         "DELEGADO COM. INVESTIGACIÓN CIENTIFÍCA:<br> TAMIÑAWI SUMI SUMIWKA MANIKO",
-    //         "DELEGADO H. CONSEJO DIRECTIVO:<br> ANA GABRIELA YUKATAN SLOVAKY",
-    //         "DOCENTE DEL ÁREA:<br> PEDRO MANOLO ANESTECIO ONETWO"
-    //       ]
-    // }
-    // convierte tribunal en un objeto:
-    console.log("tesisData.tribunal")
-    console.log(tesisData.tribunal)
-    return {
-        delegadoComisionCientifica: asIngMg(tesisData.tribunal[0].split(sep)[1]),
-        delegadoConsejoDirectivo: asIngMg(tesisData.tribunal[1].split(sep)[1]),
-        docenteDeArea: asIngMg(tesisData.tribunal[2].split(sep)[1])
-    };
-};
 
 const carreraMap = {
     "SISTEMAS DE INFORMACIÓN": {
@@ -105,7 +87,7 @@ exports.GetFullActaService = async (trabajo_id) => {
     const tesisData = await GetByIdTrabajoService(trabajo_id, true);
     console.log("tesisData");
     console.log(tesisData);
-    const tribunal = getTribunalFromTesisFull(tesisData);
+    const tribunal = GetTribunalFromTesisFullDTO(tesisData);
     actaInfoFull.delegadoComisionCientifica = tribunal.delegadoComisionCientifica;
     actaInfoFull.delegadoConsejoDirectivo = tribunal.delegadoConsejoDirectivo;
     actaInfoFull.docenteDeArea = tribunal.docenteDeArea;

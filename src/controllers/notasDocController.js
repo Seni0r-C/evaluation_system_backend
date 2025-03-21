@@ -121,7 +121,7 @@ exports.getNotasFileName = async (req, res) => {
         return res.status(400).json({
             typeMsg: 'error',
             message: 'Error en el servidor al obtener nombre de documento de calificacion por tipo de evaluación.',
-            error: error
+            error: error.message
         });
     }
 };
