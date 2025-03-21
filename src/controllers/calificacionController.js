@@ -209,6 +209,37 @@ exports.deleteRubricaCriterio = async (req, res) => {
 };
 
 
+const getCompleteThesisGradeStatement = () => {
+    return `
+        SELECT     
+		    docente.id
+		FROM 
+		    rubrica_evaluacion re
+		INNER JOIN 
+		    rubrica_criterio rc ON re.rubrica_criterio_id = rc.id
+		INNER JOIN 
+		    usuario docente ON re.docente_id = docente.id
+		INNER JOIN 
+		    usuario estudiante ON re.estudiante_id = estudiante.id
+		INNER JOIN  
+		    rubrica r ON rc.rubrica_id = r.id
+		INNER JOIN 
+		    sistema_tipo_evaluacion te ON r.tipo_evaluacion_id = te.id
+		INNER JOIN 
+		    trabajo_titulacion tt ON re.trabajo_id = tt.id
+		WHERE tt.id = ? 
+		GROUP BY docente.id
+        `;
+}
+
+const isCompleteThesis = (docent_id, trabajo_id) => {
+    const [rows] = db.query(`
+                ${getCompleteThesisGradeStatement()}
+        `, [docent_id, trabajo_id]);
+
+    return rows.length === 3;
+}
+
 // Rubrica Evaluacion
 exports.createRubricaEvaluaciones = async (req, res) => {
     const { calificaciones } = req.body;
@@ -233,12 +264,15 @@ exports.createRubricaEvaluaciones = async (req, res) => {
         await Promise.all(insertPromises);
 
         const trabajo_id = calificaciones[0].trabajo_id;
-
-        // Cambiar el estado del trabajo a "DEFENDIDO" o sea 4
-        await connection.query(
-            'UPDATE trabajo_titulacion SET estado_id = 4 WHERE id = ?',
-            [trabajo_id]
-        );
+        const docente_id = calificaciones[0].docente_id;
+        // Verificar si el trabajo de tesis ha sido calificado por todos los docentes (3)
+        if (isCompleteThesis(docente_id, trabajo_id)) {
+            // Cambiar el estado del trabajo a "DEFENDIDO" o sea 4
+            await connection.query(
+                'UPDATE trabajo_titulacion SET estado_id = 4 WHERE id = ?',
+                [trabajo_id]
+            );
+        }
 
         await connection.commit();
 
