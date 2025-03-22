@@ -234,8 +234,7 @@ const buildHeadHtml = async (hadHtmlContent, trabajoId) => {
     return hadHtmlContent;
 }
 
-const getTableBaseHtml = (numColSpanTable, evalType, estudiante, headColNamesList, value) => {
-    let rowspan = 1;
+const buildHeadTitleAndTableBaseHtml = (numColSpanTable, evalType, estudiante, headColNamesList) => {
     const buildStringWithArticle = (inputString) => {
         // List of feminine singular words (common ones), you can expand this list as needed
         const feminineWords = ["a", "ad"];
@@ -256,81 +255,83 @@ const getTableBaseHtml = (numColSpanTable, evalType, estudiante, headColNamesLis
     };
     const student = estudiante ? "(" + estudiante + ")" : "";
     const evalTypeStr = buildStringWithArticle(evalType);
+    const ths = headColNamesList.map((item) => `<th>${item}</th>`).join("");
+    const colspan = headColNamesList.length;
+    return [
+        `<h4 style="text-align: center;"> ${student}</h4>`
+        , `
+        <thead>
+            <tr>
+                <th colspan="${colspan}" style="text-align: center;">EVALUACIÓN ${evalTypeStr} DEL TRABAJO DE TITULACIÓN</th>
+            </tr>
+            <tr>
+                ${ths}
+            </tr>
+        </thead>`,
+        evalTypeStr
+    ];
+}
+
+const buildTrsBodyTableHtmlAndMedianGrade = (headColNamesList, objEvaluation) => {
+    const hasGradeComponentCategorys = headColNamesList.length > 5;
+    const trs = [];
+    const tds = [];
+    if(hasGradeComponentCategorys){
+        let firstrowspan = undefined;
+        for (const [nameGradeComponentCategory, valueGradeComponentCategory] of Object.entries(objEvaluation)) {
+            firstrowspan = Object.keys(valueGradeComponentCategory).length;
+            tds.push(`<td rowspan="${firstrowspan}">${nameGradeComponentCategory}</td>`);
+            for (const [nameEvaluation, valueEvaluation] of Object.entries(valueGradeComponentCategory)) {
+                tds.push(`<td>${nameEvaluation}</td>`);
+                tds.push(`<td>${JSON.stringify(valueEvaluation, null, 2)}</td>`);
+            }
+            trs.push(`<tr>${tds.join("")}</tr>`);
+            // Clear the tds array
+            tds.length = 0;
+        }
+        return trs.join("");
+    } else {
+        const notas = [];
+        const notasBase = [];
+        for (const [nameEvaluation, valueEvaluation] of Object.entries(objEvaluation)) {
+            tds.push(`<td>${nameEvaluation}</td>`);
+            tds.push(`<td>${valueEvaluation[0].base}</td>`);
+            notasBase.push(parseInt(valueEvaluation[0].base));
+            for (const value of Object.values(valueEvaluation)) {
+                notas.push(parseInt(value.nota));
+                tds.push(`<td>${value.nota}</td>`);
+            }
+            trs.push(`<tr>${tds.join("")}</tr>`);
+            // Clear the tds array
+            tds.length = 0;
+        }
+        const notafinalsum = notas.reduce((acc, nota) => acc + nota, 0);
+        const notafinalBase = notasBase.reduce((acc, nota) => acc + nota, 0);
+        const notafinal = (notafinalsum / notafinalBase)*100;
+        return [trs.join(""), parseInt(notafinal+"")];
+    }
+}
+
+
+const getTableBaseHtml = (numColSpanTable, evalType, estudiante, headColNamesList, value) => {
+    const [title, head, evalTypeStr] = buildHeadTitleAndTableBaseHtml(numColSpanTable, evalType, estudiante, headColNamesList)
+    const [trs, notafinal] = buildTrsBodyTableHtmlAndMedianGrade(headColNamesList, value);
     return `
-        <h4 style="text-align: center;"> ${student}</h4>
+        ${title}
         <table>
-            <thead>
-                <tr>
-                    <!-- <th colspan="9"><h2 style="text-align: center;"></h2></th> -->
-                    <th colspan="6" style="text-align: center;">EVALUACIÓN ${evalTypeStr} DEL TRABAJO DE TITULACIÓN</th>
-                </tr>
-                <tr>
-                    <th rowspan="2">COMPONENTES A EVALUAR</th>
-                    <th rowspan="2">PARÁMETROS A CALIFICAR</th>
-                    <th rowspan="2">NOTA MÁXIMA DE REFERENCIA</th>
-                    <th>TRIBUNAL 1</th>
-                    <th>TRIBUNAL 2</th>
-                    <th>TRIBUNAL 3</th>
-                </tr>
-            </thead>
+            ${head}
             <tbody>
+                ${trs}
                 <tr>
-                    <td rowspan="2">CONTENIDO</td>
-                    <td class="left-align">Calidad de la exposición de la sustentación tomando en cuenta la organización y
-                        contenido.</td>
-                    <td>30</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td colspan="${numColSpanTable}">
+                        <p style="text-align: center; font-weight: bold;">
+                            CALIFICACIÓN FINAL ${evalTypeStr}: ( ${notafinal} / 100 )
+                        </p>
+                    </td>
                 </tr>
-                <tr>
-                    <td class="left-align">Dominio demostrado en el tema y sobre otros aspectos de la especialidad.</td>
-                    <td>20</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td rowspan="2">PRESENTACIÓN</td>
-                    <td class="left-align">Elaboración y uso de la ayuda de equipos en apoyo de la disertación.</td>
-                    <td>10</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td class="left-align">Manejo de la presentación y dominio del auditorio.</td>
-                    <td>10</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>DISCUSIÓN</td>
-                    <td class="left-align">Contenido y coherencia de las respuestas y explicaciones sustentadas ante las
-                        inquietudes del tribunal.</td>
-                        <td>30</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr class="total">
-                        <td colspan="2">TOTAL</td>
-                        <td>100</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td colspan="6">
-                            <p style="text-align: center; font-weight: bold;">
-                                CALIFICACIÓN FINAL ${evalTypeStr}: ( _____ / 100 )
-                            </p>
-                        </td>
-                    </tr>
             </tbody>
         </table>
-        `
+        `;
 };
 
 const buildTablesHtml = async (trabajoId) => {
