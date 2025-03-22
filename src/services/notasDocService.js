@@ -6,6 +6,8 @@ const { GetFullActaService } = require("./actaService");
 const { GetTribunalMembersGradesService } = require("./tribunalMambersGradeService");
 const { GetByIdTrabajoService } = require("./trabajoTitulacionService");
 const { GetTribunalFromTesisFullDT0 } = require("../dto/tribunalMembersDTO");
+const { groupsBy } = require("../utils/groupListUtility");
+const { sortObjectEntries } = require("../utils/sortObjUtility");
 
 
 function crearEstudianteNotas(estudiante, index = null) {
@@ -158,7 +160,7 @@ const buildDataActaComplexivo = async (estudiantesNotasData, trabajoData) => {
  * @param {object} data - An object with tribunal members as values.
  * @return {string} A string with a fragment of HTML that represents an ordered list of tribunal members.
  */
-const buildTribunalMembersFragmentHtml = (data, normalizeFunc = (item) => item ) => {
+const buildTribunalMembersFragmentHtml = (data, normalizeFunc = (item) => item) => {
     const membersHtmlStr = Object.values(data).map((item) => {
         item = normalizeFunc(item);
         return `
@@ -201,21 +203,6 @@ const buildHeadHtml = async (hadHtmlContent, trabajoId) => {
     const dateThesisWorkAgreement = "Misssing, need be implemented in \"Registro Trabajo Final\" option dialog";
     const dateTimeThesisWorkDefense = trabajoData.fecha_defensa ?? "N/A";
     const nameTribunalMembers = GetTribunalFromTesisFullDT0(trabajoData);
-    // const nameTribunalMembers =trabajoData.tribunal;
-    console.log("Facultad");
-    console.log(facultad);
-    console.log("Carrera");
-    console.log(carrera);
-    console.log("nameStudentsList");
-    console.log(nameStudentsList);
-    console.log("topicThesisWork");
-    console.log(topicThesisWork);
-    console.log("dateThesisWorkAgreement");
-    console.log(dateThesisWorkAgreement);
-    console.log("dateThesisWorkDefense");
-    console.log(dateTimeThesisWorkDefense);
-    console.log("nameTribunalMembers");
-    console.log(nameTribunalMembers);
     const excludesCapitalization = [
         "de", "la", "el", "los", "las", "un", "una", "unos", "unas", "en", "del"
     ];
@@ -235,7 +222,7 @@ const buildHeadHtml = async (hadHtmlContent, trabajoId) => {
             .join(' '); // Join the words back together with spaces
     };
 
-    const replaceHtml = (key, value, normalize = true) => hadHtmlContent.replace("{{" + key + "}}", !normalize?value: normalizeText(value));
+    const replaceHtml = (key, value, normalize = true) => hadHtmlContent.replace("{{" + key + "}}", !normalize ? value : normalizeText(value));
     hadHtmlContent = replaceHtml("facultad", facultad);
     hadHtmlContent = replaceHtml("carrera", carrera);
     hadHtmlContent = replaceHtml("nameStudentsList", buildStudentsFragmentHtml(nameStudentsList, normalizeText), false);
@@ -245,6 +232,156 @@ const buildHeadHtml = async (hadHtmlContent, trabajoId) => {
     hadHtmlContent = replaceHtml("dateTimeThesisWorkDefense", dateTimeThesisWorkDefense.split(",")[0], false);
     hadHtmlContent = replaceHtml("nameTribunalMembers", buildTribunalMembersFragmentHtml(nameTribunalMembers, normalizeText), false);
     return hadHtmlContent;
+}
+
+const getTableBaseHtml = (numColSpanTable, evalType, estudiante, headColNamesList, value) => {
+    let rowspan = 1;
+    const buildStringWithArticle = (inputString) => {
+        // List of feminine singular words (common ones), you can expand this list as needed
+        const feminineWords = ["a", "ad"];
+
+        // Trim and normalize the input string
+        inputString = inputString.trim().toLowerCase();
+        inps = inputString.split(" ");
+        inputString = inps[0];
+
+        // Check if the word is feminine or masculine
+        const isFeminine = feminineWords.some(word => inputString.endsWith(word));
+
+        // Determine the article based on gender
+        let article = isFeminine ? "DE LA" : "DEL";
+
+        // Return the full string with the article
+        return `${article} ${inputString.toUpperCase()}`;
+    };
+    const student = estudiante ? "(" + estudiante + ")" : "";
+    const evalTypeStr = buildStringWithArticle(evalType);
+    return `
+        <h4 style="text-align: center;"> ${student}</h4>
+        <table>
+            <thead>
+                <tr>
+                    <!-- <th colspan="9"><h2 style="text-align: center;"></h2></th> -->
+                    <th colspan="6" style="text-align: center;">EVALUACIÓN ${evalTypeStr} DEL TRABAJO DE TITULACIÓN</th>
+                </tr>
+                <tr>
+                    <th rowspan="2">COMPONENTES A EVALUAR</th>
+                    <th rowspan="2">PARÁMETROS A CALIFICAR</th>
+                    <th rowspan="2">NOTA MÁXIMA DE REFERENCIA</th>
+                    <th>TRIBUNAL 1</th>
+                    <th>TRIBUNAL 2</th>
+                    <th>TRIBUNAL 3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="2">CONTENIDO</td>
+                    <td class="left-align">Calidad de la exposición de la sustentación tomando en cuenta la organización y
+                        contenido.</td>
+                    <td>30</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="left-align">Dominio demostrado en el tema y sobre otros aspectos de la especialidad.</td>
+                    <td>20</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td rowspan="2">PRESENTACIÓN</td>
+                    <td class="left-align">Elaboración y uso de la ayuda de equipos en apoyo de la disertación.</td>
+                    <td>10</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="left-align">Manejo de la presentación y dominio del auditorio.</td>
+                    <td>10</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>DISCUSIÓN</td>
+                    <td class="left-align">Contenido y coherencia de las respuestas y explicaciones sustentadas ante las
+                        inquietudes del tribunal.</td>
+                        <td>30</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="total">
+                        <td colspan="2">TOTAL</td>
+                        <td>100</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            <p style="text-align: center; font-weight: bold;">
+                                CALIFICACIÓN FINAL ${evalTypeStr}: ( _____ / 100 )
+                            </p>
+                        </td>
+                    </tr>
+            </tbody>
+        </table>
+        `
+};
+
+const buildTablesHtml = async (trabajoId) => {
+    const tribunalMembersGrades = await GetTribunalMembersGradesService(trabajoId);
+    const gradeComponentCategorys = [];
+    const tribunalMembersGradesClean = tribunalMembersGrades.map((item) => {
+        if (item.nombre.includes("::>")) {
+            const [gradeComponentCategory, gradeComponentDescription] = item.nombre.split("::>");
+            item.nombre = gradeComponentCategory;
+            item.gradeComponentCategory = gradeComponentDescription;
+            gradeComponentCategorys.push(gradeComponentCategory);
+        }
+        return item;
+    });
+    const hasGradeComponentCategorys = gradeComponentCategorys.length > 0;
+    console.log(tribunalMembersGradesClean);
+
+    let numColSpanTable = 5;
+    let defaultRowSpan = 1;
+    let headColNames = [
+        "PARÁMETROS A CALIFICAR",
+        "NOTA MÁXIMA DE REFERENCIA",
+        "TRIBUNAL 1", "TRIBUNAL 2", "TRIBUNAL 3"
+    ];
+    let groupRoute = "estudiante.tipo_evaluacion.nombre";
+    if (hasGradeComponentCategorys) {
+        groupRoute = "estudiante.tipo_evaluacion.gradeComponentCategory.nombre";
+        headColNames = ["COMPONENTES A EVALUAR", ...headColNames];
+    }
+    const newGroupedByStudents = groupsBy(tribunalMembersGradesClean, groupRoute);
+    const isOneStudent = newGroupedByStudents.length === 1;
+    console.log("newGroupedByStudents");
+    console.log(JSON.stringify(newGroupedByStudents, null, 2));
+    const tables = [];
+    let addedWriteenEvalType = false;
+    for (const [studentName, strudentValue] of Object.entries(sortObjectEntries(newGroupedByStudents))) {
+        for (const [kindEvaluation, kindEvaluationValue] of Object.entries(sortObjectEntries(strudentValue, "desc"))) {
+            if (kindEvaluation === "INFORME FINAL" && addedWriteenEvalType) {
+                continue;
+            }
+            if (kindEvaluation === "INFORME FINAL" && !addedWriteenEvalType) {
+                addedWriteenEvalType = true;
+                const table = getTableBaseHtml(numColSpanTable, kindEvaluation, "", headColNames, kindEvaluationValue);
+                tables.push(table);
+                continue;
+            }
+            const table = getTableBaseHtml(numColSpanTable, kindEvaluation, isOneStudent || kindEvaluation === "INFORME FINAL" ? "" : studentName, headColNames, kindEvaluationValue);
+            tables.push(table);
+        }
+    }
+    return tables.join("");
 }
 
 
@@ -257,38 +394,26 @@ exports.GenerateByEvalTypeNotasDocService = async (trabajoId, evalTypeId) => {
         notasEstudiantes: "NOTAS-ESTUDIANTES",
     };
 
-
-
-    // console.log("trabajoData-jiji");
-    // console.log(trabajoData);
-
-    // const tribunalMembersGrades = await GetTribunalMembersGradesService(trabajoId);
-    // console.log(tribunalMembersGrades);
-
     const content = await GetByEvalTypeNotasService(trabajoId, evalTypeId);
 
     const headHtmlTemplatePath = buildTemplatePath("rubrica/template_notas_head.html");
     const tableDefensaHtmlTemplatePath = buildTemplatePath("rubrica/template_notas_defensa.html");
-    const tableEscritoHtmlTemplatePath = buildTemplatePath("rubrica/template_notas_escrito.html");
+    // const tableEscritoHtmlTemplatePath = buildTemplatePath("rubrica/template_notas_escrito.html");
+    const tableBaseHtmlTemplatePath = buildTemplatePath("rubrica/template_notas_base.html");
     const htmlTemplatePath = buildTemplatePath(dynamicData.nameTamplate + ".html");
     const hadHtmlContent = await fs.readFile(headHtmlTemplatePath, "utf-8");
-    const tableEscritoHtmlContent = await fs.readFile(tableEscritoHtmlTemplatePath, "utf-8");
+    const tableBaseHtmlContent = await fs.readFile(tableBaseHtmlTemplatePath, "utf-8");
+    // const tableEscritoHtmlContent = await fs.readFile(tableEscritoHtmlTemplatePath, "utf-8");
     const tableDefensaHtmlContent = await fs.readFile(tableDefensaHtmlTemplatePath, "utf-8");
     let htmlContent = await fs.readFile(htmlTemplatePath, "utf-8");
     // const tempFilePath = buildTempFilesPath(dynamicData.tituloDocumentoActa + ".pdf");
     const tempHtmlPath = buildTempFilesPath(dynamicData.tituloDocumentoActa + ".html"); // Ruta para el archivo HTML temporal        
     htmlContent = htmlContent.replace("{{CONTENT}}", JSON.stringify(content, null, 2).replace("\n", "<br>"));
     htmlContent = htmlContent.replace("{{head}}", await buildHeadHtml(hadHtmlContent, trabajoId));
-    htmlContent = htmlContent.replace("{{tables}}", tableEscritoHtmlContent);
-    // htmlContent = htmlContent.replace("{{TABLE-DEFENSA}}", tableDefensaHtmlContent);
-
-    // htmlContent = htmlContent.replace("<!--NOTAS-ESTUDIANTES-->", notasEstudiantesHtmlStr);
-    // Reemplazar las partes dinámicas con los datos
-    // Object.keys(dynamicData).forEach((key) => {
-    //     const regex = new RegExp(`{{${key}}}`, "g"); // Busca la variable con {{variable}}
-    //     htmlContent = htmlContent.replace(regex, dynamicData[key]);
-    // });
-
+    htmlContent =
+        htmlContent
+            .replace("{{tables}}", tableBaseHtmlContent)
+            .replace("{{tables}}", await buildTablesHtml(trabajoId));
     // Escribir el archivo HTML modificado en un archivo temporal
     await fs.writeFile(tempHtmlPath, htmlContent);
     return dynamicData.tituloDocumentoActa;
