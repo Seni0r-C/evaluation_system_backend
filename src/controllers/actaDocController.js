@@ -1,9 +1,7 @@
 const { ensureFileExtension, buildTempFilesPath } = require('../utils/fileUtility');
 const { GenerateActaService } = require('../services/actaDocService');
 const fs = require('fs-extra');
-const path = require('path');
 const puppeteer = require('puppeteer');
-
 
 exports.getActaFile = async (req, res) => {
     try {
@@ -39,9 +37,7 @@ exports.getActaFile = async (req, res) => {
         });
 
         await browser.close();
-        // res.setHeader('Content-Disposition', 'attachment; filename=' + fileName);
-        // res.setHeader('Content-Type', 'application/pdf');
-        // Enviar el PDF generado como descarga
+
         res.download(tempPdfFilePath, fileName, async (err) => {
             if (err) {
                 console.error("Error enviando el PDF:", err);
@@ -69,34 +65,6 @@ exports.getActaFile = async (req, res) => {
         });
     }
 };
-
-// exports.getActaFile = async (req, res) => {
-//     try {
-//         const fileName = ensureFileExtension(req.params.file_name, 'pdf');
-//         // Ruta donde se encuentra el archivo
-//         const tempFilePath = buildDocPath(fileName);
-//         // Verificamos si el archivo existe
-//         if (!fs.existsSync(tempFilePath)) {
-//             return res.status(404).json({
-//                 typeMsg: 'error',
-//                 message: 'Archivo no encontrado.',
-//                 data: tempFilePath
-//             });
-//         }
-//         // Configuramos las cabeceras para la descarga
-//         res.setHeader('Content-Disposition', 'attachment; filename=' + fileName);
-//         res.setHeader('Content-Type', 'application/pdf');
-//         // Leemos y enviamos el archivo
-//         const fileStream = fs.createReadStream(tempFilePath);                       
-//         fileStream.pipe(res);
-//     } catch (error) {
-//         return res.status(400).json({
-//             typeMsg: 'error',
-//             message: 'Error en el servidor al obtener acta.',
-//             error: error
-//         });
-//     }
-// };
 
 exports.getActaFileName = async (req, res) => {
     try {

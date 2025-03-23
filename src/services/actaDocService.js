@@ -4,7 +4,6 @@ const db = require('../config/db');
 const fs = require("fs-extra");
 const { GetFullActaService } = require("./actaService");
 
-
 function crearEstudianteNotas(estudiante, index = null) {
     const promedioTotal = estudiante.promedioTotal;
     const notasStr = estudiante.notas.map(nota => {
@@ -65,33 +64,6 @@ const renderNotasEstudiantes = (estudiantes) => {
     return actaNotas.join('');
 }
 
-const getEstudiantesNotas = async (trabajoData) => {
-    try {
-        const estudianteIds = trabajoData.estudiantes;
-        const nameFile = buildTempFilesPath('notasData.json')
-        // Leer el archivo JSON
-        const data = await fs.readFile(nameFile, 'utf8');
-        // Parsear el contenido como JSON
-        return JSON.parse(data).filter(estudiante => estudianteIds.includes(estudiante.id));
-    } catch (error) {
-        console.error('Error al leer el archivo:', error);
-        return null;
-    }
-};
-
-const getTrabajo = async (id) => {
-    try {
-        const nameFile = buildTempFilesPath('trabajosData.json')
-        // Leer el archivo JSON
-        const data = await fs.readFile(nameFile, 'utf8');
-        // Parsear el contenido como JSON
-        return JSON.parse(data).find(trabajo => trabajo.id === id);
-    } catch (error) {
-        console.error('Error al leer el archivo:', error);
-        return null;
-    }
-};
-
 const nombreEstudianteList = (estudiantes) => {
     return estudiantes.map(estudiante => estudiante.nombres);
 }
@@ -104,8 +76,8 @@ const adjustPages = (notasEstudiantesHtmlStr, trabajoData, estudiantes, isComple
     const marginTop = `<div style="margin-top: -15px;"></div>`;
     const marginBottom = `<div style="padding-bottom: 180px;"></div>`;
     const nextPage = `<div style="page-break-after: always;"></div>`;
-    console.log("nWordsTopicTesis");
-    console.log(nWordsTopicTesis);
+    // console.log("nWordsTopicTesis");
+    // console.log(nWordsTopicTesis);
     try {
         if (estudiantes.length == 1 && !isComplexivo) {
             notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.0", "");

@@ -356,10 +356,27 @@ exports.desasociarEstudiante = async (req, res) => {
     }
 };
 
+exports.setQuienPreside = async (quien_preside_id, trabajo_id) => {
+    // console.log("quien_preside_id");
+    // console.log(quien_preside_id);
+    quien_preside_id = quien_preside_id.id;
+    const yearActual = new Date().getFullYear();
+    const [rows] = await db.query("SELECT * FROM acta WHERE year = ?", [yearActual]);
+    const acta = rows.length > 0 ? rows[0] : null;
+    if (!acta) {
+        await db.query("INSERT INTO acta (year, num_year_count, trabajo_id, vicedecano_id) VALUES (?, ?, ?, ?)",
+            [yearActual, 0, trabajo_id, quien_preside_id]);
+        return;
+    }
+    await db.query("UPDATE acta SET vicedecano_id = ? WHERE year = ?", [quien_preside_id, yearActual]);
+}
+
+let internalInvoke = false;
+
 // Asignar Tribunal (Verifica si ya existen docentes asignados)
 exports.asignarTribunal = async (req, res) => {
-    const { trabajo_id, docente_ids, fecha_defensa } = req.body;
-
+    const { trabajo_id, docente_ids, fecha_defensa, quien_preside_id } = req.body;
+    this.setQuienPreside(quien_preside_id, trabajo_id);
     try {
         if (!trabajo_id) {
             return res.status(400).json({
@@ -401,9 +418,11 @@ exports.asignarTribunal = async (req, res) => {
             });
         }
 
-
         // Si no hay docentes previos, proceder con la asignación
-        return await module.exports.reasignarTribunal(req, res);
+        internalInvoke = true;
+        const result = await module.exports.reasignarTribunal(req, res);
+        internalInvoke = false;
+        return result;
 
     } catch (error) {
         console.error('Error al asignar tribunal:', error);
@@ -417,8 +436,10 @@ exports.asignarTribunal = async (req, res) => {
 
 // Reasignar Tribunal (Inserta solo docentes no asignados previamente)
 exports.reasignarTribunal = async (req, res) => {
-    const { trabajo_id, docente_ids, fecha_defensa } = req.body;
-
+    const { trabajo_id, docente_ids, fecha_defensa, quien_preside_id } = req.body;
+    if (!internalInvoke) {
+        this.setQuienPreside(quien_preside_id, trabajo_id);
+    }
     try {
         if (!trabajo_id) {
             return res.status(400).json({
@@ -460,7 +481,7 @@ exports.reasignarTribunal = async (req, res) => {
                          SET fecha_defensa = ?,
                          estado_id = ?
                          WHERE id = ?`,
-                //  3: "CON TRIBUNAL"
+                //  Estado de trabajo 3: "CON TRIBUNAL"
                 [fecha_defensa, 3, trabajo_id]
             );
         }

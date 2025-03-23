@@ -13,6 +13,14 @@ const usuariosSimulados = {
             { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
         ])
     },
+    'preside': {
+        nombres: 'HAROLD OMAR GARCIA VILLANUEVA',
+        tipo_usuario: 'DOCENTE',
+        idpersonal: 12382,
+        datos_estudio: JSON.stringify([
+            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+        ])
+    },
     'tribunal': {
         nombres: 'PEDRO MANOLO ANESTECIO ONETWO',
         tipo_usuario: 'DOCENTE',

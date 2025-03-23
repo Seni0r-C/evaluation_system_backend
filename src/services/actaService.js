@@ -8,18 +8,25 @@ const { GetTribunalFromTesisFullDT0: GetTribunalFromTesisFullDTO } = require('..
 // Servicio para obtener la última información del acta
 exports.GetLastInfoActaService = async () => {
     const yearActual = new Date().getFullYear();
-    let query = "SELECT * FROM acta ORDER BY id DESC LIMIT 1";
-    const [rows] = await db.query(query);
-
+    let query = "SELECT * FROM acta WHERE year = ? ORDER BY id DESC LIMIT 1";
+    const [rows] = await db.query(query, [yearActual]);
+    let nextData = {};
     if (rows.length === 0) {
-        return {
+        let query = "SELECT * FROM acta ORDER BY id DESC LIMIT 1";
+        const [rowslastyear] = await db.query(query);
+        nextData = {
             year: yearActual, num_year_count: 1,
-            trabajo_id: null, secretaria_id: null, vicedecano_id: null, asesor_juridico_id: null,
+            trabajo_id: null, 
+            secretaria_id: rowslastyear.secretaria_id, 
+            vicedecano_id: rowslastyear.vicedecano_id, 
+            asesor_juridico_id: rowslastyear.asesor_juridico_id,
             fecha_hora: getServerDate(), ciudad: 'Portoviejo', lugar: null
         };
+        await this.PostInfoActaService(nextData);
+        return nextData;
     }
     const lastActa = rows[0];
-    return {
+    nextData = {
         year: yearActual, num_year_count: lastActa.num_year_count + 1,
         trabajo_id: null,
         secretaria_id: lastActa.secretaria_id,
@@ -27,6 +34,8 @@ exports.GetLastInfoActaService = async () => {
         asesor_juridico_id: lastActa.asesor_juridico_id,
         fecha_hora: getServerDate(), ciudad: lastActa.ciudad, lugar: lastActa.lugar
     };
+    await db.query("UPDATE acta SET num_year_count = ? WHERE id = ?", [nextData.num_year_count, lastActa.id]);
+    return nextData;
 };
 
 // Servicio para registrar información en el acta
@@ -41,9 +50,13 @@ exports.PostInfoActaService = async (data) => {
 exports.GetActaService = async (trabajo_id) => {
     const query = "SELECT * FROM acta WHERE trabajo_id = ?";
     const [rows] = await db.query(query, [trabajo_id]);
+    if (rows.length === 0) {
+
+        return rows[0];
+    }
+    
     return rows.length > 0 ? rows[0] : this.GetLastInfoActaService();
 };
-
 
 const carreraMap = {
     "SISTEMAS DE INFORMACIÓN": {
