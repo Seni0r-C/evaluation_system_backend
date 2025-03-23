@@ -356,12 +356,18 @@ exports.desasociarEstudiante = async (req, res) => {
     }
 };
 
+exports.getQuienPreside = async () => {
+    const yearActual = new Date().getFullYear();
+    const [rows] = await db.query("SELECT * FROM acta WHERE year = ?", [yearActual]);
+    return rows;
+}
+
 exports.setQuienPreside = async (quien_preside_id, trabajo_id) => {
     // console.log("quien_preside_id");
     // console.log(quien_preside_id);
     quien_preside_id = quien_preside_id.id;
+    const rows = await this.getQuienPreside();
     const yearActual = new Date().getFullYear();
-    const [rows] = await db.query("SELECT * FROM acta WHERE year = ?", [yearActual]);
     const acta = rows.length > 0 ? rows[0] : null;
     if (!acta) {
         await db.query("INSERT INTO acta (year, num_year_count, trabajo_id, vicedecano_id) VALUES (?, ?, ?, ?)",
@@ -600,6 +606,21 @@ exports.obtenerTribunal = async (req, res) => {
 
         const [results] = await db.execute(query, [trabajo_id]);
 
+        const rows = await this.getQuienPreside();
+        const hasQuienPreside = rows.length > 0 ? rows[0] : null;
+        if (hasQuienPreside) {
+            const quienPresideId = hasQuienPreside.vicedecano_id;
+            const [[quienPresideRow]] = await db.execute("SELECT * FROM usuario WHERE id = ?", [quienPresideId]);
+            results.unshift(quienPresideRow);
+        }else {
+            results.unshift(null);
+        }
+        console.log("results (members)");
+        console.log(results);
+        // console.log("hasQuienPreside");
+        // console.log(hasQuienPreside);
+        // console.log("rows");
+        // console.log(rows);
         // Validar si no existen docentes asociados
         if (results.length === 0) {
             return res.status(200).json({
