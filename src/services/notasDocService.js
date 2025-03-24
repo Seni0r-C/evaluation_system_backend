@@ -307,7 +307,12 @@ const buildTrsBodyTableHtmlAndMedianGrade = (headColNamesList, objEvaluation) =>
         }
         const notafinalsum = notas.reduce((acc, nota) => acc + nota, 0);
         const notafinalBase = notasBase.reduce((acc, nota) => acc + nota, 0);
-        const notafinal = (notafinalsum / notafinalBase)*100;
+        console.log("notafinalsum");
+        console.log(notafinalsum);
+        console.log("notafinalBase");
+        console.log(notafinalBase);
+        const numTribunalMembersGrades = 3;
+        const notafinal = (notafinalsum / (notafinalBase * numTribunalMembersGrades))*100;
         return [trs.join(""), parseInt(notafinal+"")];
     }
 }
