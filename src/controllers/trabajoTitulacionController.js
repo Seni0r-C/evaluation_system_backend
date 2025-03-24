@@ -615,8 +615,8 @@ exports.obtenerTribunal = async (req, res) => {
         }else {
             results.unshift(null);
         }
-        console.log("results (members)");
-        console.log(results);
+        // console.log("results (members)");
+        // console.log(results);
         // console.log("hasQuienPreside");
         // console.log(hasQuienPreside);
         // console.log("rows");
