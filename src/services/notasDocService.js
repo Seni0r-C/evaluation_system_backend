@@ -339,6 +339,10 @@ const buildTablesHtml = async (trabajoId) => {
     const gradeComponentCategorys = [];
     const tribunalMembersGradesClean = tribunalMembersGrades.map((item) => {
         if (item.nombre.includes("::>")) {
+            item.nombre = item.nombre.replace("::>", ": ");
+            return item;
+        }
+        if (item.nombre.includes("<::>")) {
             const [gradeComponentCategory, gradeComponentDescription] = item.nombre.split("::>");
             item.nombre = gradeComponentCategory;
             item.gradeComponentCategory = gradeComponentDescription;
@@ -363,6 +367,8 @@ const buildTablesHtml = async (trabajoId) => {
     }
     const newGroupedByStudents = groupsBy(tribunalMembersGradesClean, groupRoute);
     const isOneStudent = newGroupedByStudents.length === 1;
+    console.log("hasGradeComponentCategorys")
+    console.log(hasGradeComponentCategorys)
     console.log("newGroupedByStudents");
     console.log(JSON.stringify(newGroupedByStudents, null, 2));
     const tables = [];
