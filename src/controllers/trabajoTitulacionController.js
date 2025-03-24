@@ -245,8 +245,8 @@ exports.listarTrabajosForTribunal = async (req, res) => {
             ${whereQuery}
         `, queryParams);
 
-        console.log("Total de trabajos: ", totalRows[0].total);
-        console.log(rows);
+        // console.log("Total de trabajos: ", totalRows[0].total);
+        // console.log(rows);
         // Enviar la respuesta con los trabajos y el total de registros
         res.json({
             data: rows,

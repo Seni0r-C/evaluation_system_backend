@@ -232,11 +232,14 @@ const getCompleteThesisGradeStatement = () => {
         `;
 }
 
-const isCompleteThesis = async (docent_id, trabajo_id) => {
+const isCompleteThesis = async (docent_id, trabajo_id, db) => {
     const [rows] = await db.query(`
                 ${getCompleteThesisGradeStatement()}
-        `, [docent_id, trabajo_id]);
+        `, [trabajo_id]);
     
+    console.log("isCompleteThesis. rows.length");
+    console.log(rows.length);
+    console.log(rows);
     return rows.length === 3;
 }
 
@@ -250,8 +253,8 @@ exports.createRubricaEvaluaciones = async (req, res) => {
 
     const connection = await db.getConnection(); // Asegúrate de usar un pool de conexiones
 
-    console.log("calificaciones");
-    console.log(calificaciones);
+    // console.log("calificaciones");
+    // console.log(calificaciones);
 
     try {
         await connection.beginTransaction();
@@ -271,8 +274,8 @@ exports.createRubricaEvaluaciones = async (req, res) => {
         const docente_id = calificaciones[0].docente_id;
         console.log("const trabajo_id = c...[0].docente_id;");
         // Verificar si el trabajo de tesis ha sido calificado por todos los docentes (3)
-        const isCompleteThesisValue = await isCompleteThesis(docente_id, trabajo_id);
-        console.log("isCompleteThesis(docente_id, trabajo_id)");
+        const isCompleteThesisValue = await isCompleteThesis(docente_id, trabajo_id, connection);
+        console.log(`isCompleteThesis(docente_id: ${docente_id}, trabajo_id: ${trabajo_id})`);
         console.log(isCompleteThesisValue);
         if (isCompleteThesisValue) {
             // Cambiar el estado del trabajo a "DEFENDIDO" o sea 4
