@@ -93,7 +93,9 @@ exports.GetFullActaService = async (trabajo_id) => {
     actaInfoFull.ciudad = actaInfo.ciudad;
     actaInfoFull.fechaHora = describirFecha(actaInfo.fecha_hora);
     actaInfoFull.facultad = actaInfo.facultad ?? "Facultad de Ciencias Informáticas";
-    actaInfoFull.vicedecano = await GetNombreUsuarioService(actaInfo.vicedecano_id) ?? "Ing. Loor Zamora Patricio, Mg.";
+    const vicedecano = await GetNombreUsuarioService(actaInfo.vicedecano_id);
+    actaInfoFull.vicedecano =  vicedecano??false ? asIngPhd(vicedecano): "Ing. Loor Zamora Patricio, Mg.";
+
     actaInfoFull.lugar = actaInfo.lugar ?? "la sala de sesiones del H. Consejo Directivo";
     actaInfoFull.secretarioAsesorJuridico = await GetNombreUsuarioService(actaInfo.asesor_juridico_id) ?? "Abg. Macías Cano David";
     // Información del acta obtenida desde la tesis

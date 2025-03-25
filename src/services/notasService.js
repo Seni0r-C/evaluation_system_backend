@@ -66,6 +66,43 @@ const reduceNotasData = (data, esquema) => {
     return Object.values(groupedData);
 };
 
+// Function to group by "nombre" and calculate sum and mean
+const groupAndCalculate = (data) => {
+    return data.map(student => {
+        // Grouping by "nombre"
+        const groupedNotas = student.notas.reduce((acc, nota) => {
+            if (!acc[nota.nombre]) {
+                acc[nota.nombre] = [];
+            }
+            acc[nota.nombre].push(nota.valor);
+            return acc;
+        }, {});
+
+        // Calculate sum and mean for each group
+        const groupedSummary = Object.keys(groupedNotas).map(nombre => {
+            const valores = groupedNotas[nombre];
+            const sum = valores.reduce((total, valor) => total + valor, 0);
+            const mean = sum / valores.length;
+
+            return {
+                nombre,
+                sum,
+                mean: mean.toFixed(2),
+                valor: parseInt(mean+""),
+                base: 100
+            };
+        });
+
+        student.promedioTotal.valor = parseInt(student.promedioTotal.valor+"");
+
+        return {
+            ...student,
+            notas: groupedSummary
+        };
+    });
+};
+
+
 
 exports.GetNotasService = async (trabajo_id) => {
     try {
@@ -73,13 +110,17 @@ exports.GetNotasService = async (trabajo_id) => {
         const modalidad = await GetModalidadTrabajoService(trabajo_id);
         const modalidad_id = modalidad?.id;
         // Obtener el esquema de notas
-        const esquema = await GetNotasSchemeActaService(modalidad_id); 
+        const esquema = await GetNotasSchemeActaService(modalidad_id);
         const groupedData = reduceNotasData(data, esquema)?.map(nota => {
-            nota.promedioTotal.valor = ((nota.promedioTotal.valor / nota.promedioTotal.base)*100).toFixed(2);
+            nota.promedioTotal.valor = ((nota.promedioTotal.valor / nota.promedioTotal.base) * 100);
+            // nota.promedioTotal.valor = ((nota.promedioTotal.valor / nota.promedioTotal.base) * 100).toFixed(2);
             nota.promedioTotal.base = 100;
             return nota;
         });
-        return groupedData;
+        const groupedDataWithSummary = groupAndCalculate(groupedData);
+        console.log("groupedDataWithSummary")
+        console.log(JSON.stringify(groupedDataWithSummary, null, 2));
+        return groupedDataWithSummary;
     } catch (error) {
         const msg = { message: 'Error al obtener notas de estudiantes.', error }
         console.log(msg)
@@ -89,7 +130,7 @@ exports.GetNotasService = async (trabajo_id) => {
 
 exports.GetByEvalTypeNotasService = async (trabajo_id, eval_type_id) => {
     try {
-        const data = await GetNotasByEvalTypeTrabajoService(trabajo_id, eval_type_id);       
+        const data = await GetNotasByEvalTypeTrabajoService(trabajo_id, eval_type_id);
         return data;
     } catch (error) {
         const msg = { message: 'Error al obtener notas de estudiantes por tipo de evaluación.', error }
