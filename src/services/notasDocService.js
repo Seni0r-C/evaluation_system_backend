@@ -5,7 +5,7 @@ const fs = require("fs-extra");
 const { GetFullActaService } = require("./actaService");
 const { GetTribunalMembersGradesService } = require("./tribunalMambersGradeService");
 const { GetByIdTrabajoService } = require("./trabajoTitulacionService");
-const { GetTribunalFromTesisFullDT0 } = require("../dto/tribunalMembersDTO");
+const { GetTribunalFromTesisFullDTO,  UngetTribunalFromTesisFullDTO } = require("../dto/tribunalMembersDTO");
 const { groupsBy } = require("../utils/groupListUtility");
 const { sortObjectEntries } = require("../utils/sortObjUtility");
 
@@ -115,8 +115,8 @@ const adjustPages = (notasEstudiantesHtmlStr, trabajoData, estudiantes, isComple
         console.log("buildDataActa error");
         console.log(error);
     }
-    console.log("notasEstudiantesHtmlStr");
-    console.log(notasEstudiantesHtmlStr);
+    // console.log("notasEstudiantesHtmlStr");
+    // console.log(notasEstudiantesHtmlStr);
     return notasEstudiantesHtmlStr;
 }
 
@@ -161,12 +161,17 @@ const buildDataActaComplexivo = async (estudiantesNotasData, trabajoData) => {
  * @return {string} A string with a fragment of HTML that represents an ordered list of tribunal members.
  */
 const buildTribunalMembersFragmentHtml = (data, normalizeFunc = (item) => item) => {
-    const membersHtmlStr = Object.values(data).map((item) => {
-        item = normalizeFunc(item);
-        return `
-        <li>${item}</li>
+    // const membersHtmlStr = Object.values(data).map((item) => {
+    //     item = normalizeFunc(item);
+    //     return `
+    //     <li>${item}</li>
+    // `;
+    // }).join("");
+    const membersHtmlStr = `
+        <li>${data.delegadoConsejoDirectivo}</li>
+        <li>${data.docenteDeArea}</li>
+        <li>${data.delegadoComisionCientifica}</li>
     `;
-    }).join("");
     return `
         <ol>
             ${membersHtmlStr}
@@ -188,28 +193,26 @@ const buildStudentsFragmentHtml = (nameStudentsList, normalizeFunc) => {
     `;
 };
 
-const buildHeadHtml = async (hadHtmlContent, trabajoId) => {
+const buildHeadHtml = async (headHtmlContent, trabajoId) => {
     const thesisWorkRows = await GetByIdTrabajoService(trabajoId);
     if (!thesisWorkRows) {
         throw new Error("Trabajo not found");
     }
     const trabajoData = thesisWorkRows[0];
-    console.log("trabajoData");
-    console.log(trabajoData);
+    // console.log("trabajoData");
+    // console.log(trabajoData);
     const facultad = "FACULTAD DE CIENCIAS INFORMÁTICAS";
     const carrera = trabajoData.carrera;
     const nameStudentsList = trabajoData.estudiantes;
     const topicThesisWork = trabajoData.titulo;
     const dateThesisWorkAgreement = "Misssing, need be implemented in \"Registro Trabajo Final\" option dialog";
     const dateTimeThesisWorkDefense = trabajoData.fecha_defensa ?? "N/A";
-    const nameTribunalMembers = GetTribunalFromTesisFullDT0(trabajoData);
+    const nameTribunalMembers = GetTribunalFromTesisFullDTO(trabajoData);
     const excludesCapitalization = [
         "de", "la", "el", "los", "las", "un", "una", "unos", "unas", "en", "del"
     ];
     const normalizeText = (text) => {
         text = text.trim();
-        console.log("text");
-        console.log(text);
         return text
             .split(' ') // Split the text into words
             .map(word => {
@@ -222,16 +225,16 @@ const buildHeadHtml = async (hadHtmlContent, trabajoId) => {
             .join(' '); // Join the words back together with spaces
     };
 
-    const replaceHtml = (key, value, normalize = true) => hadHtmlContent.replace("{{" + key + "}}", !normalize ? value : normalizeText(value));
-    hadHtmlContent = replaceHtml("facultad", facultad);
-    hadHtmlContent = replaceHtml("carrera", carrera);
-    hadHtmlContent = replaceHtml("nameStudentsList", buildStudentsFragmentHtml(nameStudentsList, normalizeText), false);
-    hadHtmlContent = replaceHtml("topicThesisWork", topicThesisWork);
-    hadHtmlContent = replaceHtml("dateThesisWorkAgreement", dateThesisWorkAgreement, false);
+    const replaceHtml = (key, value, normalize = true) => headHtmlContent.replace("{{" + key + "}}", !normalize ? value : normalizeText(value));
+    headHtmlContent = replaceHtml("facultad", facultad);
+    headHtmlContent = replaceHtml("carrera", carrera);
+    headHtmlContent = replaceHtml("nameStudentsList", buildStudentsFragmentHtml(nameStudentsList, normalizeText), false);
+    headHtmlContent = replaceHtml("topicThesisWork", topicThesisWork);
+    headHtmlContent = replaceHtml("dateThesisWorkAgreement", dateThesisWorkAgreement, false);
     // date and time, separated by comma, takes the first part (date)
-    hadHtmlContent = replaceHtml("dateTimeThesisWorkDefense", dateTimeThesisWorkDefense.split(",")[0], false);
-    hadHtmlContent = replaceHtml("nameTribunalMembers", buildTribunalMembersFragmentHtml(nameTribunalMembers, normalizeText), false);
-    return hadHtmlContent;
+    headHtmlContent = replaceHtml("dateTimeThesisWorkDefense", dateTimeThesisWorkDefense.split(",")[0], false);
+    headHtmlContent = replaceHtml("nameTribunalMembers", buildTribunalMembersFragmentHtml(nameTribunalMembers, normalizeText), false);
+    return [headHtmlContent, nameTribunalMembers];
 }
 
 const buildHeadTitleAndTableBaseHtml = (numColSpanTable, evalType, estudiante, headColNamesList) => {
@@ -272,7 +275,7 @@ const buildHeadTitleAndTableBaseHtml = (numColSpanTable, evalType, estudiante, h
     ];
 }
 
-const buildTrsBodyTableHtmlAndMedianGrade = (headColNamesList, objEvaluation) => {
+const buildTrsBodyTableHtmlAndMedianGrade = (headColNamesList, objEvaluation, tribunalMembers) => {
     const hasGradeComponentCategorys = headColNamesList.length > 5;
     const trs = [];
     const tds = [];
@@ -297,10 +300,35 @@ const buildTrsBodyTableHtmlAndMedianGrade = (headColNamesList, objEvaluation) =>
             tds.push(`<td>${nameEvaluation}</td>`);
             tds.push(`<td>${valueEvaluation[0].base}</td>`);
             notasBase.push(parseInt(valueEvaluation[0].base));
-            for (const value of Object.values(valueEvaluation)) {
-                notas.push(parseInt(value.nota));
-                tds.push(`<td>${value.nota}</td>`);
-            }
+            // for (const value of Object.values(valueEvaluation)) {
+            //     notas.push(parseInt(value.nota));
+            //     tds.push(`<td>${value.nota}</td>`);
+            // }
+
+            // delegadoConsejoDirectivo            
+            const delegadoConsejoDirectivo = Object.values(valueEvaluation).find((value) => {
+                return  value.docente===tribunalMembers.delegadoConsejoDirectivo
+            });
+            notas.push(parseInt(delegadoConsejoDirectivo.nota));
+            tds.push(`<td>${delegadoConsejoDirectivo.nota}</td>`);
+            // docenteDeArea
+            const docenteDeArea = Object.values(valueEvaluation).find((value) => {
+                return value.docente===tribunalMembers.docenteDeArea
+            });
+            console.log("docenteDeArea");
+            console.log(docenteDeArea);
+            notas.push(parseInt(docenteDeArea.nota));
+            tds.push(`<td>${docenteDeArea.nota}</td>`);
+            // delegadoComisionCientifica
+            const delegadoComisionCientifica = Object.values(valueEvaluation).find((value) => {
+                return value.docente===tribunalMembers.delegadoComisionCientifica
+            });
+            console.log("delegadoComisionCientifica");
+            console.log(delegadoComisionCientifica);
+            notas.push(parseInt(delegadoComisionCientifica.nota));
+            tds.push(`<td>${delegadoComisionCientifica.nota}</td>`);
+            
+            // Concatenate the tds array into a single row (tr)
             trs.push(`<tr>${tds.join("")}</tr>`);
             // Clear the tds array
             tds.length = 0;
@@ -318,9 +346,9 @@ const buildTrsBodyTableHtmlAndMedianGrade = (headColNamesList, objEvaluation) =>
 }
 
 
-const getTableBaseHtml = (numColSpanTable, evalType, estudiante, headColNamesList, value) => {
+const getTableBaseHtml = (numColSpanTable, evalType, estudiante, headColNamesList, value, tribunalMembers) => {
     const [title, head, evalTypeStr] = buildHeadTitleAndTableBaseHtml(numColSpanTable, evalType, estudiante, headColNamesList)
-    const [trs, notafinal] = buildTrsBodyTableHtmlAndMedianGrade(headColNamesList, value);
+    const [trs, notafinal] = buildTrsBodyTableHtmlAndMedianGrade(headColNamesList, value, tribunalMembers);
     return `
         ${title}
         <table>
@@ -339,7 +367,7 @@ const getTableBaseHtml = (numColSpanTable, evalType, estudiante, headColNamesLis
         `;
 };
 
-const buildTablesHtml = async (trabajoId) => {
+const buildTablesHtml = async (trabajoId, nameTribunalMembers) => {
     const tribunalMembersGrades = await GetTribunalMembersGradesService(trabajoId);
     const gradeComponentCategorys = [];
     const tribunalMembersGradesClean = tribunalMembersGrades.map((item) => {
@@ -356,7 +384,8 @@ const buildTablesHtml = async (trabajoId) => {
         return item;
     });
     const hasGradeComponentCategorys = gradeComponentCategorys.length > 0;
-    console.log(tribunalMembersGradesClean);
+    console.log("tribunalMembersGradesClean");
+    console.log(JSON.stringify(tribunalMembersGradesClean, null, 2));
 
     let numColSpanTable = 5;
     let defaultRowSpan = 1;
@@ -374,8 +403,8 @@ const buildTablesHtml = async (trabajoId) => {
     const isOneStudent = newGroupedByStudents.length === 1;
     console.log("hasGradeComponentCategorys")
     console.log(hasGradeComponentCategorys)
-    console.log("newGroupedByStudents");
-    console.log(JSON.stringify(newGroupedByStudents, null, 2));
+    // console.log("newGroupedByStudents");
+    // console.log(JSON.stringify(newGroupedByStudents, null, 2));
     const tables = [];
     let addedWriteenEvalType = false;
     for (const [studentName, strudentValue] of Object.entries(sortObjectEntries(newGroupedByStudents))) {
@@ -385,17 +414,16 @@ const buildTablesHtml = async (trabajoId) => {
             }
             if (kindEvaluation === "INFORME FINAL" && !addedWriteenEvalType) {
                 addedWriteenEvalType = true;
-                const table = getTableBaseHtml(numColSpanTable, kindEvaluation, "", headColNames, kindEvaluationValue);
+                const table = getTableBaseHtml(numColSpanTable, kindEvaluation, "", headColNames, kindEvaluationValue, nameTribunalMembers);
                 tables.push(table);
                 continue;
             }
-            const table = getTableBaseHtml(numColSpanTable, kindEvaluation, isOneStudent || kindEvaluation === "INFORME FINAL" ? "" : studentName, headColNames, kindEvaluationValue);
+            const table = getTableBaseHtml(numColSpanTable, kindEvaluation, isOneStudent || kindEvaluation === "INFORME FINAL" ? "" : studentName, headColNames, kindEvaluationValue, nameTribunalMembers);
             tables.push(table);
         }
     }
     return tables.join("");
 }
-
 
 exports.GenerateByEvalTypeNotasDocService = async (trabajoId, evalTypeId) => {
     const dynamicData = {
@@ -421,11 +449,12 @@ exports.GenerateByEvalTypeNotasDocService = async (trabajoId, evalTypeId) => {
     // const tempFilePath = buildTempFilesPath(dynamicData.tituloDocumentoActa + ".pdf");
     const tempHtmlPath = buildTempFilesPath(dynamicData.tituloDocumentoActa + ".html"); // Ruta para el archivo HTML temporal        
     htmlContent = htmlContent.replace("{{CONTENT}}", JSON.stringify(content, null, 2).replace("\n", "<br>"));
-    htmlContent = htmlContent.replace("{{head}}", await buildHeadHtml(hadHtmlContent, trabajoId));
+    const [headHtmlContent, nameTribunalMembers] = await buildHeadHtml(hadHtmlContent, trabajoId);
+    htmlContent = htmlContent.replace("{{head}}", headHtmlContent);
     htmlContent =
         htmlContent
             .replace("{{tables}}", tableBaseHtmlContent)
-            .replace("{{tables}}", await buildTablesHtml(trabajoId));
+            .replace("{{tables}}", await buildTablesHtml(trabajoId, UngetTribunalFromTesisFullDTO(nameTribunalMembers)));
     // Escribir el archivo HTML modificado en un archivo temporal
     await fs.writeFile(tempHtmlPath, htmlContent);
     return dynamicData.tituloDocumentoActa;

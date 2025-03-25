@@ -1,6 +1,6 @@
 const { asIngMg } = require('../utils/strUtility');
 
-exports.GetTribunalFromTesisFullDT0 = (tesisData) => {
+exports.GetTribunalFromTesisFullDTO = (tesisData) => {
     const sep = ":<br> ";
     // Contenido de tribunal ejemplo:
     // {
@@ -11,11 +11,25 @@ exports.GetTribunalFromTesisFullDT0 = (tesisData) => {
     //       ]
     // }
     // convierte tribunal en un objeto:
-    console.log("tesisData.tribunal")
-    console.log(tesisData.tribunal)
+    // console.log("tesisData.tribunal")
+    // console.log(tesisData.tribunal)
     return {
         delegadoComisionCientifica: asIngMg(tesisData.tribunal[0].split(sep)[1]),
         delegadoConsejoDirectivo: asIngMg(tesisData.tribunal[1].split(sep)[1]),
         docenteDeArea: asIngMg(tesisData.tribunal[2].split(sep)[1])
     };
 };
+
+
+exports.UngetTribunalFromTesisFullDTO = (nameTribunalMembers) => {
+    const normalizeNameMember = (nameMember) => {
+        nameMember = nameMember.split(".")[1];
+        nameMember = nameMember.split(",")[0];
+        return nameMember.toUpperCase().trim();
+    }
+    return {
+        delegadoComisionCientifica: normalizeNameMember(nameTribunalMembers.delegadoComisionCientifica),
+        delegadoConsejoDirectivo: normalizeNameMember(nameTribunalMembers.delegadoConsejoDirectivo),
+        docenteDeArea: normalizeNameMember(nameTribunalMembers.docenteDeArea),
+      };
+}

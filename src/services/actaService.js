@@ -3,7 +3,7 @@ const { getServerDate, describirFecha } = require('../utils/dateUtility');
 const { GetNombreUsuarioService } = require('./usuarioService');
 const { GetByIdTrabajoService } = require('./trabajoTitulacionService');
 const { asIngPhd } = require('../utils/strUtility');
-const { GetTribunalFromTesisFullDT0: GetTribunalFromTesisFullDTO } = require('../dto/tribunalMembersDTO');
+const { GetTribunalFromTesisFullDTO: GetTribunalFromTesisFullDTO } = require('../dto/tribunalMembersDTO');
 
 // Servicio para obtener la última información del acta
 exports.GetLastInfoActaService = async () => {
