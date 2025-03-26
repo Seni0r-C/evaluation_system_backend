@@ -440,9 +440,11 @@ exports.GenerateByEvalTypeNotasDocService = async (trabajoId, evalTypeId) => {
     const tableDefensaHtmlTemplatePath = buildTemplatePath("rubrica/template_notas_defensa.html");
     // const tableEscritoHtmlTemplatePath = buildTemplatePath("rubrica/template_notas_escrito.html");
     const tableBaseHtmlTemplatePath = buildTemplatePath("rubrica/template_notas_base.html");
+    const singBaseHtmlTemplatePath = buildTemplatePath("rubrica/template_sing_notas_base.html");
     const htmlTemplatePath = buildTemplatePath(dynamicData.nameTamplate + ".html");
     const hadHtmlContent = await fs.readFile(headHtmlTemplatePath, "utf-8");
     const tableBaseHtmlContent = await fs.readFile(tableBaseHtmlTemplatePath, "utf-8");
+    const singBaseHtmlContent = await fs.readFile(singBaseHtmlTemplatePath, "utf-8");
     // const tableEscritoHtmlContent = await fs.readFile(tableEscritoHtmlTemplatePath, "utf-8");
     const tableDefensaHtmlContent = await fs.readFile(tableDefensaHtmlTemplatePath, "utf-8");
     let htmlContent = await fs.readFile(htmlTemplatePath, "utf-8");
@@ -454,7 +456,8 @@ exports.GenerateByEvalTypeNotasDocService = async (trabajoId, evalTypeId) => {
     htmlContent =
         htmlContent
             .replace("{{tables}}", tableBaseHtmlContent)
-            .replace("{{tables}}", await buildTablesHtml(trabajoId, UngetTribunalFromTesisFullDTO(nameTribunalMembers)));
+            .replace("{{tables}}", await buildTablesHtml(trabajoId, UngetTribunalFromTesisFullDTO(nameTribunalMembers)))
+            .replace("{{sings}}", singBaseHtmlContent);
     // Escribir el archivo HTML modificado en un archivo temporal
     await fs.writeFile(tempHtmlPath, htmlContent);
     return dynamicData.tituloDocumentoActa;
