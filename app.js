@@ -10,7 +10,7 @@ const app = express();
 // setupSwaggerDocs(app);
 
 const corsOptions = {
-    origin: FRONT_URL,
+    // origin: FRONT_URL,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],	
     // allowedHeaders: ['Content-Type', 'Authorization']
 };
