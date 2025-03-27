@@ -1,6 +1,5 @@
 SELECT * FROM rubrica_evaluacion;
--- removes records of grades on thesis work
-DELETE FROM rubrica_evaluacion WHERE trabajo_id = 10;
+
 
 
 -- 'CON TRIBUNAL'
@@ -16,3 +15,6 @@ SET estado_id = (SELECT te.id
 												FROM trabajo_estado te 
 												WHERE te.nombre = 'DEFENDIDO'
 												);
+-- removes records of grades on thesis work
+DELETE FROM rubrica_evaluacion WHERE trabajo_id = 10;
+

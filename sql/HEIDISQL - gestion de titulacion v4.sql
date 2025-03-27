@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `acta` (
   `secretaria_id` int(11) NOT NULL,
   `vicedecano_id` int(11) NOT NULL,
   `asesor_juridico_id` int(11) NOT NULL,
-  `fecha_hora_verbose` datetime NOT NULL,
+  `fecha_hora_verbose` text NOT NULL,
   `ciudad` varchar(150) NOT NULL,
   `lugar` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
@@ -36,13 +36,13 @@ CREATE TABLE IF NOT EXISTS `acta` (
   KEY `secretaria_id` (`secretaria_id`),
   KEY `vicedecano_id` (`vicedecano_id`),
   KEY `asesor_juridico_id` (`asesor_juridico_id`),
-  CONSTRAINT `acta_ibfk_1` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_estudiante` (`id`),
-  CONSTRAINT `acta_ibfk_2` FOREIGN KEY (`secretaria_id`) REFERENCES `usuario` (`id`),
-  CONSTRAINT `acta_ibfk_3` FOREIGN KEY (`vicedecano_id`) REFERENCES `usuario` (`id`),
-  CONSTRAINT `acta_ibfk_4` FOREIGN KEY (`asesor_juridico_id`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `FK_acta_trabajo_titulacion` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`),
+  CONSTRAINT `acta_ibfk_3` FOREIGN KEY (`vicedecano_id`) REFERENCES `usuario` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
 
--- Volcando datos para la tabla gestion_titulacion.acta: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.acta: ~1 rows (aproximadamente)
+INSERT INTO `acta` (`id`, `year`, `num_year_count`, `trabajo_id`, `secretaria_id`, `vicedecano_id`, `asesor_juridico_id`, `fecha_hora_verbose`, `ciudad`, `lugar`) VALUES
+	(5, 2025, 0, 10, 0, 61, 0, '0000-00-00 00:00:00', '', '');
 
 -- Volcando estructura para tabla gestion_titulacion.acta_notas_scheme
 CREATE TABLE IF NOT EXISTS `acta_notas_scheme` (
@@ -91,8 +91,8 @@ CREATE TABLE IF NOT EXISTS `rubrica` (
   PRIMARY KEY (`id`),
   KEY `rubrica_ibfk_1` (`modalidad_id`),
   KEY `FK_tipo_evaluacion_id` (`tipo_evaluacion_id`),
-  CONSTRAINT `FK_tipo_evaluacion_id` FOREIGN KEY (`tipo_evaluacion_id`) REFERENCES `sistema_tipo_evaluacion` (`id`)  ,
-  CONSTRAINT `rubrica_ibfk_1` FOREIGN KEY (`modalidad_id`) REFERENCES `sistema_modalidad_titulacion` (`id`)  
+  CONSTRAINT `FK_tipo_evaluacion_id` FOREIGN KEY (`tipo_evaluacion_id`) REFERENCES `sistema_tipo_evaluacion` (`id`),
+  CONSTRAINT `rubrica_ibfk_1` FOREIGN KEY (`modalidad_id`) REFERENCES `sistema_modalidad_titulacion` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
 
 -- Volcando datos para la tabla gestion_titulacion.rubrica: ~8 rows (aproximadamente)
@@ -114,30 +114,35 @@ CREATE TABLE IF NOT EXISTS `rubrica_criterio` (
   `puntaje_maximo` decimal(5,2) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `rubrica_id` (`rubrica_id`),
-  CONSTRAINT `rubrica_criterio_ibfk_1` FOREIGN KEY (`rubrica_id`) REFERENCES `rubrica` (`id`)  
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `rubrica_criterio_ibfk_1` FOREIGN KEY (`rubrica_id`) REFERENCES `rubrica` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4;
 
--- Volcando datos para la tabla gestion_titulacion.rubrica_criterio: ~19 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.rubrica_criterio: ~24 rows (aproximadamente)
 INSERT INTO `rubrica_criterio` (`id`, `rubrica_id`, `nombre`, `puntaje_maximo`) VALUES
-	(1, 1, 'APLICACIÓN DEL MÉTODO CIENTIFICO EN EL ANÁLISIS Y SOLUCIÓN DEL PROBLEMA', 40.00),
-	(2, 1, 'RIGOR CIENTÍFICO', 10.00),
-	(5, 1, 'METODOLOGÍA UTILIZADA', 10.00),
-	(6, 1, 'ORIGINALIDAD', 10.00),
-	(7, 1, 'CAPACIDAD CREADORA', 10.00),
-	(8, 1, 'PRESENTACIÓN DEL INFORME', 20.00),
-	(9, 2, 'Calidad de la exposición', 30.00),
-	(10, 2, 'Dominio demostrado en el tema', 20.00),
-	(11, 2, 'Elaboración y uso de la ayuda de equipos en apoyo de la disertación', 10.00),
-	(12, 2, 'Manejo de la presentación', 10.00),
-	(13, 2, 'Contenido y coherencia de la respuestas', 30.00),
-	(14, 4, 'Indexación', 80.00),
-	(15, 3, 'Calidad de la exposición', 30.00),
-	(16, 3, 'Dominio demostrado en el tema', 20.00),
-	(17, 3, 'Elaboración y uso de la ayuda de equipos en apoyo de la disertación', 20.00),
-	(18, 3, 'Manejo de la presentación', 10.00),
-	(19, 3, 'Contenido y coherencia de la respuestas', 30.00),
 	(20, 8, 'Calidad de la exposición	', 30.00),
-	(21, 7, 'Puntaje de prueba evirtual', 40.00);
+	(21, 7, 'Puntaje de prueba evirtual', 40.00),
+	(22, 1, 'APLICACIÓN DEL MÉTODO CIENTIFICO EN EL ANÁLISIS Y SOLUCIÓN DEL PROBLEMA (El método es idóneo para atender la necesidad detectada', 40.00),
+	(23, 1, 'RIGOR CIENTÍFICO (Implica un control coherente de la planificación, el desarrollo y el análisis de la investigación. Definición adecuada de los contenidos en el objeto de estudio y que se explique y aplique con exactitud la metodología de trabajo).', 10.00),
+	(24, 1, 'METODOLOGÍA UTILIZADA (Coherencia entre el tipo de estudio, diseño, métodos y técnicas se recogida y procesamiento de la información que lleven al alcance de los objetivos propuestos).', 10.00),
+	(25, 1, 'ORIGINALIDAD (Incluye ideas o fragmentos de otros autores, siempre y debidamente citados y referenciados que se verifican en los resultados de la aplicación de la herramienta antiplagio).', 10.00),
+	(26, 1, 'CAPACIDAD CREADORA (la forma en que se presenta la solución del problema tiene un enfoque innovador)', 10.00),
+	(27, 1, 'PRESENTACIÓN DEL INFORME FINAL: (cuenta con los aspectos descritos en el reglamento y de desarrollan de manera coherente)', 20.00),
+	(28, 2, 'CONTENIDO::>Calidad de la exposición de la sustentación tomando en cuenta la organización y contenido. (Presenta los aspectos más relevantes de la investigación de manera sistemática y coherente).', 30.00),
+	(29, 2, 'CONTENIDO::>Dominio demostrado en el tema y sobre otros aspectos de la especialidad durante la exposición (utiliza lenguaje técnico propio de la profesión, demuestra dominio en los procesos, describe adecuadamente los resultados).', 20.00),
+	(30, 2, 'PRESENTACIÓN::>Elaboración y uso de la ayuda de equipos en apoyo de la disertación (las diapositivas son claras, concretas direccionan adecuadamente la disertación).', 10.00),
+	(31, 2, 'PRESENTACIÓN::>Manejo de la presentación y dominio del auditorio (demostró seguridad, centró la atención del tribunal).', 10.00),
+	(32, 2, 'DISCUSIÓN::>Contenido y coherencia de la respuestas y explicaciones solicitadas por el tribunal (las respuestas responden a la inquietud del tribunal en función de la investigación y la experiencia del estudiante).', 30.00),
+	(33, 4, 'APLICACIÓN DEL MÉTODO CIENTIFICO EN EL ANÁLISIS Y SOLUCIÓN DEL PROBLEMA (El método es idóneo para atender la necesidad detectada)', 40.00),
+	(34, 4, 'RIGOR CIENTÍFICO (Implica un control coherente de la planificación, el desarrollo y el análisis de la investigación. Definición adecuada de los contenidos en el objeto de estudio y que se explique y aplique con exactitud la metodología de trabajo).', 10.00),
+	(35, 4, 'METODOLOGÍA UTILIZADA (Coherencia entre el tipo de estudio, diseño, métodos y técnicas se recogida y procesamiento de la información que lleven al alcance de los objetivos propuestos).', 10.00),
+	(36, 4, 'ORIGINALIDAD (Incluye ideas o fragmentos de otros autores, siempre y debidamente citados y referenciados que se verifican en los resultados de la aplicación de la herramienta antiplagio).', 10.00),
+	(37, 4, 'CAPACIDAD CREADORA (la forma en que se presenta la solución del problema tiene un enfoque innovador)', 10.00),
+	(38, 4, 'PRESENTACIÓN DEL INFORME FINAL: (cuenta con los aspectos descritos en el reglamento y de desarrollan de manera coherente)', 20.00),
+	(39, 3, 'CONTENIDO::>Calidad de la exposición de la sustentación tomando en cuenta la organización y contenido. (Presenta los aspectos más relevantes de la investigación de manera sistemática y coherente).', 30.00),
+	(40, 3, 'CONTENIDO::>Dominio demostrado en el tema y sobre otros aspectos de la especialidad durante la exposición (utiliza lenguaje técnico propio de la profesión, demuestra dominio en los procesos, describe adecuadamente los resultados).', 20.00),
+	(41, 3, 'PRESENTACIÓN::>Elaboración y uso de la ayuda de equipos en apoyo de la disertación (las diapositivas son claras, concretas direccionan adecuadamente la disertación).', 10.00),
+	(42, 3, 'PRESENTACIÓN::>Manejo de la presentación y dominio del auditorio (demostró seguridad, centró la atención del tribunal).', 10.00),
+	(43, 3, 'DISCUSIÓN::>Contenido y coherencia de la respuestas y explicaciones solicitadas por el tribunal (las respuestas responden a la inquietud del tribunal en función de la investigación y la experiencia del estudiante).', 30.00);
 
 -- Volcando estructura para tabla gestion_titulacion.rubrica_evaluacion
 CREATE TABLE IF NOT EXISTS `rubrica_evaluacion` (
@@ -154,37 +159,114 @@ CREATE TABLE IF NOT EXISTS `rubrica_evaluacion` (
   KEY `FK_docente_id` (`docente_id`),
   KEY `FK_estudiante_evaluacion_id` (`estudiante_id`),
   KEY `FK_trabajo_evaluacion_id` (`trabajo_id`),
-  CONSTRAINT `FK_docente_id` FOREIGN KEY (`docente_id`) REFERENCES `usuario` (`id`) ,
-  CONSTRAINT `FK_estudiante_evaluacion_id` FOREIGN KEY (`estudiante_id`) REFERENCES `usuario` (`id`) ,
-  CONSTRAINT `FK_rubrica_criterio_id` FOREIGN KEY (`rubrica_criterio_id`) REFERENCES `rubrica_criterio` (`id`) ,
-  CONSTRAINT `FK_rubrica_id` FOREIGN KEY (`rubrica_id`) REFERENCES `rubrica` (`id`) ,
-  CONSTRAINT `FK_trabajo_evaluacion_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`) 
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `FK_docente_id` FOREIGN KEY (`docente_id`) REFERENCES `usuario` (`id`),
+  CONSTRAINT `FK_estudiante_evaluacion_id` FOREIGN KEY (`estudiante_id`) REFERENCES `usuario` (`id`),
+  CONSTRAINT `FK_rubrica_criterio_id` FOREIGN KEY (`rubrica_criterio_id`) REFERENCES `rubrica_criterio` (`id`),
+  CONSTRAINT `FK_rubrica_id` FOREIGN KEY (`rubrica_id`) REFERENCES `rubrica` (`id`),
+  CONSTRAINT `FK_trabajo_evaluacion_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=408 DEFAULT CHARSET=utf8mb4;
 
--- Volcando datos para la tabla gestion_titulacion.rubrica_evaluacion: ~22 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.rubrica_evaluacion: ~99 rows (aproximadamente)
 INSERT INTO `rubrica_evaluacion` (`id`, `trabajo_id`, `rubrica_id`, `rubrica_criterio_id`, `docente_id`, `estudiante_id`, `puntaje_obtenido`) VALUES
-	(1, 10, 2, 9, 27, 3, 30.00),
-	(2, 10, 2, 10, 27, 3, 20.00),
-	(3, 10, 2, 11, 27, 3, 10.00),
-	(4, 10, 2, 12, 27, 3, 10.00),
-	(5, 10, 2, 13, 27, 3, 30.00),
-	(6, 10, 1, 1, 27, 3, 37.00),
-	(7, 10, 1, 2, 27, 3, 10.00),
-	(8, 10, 1, 5, 27, 3, 10.00),
-	(9, 10, 1, 6, 27, 3, 10.00),
-	(10, 10, 1, 7, 27, 3, 10.00),
-	(11, 10, 1, 8, 27, 3, 20.00),
-	(12, 10, 2, 9, 27, 4, 30.00),
-	(13, 10, 2, 10, 27, 4, 20.00),
-	(14, 10, 2, 11, 27, 4, 10.00),
-	(15, 10, 2, 12, 27, 4, 10.00),
-	(16, 10, 2, 13, 27, 4, 30.00),
-	(17, 10, 1, 1, 27, 4, 40.00),
-	(18, 10, 1, 2, 27, 4, 10.00),
-	(19, 10, 1, 5, 27, 4, 10.00),
-	(20, 10, 1, 6, 27, 4, 10.00),
-	(21, 10, 1, 7, 27, 4, 10.00),
-	(22, 10, 1, 8, 27, 4, 20.00);
+	(276, 10, 1, 22, 58, 3, 33.00),
+	(277, 10, 1, 23, 58, 3, 10.00),
+	(278, 10, 1, 24, 58, 3, 10.00),
+	(279, 10, 1, 25, 58, 3, 10.00),
+	(280, 10, 1, 26, 58, 3, 10.00),
+	(281, 10, 1, 27, 58, 3, 20.00),
+	(282, 10, 2, 28, 58, 3, 30.00),
+	(283, 10, 2, 29, 58, 3, 20.00),
+	(284, 10, 2, 30, 58, 3, 10.00),
+	(285, 10, 2, 31, 58, 3, 10.00),
+	(286, 10, 2, 32, 58, 3, 30.00),
+	(287, 10, 1, 22, 58, 4, 33.00),
+	(288, 10, 1, 23, 58, 4, 10.00),
+	(289, 10, 1, 24, 58, 4, 10.00),
+	(290, 10, 1, 25, 58, 4, 10.00),
+	(291, 10, 1, 26, 58, 4, 10.00),
+	(292, 10, 1, 27, 58, 4, 20.00),
+	(293, 10, 2, 28, 58, 4, 30.00),
+	(294, 10, 2, 29, 58, 4, 20.00),
+	(295, 10, 2, 30, 58, 4, 10.00),
+	(296, 10, 2, 31, 58, 4, 10.00),
+	(297, 10, 2, 32, 58, 4, 30.00),
+	(298, 10, 1, 22, 43, 3, 40.00),
+	(299, 10, 1, 23, 43, 3, 10.00),
+	(300, 10, 1, 24, 43, 3, 10.00),
+	(301, 10, 1, 25, 43, 3, 10.00),
+	(302, 10, 1, 26, 43, 3, 10.00),
+	(303, 10, 1, 27, 43, 3, 11.00),
+	(304, 10, 2, 28, 43, 3, 30.00),
+	(305, 10, 2, 29, 43, 3, 20.00),
+	(306, 10, 2, 30, 43, 3, 10.00),
+	(307, 10, 2, 31, 43, 3, 10.00),
+	(308, 10, 2, 32, 43, 3, 30.00),
+	(309, 10, 1, 22, 43, 4, 40.00),
+	(310, 10, 1, 23, 43, 4, 10.00),
+	(311, 10, 1, 24, 43, 4, 10.00),
+	(312, 10, 1, 25, 43, 4, 10.00),
+	(313, 10, 1, 26, 43, 4, 10.00),
+	(314, 10, 1, 27, 43, 4, 11.00),
+	(315, 10, 2, 28, 43, 4, 22.00),
+	(316, 10, 2, 29, 43, 4, 11.00),
+	(317, 10, 2, 30, 43, 4, 10.00),
+	(318, 10, 2, 31, 43, 4, 10.00),
+	(319, 10, 2, 32, 43, 4, 30.00),
+	(320, 10, 1, 22, 44, 3, 40.00),
+	(321, 10, 1, 23, 44, 3, 10.00),
+	(322, 10, 1, 24, 44, 3, 10.00),
+	(323, 10, 1, 25, 44, 3, 10.00),
+	(324, 10, 1, 26, 44, 3, 10.00),
+	(325, 10, 1, 27, 44, 3, 20.00),
+	(326, 10, 2, 28, 44, 3, 22.00),
+	(327, 10, 2, 29, 44, 3, 20.00),
+	(328, 10, 2, 30, 44, 3, 10.00),
+	(329, 10, 2, 31, 44, 3, 10.00),
+	(330, 10, 2, 32, 44, 3, 30.00),
+	(331, 10, 1, 22, 44, 4, 40.00),
+	(332, 10, 1, 23, 44, 4, 10.00),
+	(333, 10, 1, 24, 44, 4, 10.00),
+	(334, 10, 1, 25, 44, 4, 10.00),
+	(335, 10, 1, 26, 44, 4, 10.00),
+	(336, 10, 1, 27, 44, 4, 20.00),
+	(337, 10, 2, 28, 44, 4, 29.00),
+	(338, 10, 2, 29, 44, 4, 20.00),
+	(339, 10, 2, 30, 44, 4, 10.00),
+	(340, 10, 2, 31, 44, 4, 10.00),
+	(341, 10, 2, 32, 44, 4, 30.00),
+	(375, 19, 3, 39, 44, 47, 15.00),
+	(376, 19, 3, 40, 44, 47, 20.00),
+	(377, 19, 3, 41, 44, 47, 10.00),
+	(378, 19, 3, 42, 44, 47, 10.00),
+	(379, 19, 3, 43, 44, 47, 30.00),
+	(380, 19, 4, 33, 44, 47, 24.00),
+	(381, 19, 4, 34, 44, 47, 6.00),
+	(382, 19, 4, 35, 44, 47, 6.00),
+	(383, 19, 4, 36, 44, 47, 6.00),
+	(384, 19, 4, 37, 44, 47, 6.00),
+	(385, 19, 4, 38, 44, 47, 12.00),
+	(386, 19, 3, 39, 43, 47, 30.00),
+	(387, 19, 3, 40, 43, 47, 20.00),
+	(388, 19, 3, 41, 43, 47, 10.00),
+	(389, 19, 3, 42, 43, 47, 10.00),
+	(390, 19, 3, 43, 43, 47, 30.00),
+	(391, 19, 4, 33, 43, 47, 24.00),
+	(392, 19, 4, 34, 43, 47, 6.00),
+	(393, 19, 4, 35, 43, 47, 6.00),
+	(394, 19, 4, 36, 43, 47, 6.00),
+	(395, 19, 4, 37, 43, 47, 6.00),
+	(396, 19, 4, 38, 43, 47, 12.00),
+	(397, 19, 3, 39, 58, 47, 20.00),
+	(398, 19, 3, 40, 58, 47, 20.00),
+	(399, 19, 3, 41, 58, 47, 10.00),
+	(400, 19, 3, 42, 58, 47, 10.00),
+	(401, 19, 3, 43, 58, 47, 30.00),
+	(402, 19, 4, 33, 58, 47, 24.00),
+	(403, 19, 4, 34, 58, 47, 6.00),
+	(404, 19, 4, 35, 58, 47, 6.00),
+	(405, 19, 4, 36, 58, 47, 6.00),
+	(406, 19, 4, 37, 58, 47, 6.00),
+	(407, 19, 4, 38, 58, 47, 12.00);
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_carrera
 CREATE TABLE IF NOT EXISTS `sistema_carrera` (
@@ -210,8 +292,8 @@ CREATE TABLE IF NOT EXISTS `sistema_menu` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `FK_ruta_id` (`ruta_id`) USING BTREE,
   KEY `FK_padre_id` (`padre_id`) USING BTREE,
-  CONSTRAINT `FK_id_ruta` FOREIGN KEY (`ruta_id`) REFERENCES `sistema_ruta` (`id`)  ,
-  CONSTRAINT `FK_padre_id` FOREIGN KEY (`padre_id`) REFERENCES `sistema_menu` (`id`) 
+  CONSTRAINT `FK_id_ruta` FOREIGN KEY (`ruta_id`) REFERENCES `sistema_ruta` (`id`),
+  CONSTRAINT `FK_padre_id` FOREIGN KEY (`padre_id`) REFERENCES `sistema_menu` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_menu: ~13 rows (aproximadamente)
@@ -252,8 +334,8 @@ CREATE TABLE IF NOT EXISTS `sistema_modalidad_titulacion_carrera` (
   PRIMARY KEY (`id`),
   KEY `FK_id_carrera` (`id_carrera`),
   KEY `FK_id_modalidad_titulacion` (`id_modalidad_titulacion`),
-  CONSTRAINT `FK_id_modalidad_titulacion` FOREIGN KEY (`id_modalidad_titulacion`) REFERENCES `sistema_modalidad_titulacion` (`id`)  ,
-  CONSTRAINT `FK_modalidad_titulacion_carrera_sistema_carrera` FOREIGN KEY (`id_carrera`) REFERENCES `sistema_carrera` (`id`)  
+  CONSTRAINT `FK_id_modalidad_titulacion` FOREIGN KEY (`id_modalidad_titulacion`) REFERENCES `sistema_modalidad_titulacion` (`id`),
+  CONSTRAINT `FK_modalidad_titulacion_carrera_sistema_carrera` FOREIGN KEY (`id_carrera`) REFERENCES `sistema_carrera` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_modalidad_titulacion_carrera: ~3 rows (aproximadamente)
@@ -286,8 +368,8 @@ CREATE TABLE IF NOT EXISTS `sistema_rol_ruta` (
   `ruta_id` int(11) NOT NULL,
   PRIMARY KEY (`rol_id`,`ruta_id`) USING BTREE,
   KEY `FK_ruta_id` (`ruta_id`),
-  CONSTRAINT `FK_rol_id` FOREIGN KEY (`rol_id`) REFERENCES `sistema_rol` (`id`)  ,
-  CONSTRAINT `FK_ruta_id` FOREIGN KEY (`ruta_id`) REFERENCES `sistema_ruta` (`id`)  
+  CONSTRAINT `FK_rol_id` FOREIGN KEY (`rol_id`) REFERENCES `sistema_rol` (`id`),
+  CONSTRAINT `FK_ruta_id` FOREIGN KEY (`ruta_id`) REFERENCES `sistema_ruta` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_rol_ruta: ~7 rows (aproximadamente)
@@ -351,9 +433,9 @@ CREATE TABLE IF NOT EXISTS `solicitud_excepcion` (
   KEY `FK_trabajo_excepcion_id` (`trabajo_id`),
   KEY `FK_estudiante_excepcion_id` (`estudiante_id`),
   KEY `FK_vicedecano_is` (`vicedecano_id`),
-  CONSTRAINT `FK_estudiante_excepcion_id` FOREIGN KEY (`estudiante_id`) REFERENCES `usuario` (`id`)  ,
-  CONSTRAINT `FK_trabajo_excepcion_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`)  ,
-  CONSTRAINT `FK_vicedecano_is` FOREIGN KEY (`vicedecano_id`) REFERENCES `usuario` (`id`) ON DELETE SET NULL 
+  CONSTRAINT `FK_estudiante_excepcion_id` FOREIGN KEY (`estudiante_id`) REFERENCES `usuario` (`id`),
+  CONSTRAINT `FK_trabajo_excepcion_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`),
+  CONSTRAINT `FK_vicedecano_is` FOREIGN KEY (`vicedecano_id`) REFERENCES `usuario` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Volcando datos para la tabla gestion_titulacion.solicitud_excepcion: ~0 rows (aproximadamente)
@@ -382,11 +464,11 @@ CREATE TABLE IF NOT EXISTS `trabajo_estudiante` (
   PRIMARY KEY (`id`),
   KEY `FK_trabajo_id` (`trabajo_id`),
   KEY `FK_estudiante_id` (`estudiante_id`),
-  CONSTRAINT `FK_estudiante_trabajo_id` FOREIGN KEY (`estudiante_id`) REFERENCES `usuario` (`id`) ON DELETE SET NULL ,
-  CONSTRAINT `FK_trabajo_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`)  
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `FK_estudiante_trabajo_id` FOREIGN KEY (`estudiante_id`) REFERENCES `usuario` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `FK_trabajo_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
 
--- Volcando datos para la tabla gestion_titulacion.trabajo_estudiante: ~9 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.trabajo_estudiante: ~10 rows (aproximadamente)
 INSERT INTO `trabajo_estudiante` (`id`, `trabajo_id`, `estudiante_id`, `intentos`, `resultado`) VALUES
 	(1, 10, 4, 0, 'Pendiente'),
 	(2, 10, 3, 0, 'Pendiente'),
@@ -396,7 +478,8 @@ INSERT INTO `trabajo_estudiante` (`id`, `trabajo_id`, `estudiante_id`, `intentos
 	(6, 13, 27, 0, 'Pendiente'),
 	(7, 18, 27, 0, 'Pendiente'),
 	(8, 19, 47, 0, 'Pendiente'),
-	(9, 20, 47, 0, 'Pendiente');
+	(9, 20, 47, 0, 'Pendiente'),
+	(10, 21, 48, 0, 'Pendiente');
 
 -- Volcando estructura para tabla gestion_titulacion.trabajo_titulacion
 CREATE TABLE IF NOT EXISTS `trabajo_titulacion` (
@@ -416,22 +499,23 @@ CREATE TABLE IF NOT EXISTS `trabajo_titulacion` (
   KEY `FK_tutor_id` (`tutor_id`),
   KEY `FK_cotutor_id` (`cotutor_id`),
   KEY `FK_estado_id` (`estado_id`),
-  CONSTRAINT `FK_cotutor_id` FOREIGN KEY (`cotutor_id`) REFERENCES `usuario` (`id`) ON DELETE SET NULL ,
-  CONSTRAINT `FK_estado_id` FOREIGN KEY (`estado_id`) REFERENCES `trabajo_estado` (`id`) ,
-  CONSTRAINT `FK_modlaiad_titulacion_id` FOREIGN KEY (`modalidad_id`) REFERENCES `sistema_modalidad_titulacion` (`id`) ,
-  CONSTRAINT `FK_trabajo_titulacion_sistema_carrera` FOREIGN KEY (`carrera_id`) REFERENCES `sistema_carrera` (`id`) ,
-  CONSTRAINT `FK_tutor_id` FOREIGN KEY (`tutor_id`) REFERENCES `usuario` (`id`) 
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `FK_cotutor_id` FOREIGN KEY (`cotutor_id`) REFERENCES `usuario` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `FK_estado_id` FOREIGN KEY (`estado_id`) REFERENCES `trabajo_estado` (`id`),
+  CONSTRAINT `FK_modlaiad_titulacion_id` FOREIGN KEY (`modalidad_id`) REFERENCES `sistema_modalidad_titulacion` (`id`),
+  CONSTRAINT `FK_trabajo_titulacion_sistema_carrera` FOREIGN KEY (`carrera_id`) REFERENCES `sistema_carrera` (`id`),
+  CONSTRAINT `FK_tutor_id` FOREIGN KEY (`tutor_id`) REFERENCES `usuario` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4;
 
--- Volcando datos para la tabla gestion_titulacion.trabajo_titulacion: ~7 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.trabajo_titulacion: ~8 rows (aproximadamente)
 INSERT INTO `trabajo_titulacion` (`id`, `carrera_id`, `modalidad_id`, `tutor_id`, `cotutor_id`, `estado_id`, `fecha_defensa`, `titulo`, `link_anteproyecto`, `link_final`) VALUES
-	(10, 4, 3, 2, NULL, 4, '2025-01-06 00:00:00', '	Aplicación web para la medición del nivel de transformación digital para Instituciones de Educación Superior (IES)', ':)))', ''),
-	(11, 4, 3, 2, NULL, 3, '2025-02-15 08:11:00', 'Desarrollo de una plataforma para enseñanza de la física universitaria desde dispositivo multisensorial', 'sdfghsdfgjsdfg', 'google.com'),
-	(12, 4, 3, 14, 21, 3, '2025-02-12 10:46:00', 'Redes neuronales convulucionales para mejorar la resolución de imágenes medicas', 'asdasdasd', ''),
-	(13, 4, 3, 21, 14, 1, NULL, 'Word Embedding en documentos médicos através dela aplicación de Word2Vec y Doc2Vec', 'sdasdas', ''),
-	(18, 4, 3, 21, 21, 1, NULL, 'Aplicación de Técnicas de Aprendizaje Automático para predecir áreas en riesgo de incendio forestal', 'asdsad', ''),
-	(19, 4, 2, 8, NULL, 3, '2025-02-19 09:27:00', 'Diseño de un esquema arquitectónico para integrar sistemas monolíticos con arquitecturas emergentes', '123456789', ''),
-	(20, 4, 1, 14, NULL, 3, '2025-02-14 09:00:00', 'Caso de estudio: App bibliotecaria', 'https://drive.google.com/file/d/17U6Pn-8IpUmS6pDc2VSR7T9Rm4tsNd7b/view', 'https://drive.google.com/file/d/17U6Pn-8IpUmS6pDc2VSR7T9Rm4tsNd7b/view');
+	(10, 4, 3, 2, NULL, 4, '2025-03-07 07:50:00', '	Aplicación web para la medición del nivel de transformación digital para Instituciones de Educación Superior (IES)', 'https://drive.google.com/file/d/17U6Pn-8IpUmS6pDc2VSR7T9Rm4tsNd7b/view', ''),
+	(11, 4, 3, 2, NULL, 2, '2025-02-15 08:11:00', 'Desarrollo de una plataforma para enseñanza de la física universitaria desde dispositivo multisensorial', 'https://drive.google.com/file/d/17U6Pn-8IpUmS6pDc2VSR7T9Rm4tsNd7b/view', 'google.com'),
+	(12, 4, 3, 14, 21, 3, '2025-02-01 10:46:00', 'Redes neuronales convulucionales para mejorar la resolución de imágenes medicas', 'https://drive.google.com/file/d/17U6Pn-8IpUmS6pDc2VSR7T9Rm4tsNd7b/view', ''),
+	(13, 4, 3, 21, 14, 1, NULL, 'Word Embedding en documentos médicos através dela aplicación de Word2Vec y Doc2Vec', 'https://drive.google.com/file/d/17U6Pn-8IpUmS6pDc2VSR7T9Rm4tsNd7b/view', ''),
+	(18, 4, 3, 21, 21, 1, NULL, 'Aplicación de Técnicas de Aprendizaje Automático para predecir áreas en riesgo de incendio forestal', 'https://drive.google.com/file/d/17U6Pn-8IpUmS6pDc2VSR7T9Rm4tsNd7b/view', ''),
+	(19, 4, 2, 8, NULL, 4, '2025-03-05 08:16:00', 'Diseño de un esquema arquitectónico para integrar sistemas monolíticos con arquitecturas emergentes', 'https://drive.google.com/file/d/17U6Pn-8IpUmS6pDc2VSR7T9Rm4tsNd7b/view', ''),
+	(20, 4, 1, 14, NULL, 2, '2025-02-14 09:00:00', 'Caso de estudio: App bibliotecaria', 'https://drive.google.com/file/d/17U6Pn-8IpUmS6pDc2VSR7T9Rm4tsNd7b/view', 'https://drive.google.com/file/d/17U6Pn-8IpUmS6pDc2VSR7T9Rm4tsNd7b/view'),
+	(21, 4, 3, 21, NULL, 2, NULL, 'Artificial intelligence (AI) applications for marketing: A literature-based study', 'https://drive.google.com/file/d/17U6Pn-8IpUmS6pDc2VSR7T9Rm4tsNd7b/view', 'https://drive.google.com/file/d/17U6Pn-8IpUmS6pDc2VSR7T9Rm4tsNd7b/view');
 
 -- Volcando estructura para tabla gestion_titulacion.trabajo_tribunal
 CREATE TABLE IF NOT EXISTS `trabajo_tribunal` (
@@ -443,28 +527,28 @@ CREATE TABLE IF NOT EXISTS `trabajo_tribunal` (
   KEY `FK_trabajo_tribunal_id` (`trabajo_id`),
   KEY `FK_docente_tribunal_id` (`docente_id`),
   KEY `FK_tribunal_rol_id` (`tribunal_rol_id`) USING BTREE,
-  CONSTRAINT `FK_docente_tribunal_id` FOREIGN KEY (`docente_id`) REFERENCES `usuario` (`id`) ,
-  CONSTRAINT `FK_trabajo_tribunal_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`) ,
-  CONSTRAINT `FK_tribunal_rol_id` FOREIGN KEY (`tribunal_rol_id`) REFERENCES `tribunal_rol` (`id`) 
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `FK_docente_tribunal_id` FOREIGN KEY (`docente_id`) REFERENCES `usuario` (`id`),
+  CONSTRAINT `FK_trabajo_tribunal_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`),
+  CONSTRAINT `FK_tribunal_rol_id` FOREIGN KEY (`tribunal_rol_id`) REFERENCES `tribunal_rol` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4;
 
 -- Volcando datos para la tabla gestion_titulacion.trabajo_tribunal: ~15 rows (aproximadamente)
 INSERT INTO `trabajo_tribunal` (`id`, `trabajo_id`, `docente_id`, `tribunal_rol_id`) VALUES
-	(1, 10, 21, 2),
-	(2, 10, 14, 3),
-	(3, 10, 8, 4),
 	(40, 11, 58, 2),
 	(41, 11, 43, 3),
 	(42, 11, 44, 4),
 	(43, 12, 44, 2),
 	(44, 12, 43, 3),
 	(45, 12, 58, 4),
-	(46, 19, 21, 2),
-	(47, 19, 43, 3),
-	(48, 19, 8, 4),
 	(49, 20, 58, 2),
 	(50, 20, 14, 3),
-	(51, 20, 44, 4);
+	(51, 20, 44, 4),
+	(52, 10, 58, 2),
+	(53, 10, 43, 3),
+	(54, 10, 44, 4),
+	(55, 19, 58, 2),
+	(56, 19, 43, 3),
+	(57, 19, 44, 4);
 
 -- Volcando estructura para tabla gestion_titulacion.tribunal_rol
 CREATE TABLE IF NOT EXISTS `tribunal_rol` (
@@ -491,9 +575,9 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   UNIQUE KEY `usuario` (`usuario`),
   UNIQUE KEY `id_personal` (`id_personal`),
   KEY `idx_nombre` (`nombre`)
-) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4;
 
--- Volcando datos para la tabla gestion_titulacion.usuario: ~34 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.usuario: ~37 rows (aproximadamente)
 INSERT INTO `usuario` (`id`, `usuario`, `id_personal`, `nombre`) VALUES
 	(2, 'vargas', '235657', 'JUAN SILVO VARGAS VERDES'),
 	(3, 'xd', '104421', 'JOSTON JARZTA HICENBERZ GEORGEOUS'),
@@ -528,7 +612,10 @@ INSERT INTO `usuario` (`id`, `usuario`, `id_personal`, `nombre`) VALUES
 	(48, 'cubillus2854', '165344', 'UBILLUS BUSTAMANTE CRISTOPHER ALEXANDER'),
 	(49, 'jrodriguez7603', '106916', 'RODRIGUEZ ZAMBRANO JOSTIN ANDRES'),
 	(54, 'admin', '15390', 'VERGAS ANTONIO RESABALA CHICUNGUNYIA'),
-	(58, 'tutora', '22360', 'ANA GABRIELA YUKATAN SLOVAKY');
+	(58, 'tutora', '22360', 'ANA GABRIELA YUKATAN SLOVAKY'),
+	(61, 'preside', '12382', 'HAROLD OMAR GARCIA VILLANUEVA'),
+	(62, 'alumna', '19355', 'AGUINALDA GUISELLE VALIVIEZO JILIWE'),
+	(63, 'pupilo', '34351', 'SANTIAGO SEGUNDO PACHECO VEREDICTO');
 
 -- Volcando estructura para tabla gestion_titulacion.usuario_carrera
 CREATE TABLE IF NOT EXISTS `usuario_carrera` (
@@ -536,11 +623,11 @@ CREATE TABLE IF NOT EXISTS `usuario_carrera` (
   `id_carrera` int(11) NOT NULL,
   PRIMARY KEY (`id_usuario`,`id_carrera`),
   KEY `id_carrera_FK` (`id_carrera`),
-  CONSTRAINT `id_carrera_FK` FOREIGN KEY (`id_carrera`) REFERENCES `sistema_carrera` (`id`)  ,
-  CONSTRAINT `id_usuario_FK` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)  
+  CONSTRAINT `id_carrera_FK` FOREIGN KEY (`id_carrera`) REFERENCES `sistema_carrera` (`id`),
+  CONSTRAINT `id_usuario_FK` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Volcando datos para la tabla gestion_titulacion.usuario_carrera: ~12 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.usuario_carrera: ~15 rows (aproximadamente)
 INSERT INTO `usuario_carrera` (`id_usuario`, `id_carrera`) VALUES
 	(27, 4),
 	(38, 4),
@@ -553,7 +640,10 @@ INSERT INTO `usuario_carrera` (`id_usuario`, `id_carrera`) VALUES
 	(48, 4),
 	(49, 4),
 	(54, 4),
-	(58, 4);
+	(58, 4),
+	(61, 4),
+	(62, 4),
+	(63, 4);
 
 -- Volcando estructura para tabla gestion_titulacion.usuario_rol
 CREATE TABLE IF NOT EXISTS `usuario_rol` (
@@ -562,11 +652,11 @@ CREATE TABLE IF NOT EXISTS `usuario_rol` (
   PRIMARY KEY (`id_usuario`,`id_rol`),
   KEY `FK_id_usuario` (`id_usuario`),
   KEY `FK_id_rol` (`id_rol`),
-  CONSTRAINT `FK_id_rol` FOREIGN KEY (`id_rol`) REFERENCES `sistema_rol` (`id`)  ,
-  CONSTRAINT `FK_id_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)  
+  CONSTRAINT `FK_id_rol` FOREIGN KEY (`id_rol`) REFERENCES `sistema_rol` (`id`),
+  CONSTRAINT `FK_id_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Volcando datos para la tabla gestion_titulacion.usuario_rol: ~15 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.usuario_rol: ~18 rows (aproximadamente)
 INSERT INTO `usuario_rol` (`id_usuario`, `id_rol`) VALUES
 	(8, 3),
 	(14, 3),
@@ -582,7 +672,10 @@ INSERT INTO `usuario_rol` (`id_usuario`, `id_rol`) VALUES
 	(48, 4),
 	(49, 1),
 	(54, 1),
-	(58, 3);
+	(58, 3),
+	(61, 3),
+	(62, 4),
+	(63, 4);
 
 -- Volcando estructura para vista gestion_titulacion.vista_menu_rol
 -- Creando tabla temporal para superar errores de dependencia de VIEW
