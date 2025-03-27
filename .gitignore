@@ -38,3 +38,6 @@ localdata/
 # Docker
 .dockerignore
 Dockerfile
+
+.env.dev
+.env.prod
