@@ -3,7 +3,7 @@ const { getServerDate, describirFecha } = require('../utils/dateUtility');
 const { GetNombreUsuarioService } = require('./usuarioService');
 const { GetByIdTrabajoService } = require('./trabajoTitulacionService');
 const { asIngPhd } = require('../utils/strUtility');
-const { GetTribunalFromTesisFullDTO: GetTribunalFromTesisFullDTO } = require('../dto/tribunalMembersDTO');
+const { GetTribunalFromTesisFullDTO } = require('../dto/tribunalMembersDTO');
 
 // Servicio para obtener la última información del acta
 exports.GetLastInfoActaService = async () => {
@@ -50,11 +50,10 @@ exports.PostInfoActaService = async (data) => {
 exports.GetActaService = async (trabajo_id) => {
     const query = "SELECT * FROM acta WHERE trabajo_id = ?";
     const [rows] = await db.query(query, [trabajo_id]);
-    if (rows.length === 0) {
+    // if (rows.length === 0) {
 
-        return rows[0];
-    }
-    
+    //     return rows[0];
+    // }
     return rows.length > 0 ? rows[0] : this.GetLastInfoActaService();
 };
 
@@ -84,6 +83,7 @@ const getDefaultTitulo = (carreraName) => {
 exports.GetFullActaService = async (trabajo_id) => {
     const actaInfoFull = {};
     const actaInfo = await this.GetActaService(trabajo_id);
+    console.log(JSON.stringify(actaInfo, null, 2));
     actaInfo.num_year_count = actaInfo.num_year_count+"";
     const numZeros = Math.abs(6 - actaInfo.num_year_count.length);
     actaInfo.num_year_count = actaInfo.num_year_count.padStart(numZeros, '0');
@@ -100,8 +100,6 @@ exports.GetFullActaService = async (trabajo_id) => {
     actaInfoFull.secretarioAsesorJuridico = await GetNombreUsuarioService(actaInfo.asesor_juridico_id) ?? "Abg. Macías Cano David";
     // Información del acta obtenida desde la tesis
     const tesisData = await GetByIdTrabajoService(trabajo_id, true);
-    console.log("tesisData");
-    console.log(tesisData);
     const tribunal = GetTribunalFromTesisFullDTO(tesisData);
     actaInfoFull.delegadoComisionCientifica = tribunal.delegadoComisionCientifica;
     actaInfoFull.delegadoConsejoDirectivo = tribunal.delegadoConsejoDirectivo;

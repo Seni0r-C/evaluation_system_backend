@@ -77,7 +77,7 @@ exports.getActaFileName = async (req, res) => {
         return res.status(400).json({
             typeMsg: 'error',
             message: 'Error en el servidor al obtener nombre de acta.',
-            error: error
+            error: error.message
         });
     }
 };

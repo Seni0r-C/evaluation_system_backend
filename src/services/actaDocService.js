@@ -150,7 +150,6 @@ const buildDataActaComplexivo = async (estudiantesNotasData, trabajoData) => {
 exports.GenerateActaService = async (trabajoId) => {
     // const trabajoData = await getTrabajo(trabajoId);
     const trabajoData = await GetFullActaService(trabajoId);
-
     // const trabajoData = await GetNotasService(trabajoId);
     // console.debug("-----------------------------trabajoData-----------------------------")
     // console.debug(trabajoData)
