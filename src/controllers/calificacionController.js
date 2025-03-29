@@ -87,6 +87,7 @@ exports.getRubricas = async (req, res) => {
     }
 };
 
+
 exports.getRubrica = async (req, res) => {
     const { id_tipo_evaluacion, id_modalidad } = req.query;
 
@@ -98,7 +99,6 @@ exports.getRubrica = async (req, res) => {
     if (!id_tipo_evaluacion || !id_modalidad) {
         return res.status(400).json({ error: 'Los parámetros id_tipo_evaluacion y id_modalidad son obligatorios' });
     }
-
     try {
         // Obtener la rúbrica principal
         const [rubricaRows] = await db.query(
@@ -236,7 +236,7 @@ const isCompleteThesis = async (docent_id, trabajo_id, db) => {
     const [rows] = await db.query(`
                 ${getCompleteThesisGradeStatement()}
         `, [trabajo_id]);
-    
+
     console.log("isCompleteThesis. rows.length");
     console.log(rows.length);
     console.log(rows);
@@ -269,7 +269,7 @@ exports.createRubricaEvaluaciones = async (req, res) => {
         // Ejecutar todas las inserciones
         await Promise.all(insertPromises);
         console.log("await Promise.all(insertPromises)");
-        
+
         const trabajo_id = calificaciones[0].trabajo_id;
         const docente_id = calificaciones[0].docente_id;
         console.log("const trabajo_id = c...[0].docente_id;");
@@ -315,6 +315,51 @@ exports.getRubricaEvaluacionById = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+const getGradesRubricCriterialStatement = () => {
+    return `
+    SELECT 
+        re.estudiante_id,
+        ste.nombre AS tipo_evaluacion,
+        re.rubrica_criterio_id,
+        re.puntaje_obtenido
+    FROM rubrica_evaluacion re
+    JOIN rubrica r ON re.rubrica_id = r.id
+    JOIN sistema_tipo_evaluacion ste ON r.tipo_evaluacion_id = ste.id
+    JOIN trabajo_estudiante te ON re.estudiante_id = te.estudiante_id
+    WHERE 
+        te.trabajo_id = ? AND re.docente_id = ?
+    `
+}
+
+
+const transformRubricGradeData = (data) => {
+    const result = {};
+
+    data.forEach(({ estudiante_id, tipo_evaluacion, puntaje_obtenido }) => {
+        const id = estudiante_id.toString();
+        if (!result[id]) result[id] = {};
+        if (!result[id][tipo_evaluacion]) result[id][tipo_evaluacion] = {};
+
+        const index = Object.keys(result[id][tipo_evaluacion]).length;
+        result[id][tipo_evaluacion][index] = parseInt(puntaje_obtenido, 10);
+    });
+
+    return result;
+};
+
+exports.getGradesRubricCriterial = async (req, res) => {
+    const { trabajo_id, docente_id } = req.query;
+    try {
+        console.log("getGradesRubricCriterial");
+        const [rows] = await db.query(getGradesRubricCriterialStatement(), [trabajo_id, docente_id ]);
+        console.log(rows);
+        if (rows.length === 0) return res.status(404).json({ message: 'Notas de rubricas de evaluacion no encontrado' });
+        res.json(transformRubricGradeData(rows));
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
 
 exports.updateRubricaEvaluacion = async (req, res) => {
     const { id } = req.params;

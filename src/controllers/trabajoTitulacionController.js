@@ -215,8 +215,8 @@ exports.listarTrabajosForTribunal = async (req, res) => {
         if (user?.id) {
             whereClauses.push('ttb.docente_id = ?');
             queryParams.push(user.id);
-            whereClauses.push(`tt.id NOT IN (${listThesisGradesByIdDocentStatement()})`);
-            queryParams.push(user.id);
+            // whereClauses.push(`tt.id NOT IN (${listThesisGradesByIdDocentStatement()})`);
+            // queryParams.push(user.id);
         }
         // Unir todas las cláusulas WHERE si existen
         const whereQuery = whereClauses.length ? 'WHERE ' + whereClauses.join(' AND ') : '';
@@ -245,9 +245,6 @@ exports.listarTrabajosForTribunal = async (req, res) => {
             ${whereQuery}
         `, queryParams);
 
-        // console.log("Total de trabajos: ", totalRows[0].total);
-        // console.log(rows);
-        // Enviar la respuesta con los trabajos y el total de registros
         res.json({
             data: rows,
             total: totalRows[0].total,
