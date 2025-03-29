@@ -30,9 +30,9 @@ exports.crearTrabajo = async (req, res) => {
         // Crear el nuevo trabajo de titulación
         const [result] = await db.execute(
             `INSERT INTO trabajo_titulacion 
-            (carrera_id, modalidad_id, tutor_id, cotutor_id, titulo, link_anteproyecto) 
-            VALUES (?, ?, ?, ?, ?, ?)`,
-            [carrera_id, modalidad_id, tutor_id, cotutor_id || null, titulo, link_archivo]
+            (carrera_id, modalidad_id, tutor_id, cotutor_id, titulo, link_anteproyecto, link_final) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [carrera_id, modalidad_id, tutor_id, cotutor_id || null, titulo, link_archivo, '']
         );
 
         // Responder con éxito
