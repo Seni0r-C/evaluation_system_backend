@@ -1,6 +1,7 @@
 const db = require('../config/db');
 const { formatDateSelector } = require('../utils/dateUtility.js')
 const { GetByIdTrabajoService } = require('../services/trabajoTitulacionService.js');
+const { GetTribunalMembersByTrabajoIdService } = require('../services/tribunalMambersGradeService.js');
 
 // Crear un nuevo trabajo de titulación
 exports.crearTrabajo = async (req, res) => {
@@ -282,6 +283,23 @@ exports.obtenerEstados = async (req, res) => {
             exito: true,
             mensaje: 'Estados de trabajo de titulación',
             estados: rows
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.getThesisTribunalMembers = async (req, res) => {
+    try {
+        const trabajo_id = req.params.trabajo_id;
+        console.log("GetTribunalMembersByTrabajoIdService");
+        console.log(req.params);
+        const data = await GetTribunalMembersByTrabajoIdService(trabajo_id);
+        console.log(data);
+        res.json({
+            exito: true,
+            mensaje: 'Get thesis tribunal members',
+            data: data
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

@@ -38,3 +38,22 @@ exports.GetTribunalMembersGradesService = async (trabajo_id) => {
     const [rows] = await db.query(`${getTribunalMembersGradesStatement()}`, [trabajo_id]);
     return rows;
 }
+
+const getTribunalMembersByTrabajoIdStatement = () => {
+    return `
+        SELECT DISTINCT 
+            u.id AS id, 
+            u.nombre AS nombre 
+        FROM 
+            rubrica_evaluacion re
+        INNER JOIN 
+            usuario u ON re.docente_id = u.id
+        WHERE 
+            re.trabajo_id = ?
+    `;
+};
+
+exports.GetTribunalMembersByTrabajoIdService = async (trabajo_id) => {
+    const [rows] = await db.query(`${getTribunalMembersByTrabajoIdStatement()}`, [trabajo_id]);
+    return rows;
+}

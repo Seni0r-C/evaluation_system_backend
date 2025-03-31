@@ -10,6 +10,7 @@ router.get('/obtener/:id', trabajoController.obtenerTrabajo);
 router.get('/estados', trabajoController.obtenerEstados);
 router.patch('/actualizar/:id', trabajoController.actualizarTrabajo);
 router.delete('/eliminar/:id', trabajoController.eliminarTrabajo);
+router.get('/tribunal/:trabajo_id', trabajoController.getThesisTribunalMembers);
 
 // Gestión de estudiantes en trabajos de titulación
 router.post('/asociarEstudiante', trabajoController.asociarEstudiante);
