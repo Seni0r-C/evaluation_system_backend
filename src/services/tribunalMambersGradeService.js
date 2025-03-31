@@ -39,19 +39,41 @@ exports.GetTribunalMembersGradesService = async (trabajo_id) => {
     return rows;
 }
 
+// const getTribunalMembersByTrabajoIdStatement = () => {
+//     return `
+//         SELECT DISTINCT 
+//             u.id AS id, 
+//             u.nombre AS nombre 
+//         FROM 
+//             rubrica_evaluacion re
+//         INNER JOIN 
+//             usuario u ON re.docente_id = u.id
+//         WHERE 
+//             re.trabajo_id = ?
+//     `;
+// };
+
 const getTribunalMembersByTrabajoIdStatement = () => {
     return `
         SELECT DISTINCT 
             u.id AS id, 
-            u.nombre AS nombre 
+            u.nombre AS nombre,
+            CASE 
+                WHEN re.id IS NOT NULL THEN 'CALIFICADO' 
+                ELSE 'PENDIENTE' 
+            END AS estado
         FROM 
-            rubrica_evaluacion re
+            trabajo_tribunal tt
         INNER JOIN 
-            usuario u ON re.docente_id = u.id
+            usuario u ON tt.docente_id = u.id
+        LEFT JOIN 
+            rubrica_evaluacion re ON tt.trabajo_id = re.trabajo_id 
+            AND tt.docente_id = re.docente_id
         WHERE 
-            re.trabajo_id = ?
+            tt.trabajo_id = ?
+        ORDER BY u.nombre
     `;
-};
+};  
 
 exports.GetTribunalMembersByTrabajoIdService = async (trabajo_id) => {
     const [rows] = await db.query(`${getTribunalMembersByTrabajoIdStatement()}`, [trabajo_id]);

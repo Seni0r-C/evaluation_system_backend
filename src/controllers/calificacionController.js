@@ -420,7 +420,7 @@ exports.getGradesRubricCriterial = async (req, res) => {
     const { trabajo_id, docente_id } = req.query;
     try {
         const [rows] = await db.query(getGradesRubricCriterialStatement(), [trabajo_id, docente_id ]);
-        if (rows.length === 0) return res.status(404).json({ message: 'Notas de rubricas de evaluacion no encontrado' });
+        console.log(rows);
         res.json(transformRubricGradeData(rows));
     } catch (error) {
         res.status(500).json({ error: error.message });
