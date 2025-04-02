@@ -240,64 +240,67 @@ const isCompleteThesis = async (docent_id, trabajo_id, db) => {
     return rows.length === 3;
 }
 
-exports.createRubricaEvaluaciones = async (req, res) => {
-    const { calificaciones } = req.body;
-
+const createRubricaEvaluacionesService = async (calificaciones) => {
     if (!Array.isArray(calificaciones) || calificaciones.length === 0) {
         return res.status(400).json({ error: "El array de calificaciones es inválido o está vacío." });
     }
 
     const connection = await db.getConnection(); // Asegúrate de usar un pool de conexiones
 
-    try {
-        await connection.beginTransaction();
+    await connection.beginTransaction();
 
-        const updateOrInsertPromises = calificaciones.map(async ({ trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido }) => {
-            // Verificar si la calificación ya existe
-            const [existingRecord] = await connection.query(
-                `SELECT id FROM rubrica_evaluacion 
+    const updateOrInsertPromises = calificaciones.map(async ({ trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido }) => {
+        // Verificar si la calificación ya existe
+        const [existingRecord] = await connection.query(
+            `SELECT id FROM rubrica_evaluacion 
                  WHERE trabajo_id = ? AND rubrica_id = ? AND rubrica_criterio_id = ? 
                  AND docente_id = ? AND estudiante_id = ?`,
-                [trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id]
-            );
+            [trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id]
+        );
 
-            if (existingRecord.length > 0) {
-                // Si ya existe, actualizar el puntaje
-                return connection.query(
-                    `UPDATE rubrica_evaluacion 
+        if (existingRecord.length > 0) {
+            // Si ya existe, actualizar el puntaje
+            return connection.query(
+                `UPDATE rubrica_evaluacion 
                      SET puntaje_obtenido = ? 
                      WHERE id = ?`,
-                    [puntaje_obtenido, existingRecord[0].id]
-                );
-            } else {
-                // Si no existe, insertar una nueva calificación
-                return connection.query(
-                    `INSERT INTO rubrica_evaluacion 
+                [puntaje_obtenido, existingRecord[0].id]
+            );
+        } else {
+            // Si no existe, insertar una nueva calificación
+            return connection.query(
+                `INSERT INTO rubrica_evaluacion 
                      (trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido) 
                      VALUES (?, ?, ?, ?, ?, ?)`,
-                    [trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido]
-                );
-            }
-        });
-
-        await Promise.all(updateOrInsertPromises);
-
-        const trabajo_id = calificaciones[0].trabajo_id;
-        const docente_id = calificaciones[0].docente_id;
-
-        // Verificar si el trabajo de tesis ha sido calificado por todos los docentes (3)
-        const isCompleteThesisValue = await isCompleteThesis(docente_id, trabajo_id, connection);
-
-        if (isCompleteThesisValue) {
-            // Cambiar el estado del trabajo a "DEFENDIDO" o sea 4
-            await connection.query(
-                'UPDATE trabajo_titulacion SET estado_id = 4 WHERE id = ?',
-                [trabajo_id]
+                [trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido]
             );
         }
+    });
 
-        await connection.commit();
+    await Promise.all(updateOrInsertPromises);
 
+    const trabajo_id = calificaciones[0].trabajo_id;
+    const docente_id = calificaciones[0].docente_id;
+
+    // Verificar si el trabajo de tesis ha sido calificado por todos los docentes (3)
+    const isCompleteThesisValue = await isCompleteThesis(docente_id, trabajo_id, connection);
+
+    if (isCompleteThesisValue) {
+        // Cambiar el estado del trabajo a "DEFENDIDO" o sea 4
+        await connection.query(
+            'UPDATE trabajo_titulacion SET estado_id = 4 WHERE id = ?',
+            [trabajo_id]
+        );
+    }
+
+    await connection.commit();
+
+}
+
+exports.createRubricaEvaluaciones = async (req, res) => {
+    const { calificaciones } = req.body;
+    try {
+        await createRubricaEvaluacionesService(calificaciones);
         res.status(201).json({ message: "Calificaciones guardadas o actualizadas exitosamente." });
     } catch (error) {
         await connection.rollback();
@@ -363,7 +366,7 @@ const transformRubricGradeData = (data) => {
 exports.getGradesRubricCriterial = async (req, res) => {
     const { trabajo_id, docente_id } = req.query;
     try {
-        const [rows] = await db.query(getGradesRubricCriterialStatement(), [trabajo_id, trabajo_id, docente_id ]);
+        const [rows] = await db.query(getGradesRubricCriterialStatement(), [trabajo_id, trabajo_id, docente_id]);
         console.log(rows);
         res.json(transformRubricGradeData(rows));
     } catch (error) {
