@@ -10,11 +10,11 @@ UPDATE trabajo_titulacion
 SET estado_id = (SELECT te.id 
 						FROM trabajo_estado te 
 						WHERE te.nombre = 'CON TRIBUNAL') 
-						WHERE id = 10 AND estado_id = (
+						WHERE id = 19 AND estado_id = (
 												SELECT te.id 
 												FROM trabajo_estado te 
 												WHERE te.nombre = 'DEFENDIDO'
 												);
 -- removes records of grades on thesis work
-DELETE FROM rubrica_evaluacion WHERE trabajo_id = 10;
+DELETE FROM rubrica_evaluacion WHERE trabajo_id = 19;
 

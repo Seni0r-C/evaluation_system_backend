@@ -292,10 +292,7 @@ exports.obtenerEstados = async (req, res) => {
 exports.getThesisTribunalMembers = async (req, res) => {
     try {
         const trabajo_id = req.params.trabajo_id;
-        console.log("GetTribunalMembersByTrabajoIdService");
-        console.log(req.params);
         const data = await GetTribunalMembersByTrabajoIdService(trabajo_id);
-        console.log(data);
         res.json({
             exito: true,
             mensaje: 'Get thesis tribunal members',
@@ -378,8 +375,6 @@ exports.getQuienPreside = async () => {
 }
 
 exports.setQuienPreside = async (quien_preside_id, trabajo_id) => {
-    // console.log("quien_preside_id");
-    // console.log(quien_preside_id);
     quien_preside_id = quien_preside_id.id;
     const rows = await this.getQuienPreside();
     const yearActual = new Date().getFullYear();

@@ -237,64 +237,8 @@ const isCompleteThesis = async (docent_id, trabajo_id, db) => {
                 ${getCompleteThesisGradeStatement()}
         `, [trabajo_id]);
 
-    console.log("isCompleteThesis. rows.length");
-    console.log(rows.length);
-    console.log(rows);
     return rows.length === 3;
 }
-
-// Rubrica Evaluacion
-// exports.createRubricaEvaluaciones = async (req, res) => {
-//     const { calificaciones } = req.body;
-
-//     if (!Array.isArray(calificaciones) || calificaciones.length === 0) {
-//         return res.status(400).json({ error: "El array de calificaciones es inválido o está vacío." });
-//     }
-
-//     const connection = await db.getConnection(); // Asegúrate de usar un pool de conexiones
-
-//     // console.log("calificaciones");
-//     // console.log(calificaciones);
-
-//     try {
-//         await connection.beginTransaction();
-
-//         const insertPromises = calificaciones.map(({ trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido }) => {
-//             return connection.query(
-//                 'INSERT INTO rubrica_evaluacion (trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido) VALUES (?, ?, ?, ?, ?, ?)',
-//                 [trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido]
-//             );
-//         });
-//         console.log("const insertPromises = calificaciones.map");
-//         // Ejecutar todas las inserciones
-//         await Promise.all(insertPromises);
-//         console.log("await Promise.all(insertPromises)");
-
-//         const trabajo_id = calificaciones[0].trabajo_id;
-//         const docente_id = calificaciones[0].docente_id;
-//         console.log("const trabajo_id = c...[0].docente_id;");
-//         // Verificar si el trabajo de tesis ha sido calificado por todos los docentes (3)
-//         const isCompleteThesisValue = await isCompleteThesis(docente_id, trabajo_id, connection);
-//         console.log(`isCompleteThesis(docente_id: ${docente_id}, trabajo_id: ${trabajo_id})`);
-//         console.log(isCompleteThesisValue);
-//         if (isCompleteThesisValue) {
-//             // Cambiar el estado del trabajo a "DEFENDIDO" o sea 4
-//             await connection.query(
-//                 'UPDATE trabajo_titulacion SET estado_id = 4 WHERE id = ?',
-//                 [trabajo_id]
-//             );
-//         }
-
-//         await connection.commit();
-
-//         res.status(201).json({ message: "Calificaciones guardadas exitosamente." });
-//     } catch (error) {
-//         await connection.rollback();
-//         res.status(500).json({ error: "Error al guardar las calificaciones: " + error.message });
-//     } finally {
-//         connection.release();
-//     }
-// };
 
 exports.createRubricaEvaluaciones = async (req, res) => {
     const { calificaciones } = req.body;
@@ -396,7 +340,7 @@ const getGradesRubricCriterialStatement = () => {
     JOIN sistema_tipo_evaluacion ste ON r.tipo_evaluacion_id = ste.id
     JOIN trabajo_estudiante te ON re.estudiante_id = te.estudiante_id
     WHERE 
-        te.trabajo_id = ? AND re.docente_id = ?
+        re.trabajo_id = ? AND te.trabajo_id = ? AND re.docente_id = ?
     `
 }
 
@@ -419,7 +363,7 @@ const transformRubricGradeData = (data) => {
 exports.getGradesRubricCriterial = async (req, res) => {
     const { trabajo_id, docente_id } = req.query;
     try {
-        const [rows] = await db.query(getGradesRubricCriterialStatement(), [trabajo_id, docente_id ]);
+        const [rows] = await db.query(getGradesRubricCriterialStatement(), [trabajo_id, trabajo_id, docente_id ]);
         console.log(rows);
         res.json(transformRubricGradeData(rows));
     } catch (error) {
