@@ -15,7 +15,6 @@ exports.getActaFile = async (req, res) => {
             return res.status(404).json({
                 typeMsg: 'error',
                 message: 'Archivo de plantilla acta no encontrado.',
-                data: tempHtmlPath
             });
         }
 
@@ -74,7 +73,7 @@ exports.getActaFileName = async (req, res) => {
 
         res.json({ fileName });
     } catch (error) {
-        return res.status(400).json({
+        return res.json({
             typeMsg: 'error',
             message: 'Error en el servidor al obtener nombre de acta.',
             error: error.message

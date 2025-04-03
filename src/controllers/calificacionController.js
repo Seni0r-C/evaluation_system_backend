@@ -460,7 +460,6 @@ exports.getGradesRubricCriterial = async (req, res) => {
     const { trabajo_id, docente_id } = req.query;
     try {
         const [rows] = await db.query(getGradesRubricCriterialStatement(), [trabajo_id, trabajo_id, docente_id]);
-        console.log(rows);
         res.json(transformRubricGradeData(rows));
     } catch (error) {
         res.status(500).json({ error: error.message });
