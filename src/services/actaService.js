@@ -94,8 +94,6 @@ exports.GetActaService = async (trabajo_id, lugar = null, ciudad="Portoviejo") =
         }
         await this.UpdateInfoActaService(acta);
     }
-    console.log("GetActaService");
-    console.log(acta);
     return acta;
 };
 
