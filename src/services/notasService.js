@@ -66,6 +66,11 @@ const reduceNotasData = (data, esquema) => {
     return Object.values(groupedData);
 };
 
+function customRound(num) {
+    return (num % 1 >= 0.5) ? Math.ceil(num) : Math.floor(num);
+}
+
+
 // Function to group by "nombre" and calculate sum and mean
 const groupAndCalculate = (data) => {
     return data.map(student => {
@@ -87,13 +92,13 @@ const groupAndCalculate = (data) => {
             return {
                 nombre,
                 sum,
-                mean: mean.toFixed(2),
-                valor: parseInt(mean+""),
+                mean: customRound(mean),
+                valor: parseInt(customRound(mean)+""),
                 base: 100
             };
         });
 
-        student.promedioTotal.valor = parseInt(student.promedioTotal.valor+"");
+        student.promedioTotal.valor = parseInt(customRound(student.promedioTotal.valor)+"");
 
         return {
             ...student,
@@ -111,6 +116,8 @@ exports.GetNotasService = async (trabajo_id) => {
         const modalidad_id = modalidad?.id;
         // Obtener el esquema de notas
         const esquema = await GetNotasSchemeActaService(modalidad_id);
+        console.log("esquema");
+        console.log(esquema);
         const groupedData = reduceNotasData(data, esquema)?.map(nota => {
             nota.promedioTotal.valor = ((nota.promedioTotal.valor / nota.promedioTotal.base) * 100);
             // nota.promedioTotal.valor = ((nota.promedioTotal.valor / nota.promedioTotal.base) * 100).toFixed(2);
@@ -118,7 +125,7 @@ exports.GetNotasService = async (trabajo_id) => {
             return nota;
         });
         const groupedDataWithSummary = groupAndCalculate(groupedData);
-        // console.log(JSON.stringify(groupedDataWithSummary, null, 2));
+        console.log(JSON.stringify(groupedDataWithSummary, null, 2));
         return groupedDataWithSummary;
     } catch (error) {
         const msg = { message: 'Error al obtener notas de estudiantes.', error }
@@ -137,3 +144,4 @@ exports.GetByEvalTypeNotasService = async (trabajo_id, eval_type_id) => {
         throw new Error(msg);
     }
 };
+

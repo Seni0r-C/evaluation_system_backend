@@ -76,8 +76,9 @@ exports.UpdateInfoActaService = async (data) => {
 
 // Servicio para obtener un acta por trabajo_id
 exports.GetActaService = async (trabajo_id, lugar = null, ciudad="Portoviejo") => {
-    const query = "SELECT * FROM acta WHERE trabajo_id = ?";
-    const [rows] = await db.query(query, [trabajo_id]);
+    const yearActual = new Date().getFullYear();
+    const query = "SELECT * FROM acta WHERE trabajo_id = ? AND year = ?";
+    const [rows] = await db.query(query, [trabajo_id, yearActual]);
     let acta = null;
     if (rows.length === 0) {
         acta = await this.GetLastInfoActaService(trabajo_id, lugar);
