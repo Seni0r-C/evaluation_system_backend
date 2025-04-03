@@ -86,16 +86,48 @@ exports.parseToLocale = (date) => {
     });
 };
 
-exports.getServerDate = () => {
-    return this.parseToLocale(new Date());
+
+exports.formatDatetimeMysql = (date) => {
+    try {
+        console.log("formatDatetimeMysql");
+        console.log(date);
+        const parts = date.split(",");
+        const dateParts = parts[0].trim().split("/");
+        const day = dateParts[0];
+        const month = dateParts[1];
+        const year = dateParts[2];
+        const time = parts[1].trim();
+        return `${year}-${month}-${day} ${time}:00`;
+    } catch (Exception) {
+        console.log(Exception);
+        return '';
+    }
 };
 
+exports.jsonDatetimeFromServerDate = (fechaStr) => {
+    const [datePart, timePart] = fechaStr.split(", ");
+    const [day, month, year] = datePart.split("/").map(Number);
+    const [hour, minute] = timePart.split(":").map(Number);
+    return { day, month, year, hour, minute };
+}
+
+exports.jsonDatetimeFromMysql = (fechaStr) => {
+    const [datePart, timePart] = fechaStr.split(" ");
+    const [year, month, day] = datePart.split("-").map(Number);
+    const [hour, minute, second] = timePart.split(":").map(Number);
+    return { day, month, year, hour, minute, second };
+}
+
+exports.getServerDate = (mysqlFormat = true) => {
+    const date = this.parseToLocale(new Date());
+    return mysqlFormat ? this.formatDatetimeMysql(date) : date;
+};
 
 const numerosTexto = {
     0: "cero", 1: "uno", 2: "dos", 3: "tres", 4: "cuatro", 5: "cinco", 6: "seis", 7: "siete", 8: "ocho", 9: "nueve",
     10: "diez", 11: "once", 12: "doce", 13: "trece", 14: "catorce", 15: "quince", 16: "dieciséis", 17: "diecisiete",
     18: "dieciocho", 19: "diecinueve", 20: "veinte", 21: "veintiuno", 22: "veintidós", 23: "veintitrés", 24: "veinticuatro",
-    25: "veinticinco", 26: "veintiséis", 27: "veintisiete", 28: "veintiocho", 29: "veintinueve", 
+    25: "veinticinco", 26: "veintiséis", 27: "veintisiete", 28: "veintiocho", 29: "veintinueve",
     30: "treinta", 31: "treinta y uno"
 };
 
@@ -111,7 +143,7 @@ const convertirNumeroATexto = (numero) => {
 
     const unidades = numero % 10;
     const decenas = Math.floor(numero / 10) * 10;
-    
+
     return `${numerosTexto[decenas]} y ${numerosTexto[unidades]}`;
 };
 
@@ -122,11 +154,9 @@ const convertirAnioATexto = (anio) => {
     return `dos mil ${centenas ? convertirNumeroATexto(centenas) : ""}`.trim();
 };
 
-exports.describirFecha = (fechaStr, incluirMinutos = false) => {
+exports.describirFecha = (dateObject, incluirMinutos = false) => {
     try {
-        const [datePart, timePart] = fechaStr.split(", ");
-        const [day, month, year] = datePart.split("/").map(Number);
-        const [hour, minute] = timePart.split(":").map(Number);
+        const { day, month, year, hour, minute } = dateObject;
 
         if (!day || !month || !year || hour === undefined || minute === undefined) {
             throw new Error("Formato de fecha incorrecto.");

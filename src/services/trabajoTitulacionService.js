@@ -35,6 +35,7 @@ exports.GetByIdTrabajoService = async (id, unpack = false) => {
         }
         if (rows[0]?.fecha_defensa) {
             rows[0].fecha_defensa = parseToLocale(rows[0].fecha_defensa);
+            console.log(rows[0].fecha_defensa);
         }
 
     }

@@ -103,8 +103,8 @@ const groupAndCalculate = (data) => {
 };
 
 
-
 exports.GetNotasService = async (trabajo_id) => {
+    console.log("groupedDataWithSummary")
     try {
         const data = await GetNotasTrabajoService(trabajo_id);
         const modalidad = await GetModalidadTrabajoService(trabajo_id);
@@ -118,8 +118,7 @@ exports.GetNotasService = async (trabajo_id) => {
             return nota;
         });
         const groupedDataWithSummary = groupAndCalculate(groupedData);
-        console.log("groupedDataWithSummary")
-        console.log(JSON.stringify(groupedDataWithSummary, null, 2));
+        // console.log(JSON.stringify(groupedDataWithSummary, null, 2));
         return groupedDataWithSummary;
     } catch (error) {
         const msg = { message: 'Error al obtener notas de estudiantes.', error }
