@@ -34,6 +34,8 @@ router.post('/rubrica-evaluacion', controller.createRubricaEvaluaciones);
 router.get('/rubrica-evaluacion', controller.getRubricaEvaluaciones);
 router.get('/rubrica-evaluacion/:id', controller.getRubricaEvaluacionById);
 router.put('/rubrica-evaluacion/:id', controller.updateRubricaEvaluacion)
+router.post('/rubrica-evaluacion-examen-teorico', controller.createRubricaEvaluacionExamenTeorico);
+router.get('/rubrica-evaluacion-examen-teorico/:trabajo_id', controller.geValueOfExamenTeoricoGradeByTrabajoIdController);
 
 // Exportar las rutas
 module.exports = router;

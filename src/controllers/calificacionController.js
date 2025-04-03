@@ -240,14 +240,10 @@ const isCompleteThesis = async (docent_id, trabajo_id, db) => {
     return rows.length === 3;
 }
 
-const createRubricaEvaluacionesService = async (calificaciones) => {
+const createRubricaEvaluacionesService = async (connection, calificaciones) => {
     if (!Array.isArray(calificaciones) || calificaciones.length === 0) {
         return res.status(400).json({ error: "El array de calificaciones es inválido o está vacío." });
     }
-
-    const connection = await db.getConnection(); // Asegúrate de usar un pool de conexiones
-
-    await connection.beginTransaction();
 
     const updateOrInsertPromises = calificaciones.map(async ({ trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido }) => {
         // Verificar si la calificación ya existe
@@ -299,8 +295,10 @@ const createRubricaEvaluacionesService = async (calificaciones) => {
 
 exports.createRubricaEvaluaciones = async (req, res) => {
     const { calificaciones } = req.body;
+    const connection = await db.getConnection(); // Asegúrate de usar un pool de conexiones
     try {
-        await createRubricaEvaluacionesService(calificaciones);
+        await connection.beginTransaction();
+        await createRubricaEvaluacionesService(connection, calificaciones);
         res.status(201).json({ message: "Calificaciones guardadas o actualizadas exitosamente." });
     } catch (error) {
         await connection.rollback();
@@ -308,6 +306,101 @@ exports.createRubricaEvaluaciones = async (req, res) => {
     } finally {
         connection.release();
     }
+};
+
+const geValueOfExamenTeoricoGradeByIdTrabajoStatement = () => {
+    return `
+    SELECT 
+        re.id AS rubrica_evaluacion_id,
+        re.trabajo_id,
+        re.docente_id,
+        re.estudiante_id,
+        re.puntaje_obtenido,
+        rc.id AS rubrica_criterio_id,
+        rc.nombre AS criterio_nombre,
+        rc.puntaje_maximo,
+        ste.nombre AS tipo_evaluacion
+    FROM rubrica_evaluacion re
+    JOIN rubrica_criterio rc ON re.rubrica_criterio_id = rc.id
+    JOIN rubrica r ON rc.rubrica_id = r.id
+    JOIN sistema_tipo_evaluacion ste ON r.tipo_evaluacion_id = ste.id
+    WHERE 
+        rc.puntaje_maximo = 40
+        AND ste.nombre LIKE '%EXAMEN TEORICO%'
+        AND re.trabajo_id = ? LIMIT 1
+    `;
+}
+
+const geValueOfExamenTeoricoGradeByIdTrabajo = async (db, id_trabajo) => {
+    const [rows] = await db.query(`
+                    ${geValueOfExamenTeoricoGradeByIdTrabajoStatement()}
+            `, [id_trabajo]);
+    return rows;
+}
+
+exports.geValueOfExamenTeoricoGradeByTrabajoIdController = async (req, res) => {
+    try {
+        const trabajo_id = req.params.trabajo_id;
+        const [row] = await geValueOfExamenTeoricoGradeByIdTrabajo(db, trabajo_id);
+        console.log("geValueOfExamenTeoricoGradeByTrabajoIdController");
+        console.log({ trabajo_id, row });
+        res.status(200).json( { grade: row?.puntaje_obtenido ?? null } );
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+const getIdsExamenTeoricoGradeStatement = () => {
+    return `
+    SELECT r.id rubrica_id, rc.id rubrica_criterio_id FROM rubrica_criterio rc 
+    INNER JOIN rubrica r ON r.id = rc.rubrica_id  
+    INNER JOIN sistema_tipo_evaluacion ste ON ste.id = r.tipo_evaluacion_id
+    WHERE puntaje_maximo=40 AND ste.nombre LIKE '%EXAMEN TEORICO%'
+    `;
+}
+
+const getIdsExamenTeoricoGrade = async (db) => {
+    const [rows] = await db.query(`
+                    ${getIdsExamenTeoricoGradeStatement()}
+            `);
+    console.log("getIdsExamenTeoricoGrade");
+    console.log(rows);
+    return rows;
+}
+
+exports.createRubricaEvaluacionExamenTeorico = async (req, res) => {
+    const { trabajo_id, docents, students, teoricExamGrade } = req.body;
+    const [{ rubrica_id, rubrica_criterio_id }] = await getIdsExamenTeoricoGrade(db);
+    const calificaciones = [];
+    for (const docent of docents) {
+        for (const student of students) {
+            const calificacion = {
+                trabajo_id: trabajo_id,
+                rubrica_id: rubrica_id,
+                rubrica_criterio_id: rubrica_criterio_id,
+                docente_id: docent.id,
+                estudiante_id: student.id,
+                puntaje_obtenido: teoricExamGrade
+            }
+            calificaciones.push(calificacion);
+        }
+    }
+
+    const connection = await db.getConnection(); // Asegúrate de usar un pool de conexiones
+
+    try {
+        await connection.beginTransaction();
+        await createRubricaEvaluacionesService(connection, calificaciones);
+        res.status(200).json({ message: "Calificacion de EXAMEN TEORICO guardada exitosamente." });
+    } catch (error) {
+        await connection.rollback();
+        res.status(500).json({ error: "Error al procesar calificacion de EXAMEN TEORICO: " + error.message });
+    } finally {
+        connection.release();
+    }
+
+    console.log({ trabajo_id, docents, students, teoricExamGrade });
 };
 
 
