@@ -43,7 +43,11 @@ app.use('/trabajo-titulacion', trabajoTitulacionRoutes);
 app.use('/calificacion', calificacionRoutes);
 app.use('/usuarios', usuariosRoutes);
 app.use('/rutas', rutasRoutes);
+
 app.use('/roles', rolesRoutes);
+app.use('/permisos', require('./src/routes/permisosRoutes.js'));
+app.use('/roles-permisos', require('./src/routes/rolesPermisosRoutes.js'));
+
 app.use('/acta', actaRoutes);
 app.use('/notas', notasRoutes);
 app.use('/rubrica', rubricaRoutes);

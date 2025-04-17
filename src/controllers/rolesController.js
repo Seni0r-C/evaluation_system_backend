@@ -1,4 +1,4 @@
-const db = require('../config/db'); // Suponiendo que tienes un modelo para la base de datos   
+const db = require('../config/db');
 
 exports.getRoles = async (req, res) => {
     try {
@@ -8,3 +8,4 @@ exports.getRoles = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener las rutas', details: error });
     }
 };
+
