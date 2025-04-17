@@ -9,6 +9,7 @@ router.get('/', rolesController.getRoles);
 // ✅ Crear nuevo rol
 router.post('/', async (req, res) => {
   const { nombre } = req.body;
+  if (!nombre || nombre.trim() === '') return res.status(400).json({ error: 'Nombre es requerido' });
   const [result] = await db.execute('INSERT INTO sistema_rol (nombre) VALUES (?)', [nombre]);
   res.json({ id: result.insertId, nombre });
 });
