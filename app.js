@@ -35,6 +35,8 @@ const actaRoutes = require('./src/routes/actaRoutes');
 const notasRoutes = require('./src/routes/notasRoutes');
 const rubricaRoutes = require('./src/routes/rubricaRoutes');
 const reportesRoutes = require('./src/routes/reportesRoutes');
+const indexacionRevistaTrabajoRoute = require('./src/routes/indexacionRevistaTrabajoTitulacionRoute');
+const indexacionRevistaRoute = require('./src/routes/indexacionRevistaRoute');
 
 app.use('/auth', authRoutes);
 app.use('/carrera', carrerasRoutes);
@@ -47,6 +49,8 @@ app.use('/rutas', rutasRoutes);
 app.use('/roles', rolesRoutes);
 app.use('/permisos', require('./src/routes/permisosRoutes.js'));
 app.use('/roles-permisos', require('./src/routes/rolesPermisosRoutes.js'));
+app.use('/indexacion-revista', indexacionRevistaRoute);
+app.use('/indexacion-revista-trabajo', indexacionRevistaTrabajoRoute);
 
 app.use('/acta', actaRoutes);
 app.use('/notas', notasRoutes);
