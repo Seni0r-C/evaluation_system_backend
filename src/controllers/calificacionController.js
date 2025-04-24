@@ -413,6 +413,7 @@ exports.getRubricaEvaluaciones = async (req, res) => {
     }
 };
 
+
 exports.getRubricaEvaluacionById = async (req, res) => {
     const { id } = req.params;
     try {
