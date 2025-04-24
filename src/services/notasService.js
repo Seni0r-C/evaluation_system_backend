@@ -1,9 +1,12 @@
 const { GetNotasTrabajoService, GetModalidadTrabajoService, GetNotasByEvalTypeTrabajoService } = require('../services/trabajoTitulacionService');
 const { GetNotasSchemeActaService } = require('../services/schemeActaService');
+const { groupsBy } = require('../utils/groupListUtility');
+const { calcGrades } = require('../utils/gradesUtility');
 
 const reduceNotasData = (data, esquema) => {
     const groupedData = {};
-
+    // console.log("reduceNotasData: JSON.stringify(data);")
+    // console.log(JSON.stringify(data));
     data.forEach((item) => {
         const { estudiante, tipo_evaluacion, est_id, cedula } = item;
 
@@ -113,20 +116,33 @@ exports.GetNotasService = async (trabajo_id) => {
     try {
         const data = await GetNotasTrabajoService(trabajo_id);
         const modalidad = await GetModalidadTrabajoService(trabajo_id);
-        const modalidad_id = modalidad?.id;
+        // const modalidad_id = modalidad?.id;
         // Obtener el esquema de notas
-        const esquema = await GetNotasSchemeActaService(modalidad_id);
-        console.log("esquema");
-        console.log(esquema);
-        const groupedData = reduceNotasData(data, esquema)?.map(nota => {
-            nota.promedioTotal.valor = ((nota.promedioTotal.valor / nota.promedioTotal.base) * 100);
-            // nota.promedioTotal.valor = ((nota.promedioTotal.valor / nota.promedioTotal.base) * 100).toFixed(2);
-            nota.promedioTotal.base = 100;
-            return nota;
+        // const esquema = await GetNotasSchemeActaService(modalidad_id);
+        // console.log("esquema");
+        // console.log(esquema);
+        // const result = groupsBy(data, 'estudiante.docente.tipo_evaluacion', true, (item)=>{
+        const result = groupsBy(data, 'estudiante.tipo_evaluacion', true, (item)=>{
+            item.nota = parseInt(item.nota);
+            item.base = parseInt(item.base);
+            return item;
         });
-        const groupedDataWithSummary = groupAndCalculate(groupedData);
-        console.log(JSON.stringify(groupedDataWithSummary, null, 2));
-        return groupedDataWithSummary;
+        const groupedData = calcGrades(result, modalidad);
+        // console.log("result");
+        // console.log(JSON.stringify(result, null, 2));
+        // console.log("Rest of summary");
+        // console.log(modalidad);
+        // console.log("groupedData");
+        // console.log(JSON.stringify(groupedData, null, 2));
+        return groupedData;
+        // const groupedData = reduceNotasData(data, esquema)?.map(nota => {
+        //     nota.promedioTotal.valor = ((nota.promedioTotal.valor / nota.promedioTotal.base) * 100);
+        //     nota.promedioTotal.base = 100;
+        //     return nota;
+        // });
+        // const groupedDataWithSummary = groupAndCalculate(groupedData);
+        // console.log(JSON.stringify(groupedDataWithSummary, null, 2));
+        // return groupedDataWithSummary;
     } catch (error) {
         const msg = { message: 'Error al obtener notas de estudiantes.', error }
         console.log(msg)

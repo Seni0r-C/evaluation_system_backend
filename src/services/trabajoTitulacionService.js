@@ -153,7 +153,7 @@ exports.GetNotasByEvalTypeTrabajoService = async (trabajo_id, eval_type) => {
 exports.GetModalidadTrabajoService = async (trabajo_id) => {
     const query = `
         SELECT 
-            m.id
+            m.id, m.nombre
         FROM 
             sistema_modalidad_titulacion m
         INNER JOIN trabajo_titulacion tt ON m.id = tt.modalidad_id
