@@ -61,11 +61,12 @@ exports.InsertInfoActaService = async (data) => {
 exports.UpdateInfoActaService = async (data) => {
     const query = `
     UPDATE acta 
-        SET secretaria_id = ?, vicedecano_id = ?, asesor_juridico_id = ?, 
+        SET num_year_count = ?, secretaria_id = ?, vicedecano_id = ?, asesor_juridico_id = ?, 
         fecha_hora = ?, ciudad = ?, lugar = ? 
         WHERE trabajo_id = ?
     `;
     const values = [
+        data.num_year_count,
         data.secretaria_id, data.vicedecano_id, data.asesor_juridico_id, 
         data.fecha_hora, data.ciudad, data.lugar, data.trabajo_id, 
         // data.fecha_hora
@@ -135,7 +136,7 @@ exports.GetFullActaService = async (trabajo_id) => {
     actaInfoFull.fechaHora = describirFecha(jsonDatetimeFromMysql(actaInfo.fecha_hora));
     actaInfoFull.facultad = actaInfo.facultad ?? "Facultad de Ciencias Informáticas";
     const vicedecano = await GetNombreUsuarioService(actaInfo.vicedecano_id);
-    actaInfoFull.vicedecano = vicedecano ?? false ? asIngPhd(vicedecano) : "Ing. Loor Zamora Patricio, Mg.";
+    actaInfoFull.vicedecano = vicedecano ?? false ? asIngPhd(vicedecano) : "Ing. Christian Torres Morán, Mg.";
 
     actaInfoFull.lugar = actaInfo.lugar;
     actaInfoFull.secretarioAsesorJuridico = await GetNombreUsuarioService(actaInfo.asesor_juridico_id) ?? "Abg. Macías Cano David";

@@ -11,8 +11,8 @@ router.get('/', async (req, res) => {
 // ✅ Crear nuevo permiso
 router.post('/', async (req, res) => {
     const { nombre, permiso, permiso_id = null } = req.body;
-    if (!nombre || nombre.trim() === '') return res.status(400).json({ error: 'nombre es requerido' });
-    if (!permiso || permiso.trim() === '') return res.status(400).json({ error: 'permiso es requerido' });
+    if (!nombre || nombre?.trim() === '') return res.status(400).json({ error: 'nombre es requerido' });
+    if (!permiso || permiso?.trim() === '') return res.status(400).json({ error: 'permiso es requerido' });
     // if (!permiso_id || permiso_id.trim() === '') return res.status(400).json({ error: 'permiso_id es requerido' });
 
     const [result] = await db.execute(

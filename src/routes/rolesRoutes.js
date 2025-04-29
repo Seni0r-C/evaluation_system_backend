@@ -8,16 +8,17 @@ router.get('/', rolesController.getRoles);
 
 // ✅ Crear nuevo rol
 router.post('/', async (req, res) => {
-  const { nombre } = req.body;
-  if (!nombre || nombre.trim() === '') return res.status(400).json({ error: 'Nombre es requerido' });
+  const { nombre } = req.body?.nombre;
+  if (!nombre || nombre?.trim() === '') return res.status(400).json({ error: 'Nombre es requerido' });
   const [result] = await db.execute('INSERT INTO sistema_rol (nombre) VALUES (?)', [nombre]);
   res.json({ id: result.insertId, nombre });
 });
-
+  
 // ✅ Actualizar rol
 router.put('/:id', async (req, res) => {
-  const { nombre } = req.body;
+  const { nombre } = req.body?.nombre;
   const { id } = req.params;
+  if (!nombre || nombre?.trim() === '') return res.status(400).json({ error: 'Nombre es requerido' });
   await db.execute('UPDATE sistema_rol SET nombre = ? WHERE id = ?', [nombre, id]);
   res.sendStatus(204);
 });

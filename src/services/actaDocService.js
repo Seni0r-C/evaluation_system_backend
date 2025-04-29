@@ -40,7 +40,7 @@ function crearEstudianteNotas(estudiante, index = null) {
         <div class="estudiante-notas">
                 <span class="nextline estudiante-nombre">
                     ${estudiante.nombres}
-                    <span class="estudiante-cedula">${estudiante.cedula}</span>
+                    <span class="estudiante-cedula">${estudiante.cedula??''}</span>
                 </span>
                 ${notasStr}
                 <span class="nextline estudiante-nota">
@@ -74,6 +74,7 @@ const adjustPages = (notasEstudiantesHtmlStr, trabajoData, estudiantes, isComple
 
     const nWordsTopicTesis = temaTesis?.length ?? 0;
     const marginTop = `<div style="margin-top: -15px;"></div>`;
+    const marginTopComplexivo = `<div style="margin-top: 25px;"></div>`;
     const marginBottom = `<div style="padding-bottom: 180px;"></div>`;
     const nextPage = `<div style="page-break-after: always;"></div>`;
     // console.log("nWordsTopicTesis");
@@ -85,7 +86,7 @@ const adjustPages = (notasEstudiantesHtmlStr, trabajoData, estudiantes, isComple
             return notasEstudiantesHtmlStr;
         }
         if (estudiantes.length == 1 && isComplexivo) {
-            notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.0", marginTop);
+            notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.0", marginTopComplexivo);
             notasEstudiantesHtmlStr = notasEstudiantesHtmlStr.replace("notastudent.1", nextPage);
             return notasEstudiantesHtmlStr;
         }
@@ -150,11 +151,15 @@ const buildDataActaComplexivo = async (estudiantesNotasData, trabajoData) => {
 exports.GenerateActaService = async (trabajoId) => {
     // const trabajoData = await getTrabajo(trabajoId);
     const trabajoData = await GetFullActaService(trabajoId);
+    
+    
     // const trabajoData = await GetNotasService(trabajoId);
     // console.debug("-----------------------------trabajoData-----------------------------")
     // console.debug(trabajoData)
     // const estudiantesNotasData = await getEstudiantesNotas(trabajoData);
     const estudiantesNotasData = await GetNotasService(trabajoId);
+    console.log("-----------------------------estudiantesNotasData-----------------------------");
+    console.log(estudiantesNotasData);
     const actaComplexivoData = await buildDataActaComplexivo(estudiantesNotasData, trabajoData);
     // console.debug("-----------------------------actaComplexivoData-----------------------------")
     // console.debug(actaComplexivoData)

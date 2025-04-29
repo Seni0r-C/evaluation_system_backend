@@ -46,7 +46,7 @@ function crearEstudianteNotas(estudiante, index = null) {
         <div class="estudiante-notas">
                 <span class="nextline estudiante-nombre">
                     ${estudiante.nombres}
-                    <span class="estudiante-cedula">${estudiante.cedula}</span>
+                    <span class="estudiante-cedula">${estudiante.cedula??''}</span>
                 </span>
                 ${notasStr}
                 <span class="nextline estudiante-nota">

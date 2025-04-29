@@ -110,7 +110,7 @@ exports.calcGrades = calcGrades = (data, modalidadTitulacion) => {
         console.log(studentData);
         newStudentData = {
             est_id: studentData.est_id,
-            cedula: studentData.est_id,
+            cedula: studentData.cedula,
             nombres: estudiante,
             notas: calcAverageGrades(data, estudiante),
         };

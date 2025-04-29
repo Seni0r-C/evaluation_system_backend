@@ -49,7 +49,7 @@ exports.GetNotasTrabajoService = async (trabajo_id) => {
         SELECT 
             docente.nombre AS docente,
             estudiante.id AS est_id,
-            estudiante.id AS cedula,
+            estudiante.cedula AS cedula,
             estudiante.nombre AS estudiante,
             te.nombre AS tipo_evaluacion, 
             SUM(re.puntaje_obtenido) AS nota,
@@ -81,7 +81,7 @@ exports.GetNotasByEvalTypeTrabajoService = async (trabajo_id, eval_type) => {
         SELECT 
             docente.nombre AS docente,
             estudiante.id AS est_id,
-            estudiante.id AS cedula,
+            estudiante.cedula AS cedula,
             estudiante.nombre AS estudiante,
             te.nombre AS tipo_evaluacion, 
             r.tipo_evaluacion_id AS eval_type,
@@ -122,7 +122,7 @@ exports.GetNotasByEvalTypeTrabajoService = async (trabajo_id, eval_type) => {
 //          SELECT 
 //             docente.nombre AS docente,
 //             estudiante.id AS est_id,
-//             estudiante.id AS cedula,
+//             estudiante.cedula AS cedula,
 //             estudiante.nombre AS estudiante,
 //             te.nombre AS tipo_evaluacion, 
 //             r.tipo_evaluacion_id AS eval_type,
