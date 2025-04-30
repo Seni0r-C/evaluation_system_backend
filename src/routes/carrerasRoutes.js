@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const carreraController = require('../controllers/carrerasController');
-const authMiddleware = require('../middlewares/authMiddleware');
-
+const auth = require('../middlewares/authMiddleware');
+const onlyRoles = require('../middlewares/onlyTypeOfUsers');
+const roles = [1, 10, 11, 12];
 // Rutas de carrera
-router.post('/crear', carreraController.createCarrera);
-router.get('/listar', carreraController.getCarreras);
-router.get('/listar/:id', carreraController.getCarreraById);
-router.put('/actualizar/:id', carreraController.updateCarrera);
-router.delete('/eliminar/:id', carreraController.deleteCarrera);
+router.post('/crear', auth, onlyRoles(roles), carreraController.createCarrera);
+router.get('/listar', auth, carreraController.getCarreras);
+router.get('/listar/:id', auth, carreraController.getCarreraById);
+router.put('/actualizar/:id', auth, onlyRoles(roles), carreraController.updateCarrera);
+router.delete('/eliminar/:id', auth, onlyRoles(roles), carreraController.deleteCarrera);
 
 module.exports = router;

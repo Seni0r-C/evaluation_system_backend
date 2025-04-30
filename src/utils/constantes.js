@@ -1,6 +1,5 @@
 const { utmAuth } = require("../services/authService");
 const https = require('https');
-const path = require('path');
 
 // Simulamos un conjunto de usuarios con sus contraseñas
 //LA VERDAD NOS E SI ESTO FUNCIONE CORRECTAMENTE  :) pero es loq ue esatba antes xd

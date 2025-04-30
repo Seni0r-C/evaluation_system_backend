@@ -240,9 +240,42 @@ const isCompleteThesis = async (docent_id, trabajo_id, db) => {
     return rows.length === 3;
 }
 
+const isThisMiembrotribunalCorrect = async (connection, trabajo_id, docente_id) => {
+    const [result] = await connection.query(`
+        SELECT
+            docente_id
+        FROM
+            trabajo_tribunal
+        WHERE
+            trabajo_id = ? AND docente_id = ?
+        `, [trabajo_id, docente_id]);
+    return result.length !== 0;
+}
+
 const createRubricaEvaluacionesService = async (connection, calificaciones) => {
     if (!Array.isArray(calificaciones) || calificaciones.length === 0) {
         return res.status(400).json({ error: "El array de calificaciones es inválido o está vacío." });
+    }
+
+    const trabajo_id = calificaciones[0].trabajo_id;
+    const docente_id = calificaciones[0].docente_id;
+
+    //verificar si el docente es el mismo que esta enviado la solicitud
+    const { userId } = req.user;
+    if (userId !== docente_id) {
+        return res.status(403).json({ error: "No tienes permiso para realizar esta acción" });
+    }
+
+    // Verificar si el docente esta asignado para el trabajo
+    if (!await isThisMiembrotribunalCorrect(connection, trabajo_id, docente_id)) {
+        return res.status(400).json({ error: "El docente no esta asignado para el trabajo" });
+    }
+
+    // Verificar si el trabajo de tesis ha sido calificado por todos los docentes (3)
+    const isComplete = await isCompleteThesis(docente_id, trabajo_id, connection);
+
+    if (!isComplete) {
+        return res.status(400).json({ error: "El trabajo de tesis no ha sido calificado por todos los docentes" });
     }
 
     const updateOrInsertPromises = calificaciones.map(async ({ trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido }) => {
@@ -274,9 +307,6 @@ const createRubricaEvaluacionesService = async (connection, calificaciones) => {
     });
 
     await Promise.all(updateOrInsertPromises);
-
-    const trabajo_id = calificaciones[0].trabajo_id;
-    const docente_id = calificaciones[0].docente_id;
 
     // Verificar si el trabajo de tesis ha sido calificado por todos los docentes (3)
     const isCompleteThesisValue = await isCompleteThesis(docente_id, trabajo_id, connection);
@@ -344,7 +374,7 @@ exports.geValueOfExamenTeoricoGradeByTrabajoIdController = async (req, res) => {
         const [row] = await geValueOfExamenTeoricoGradeByIdTrabajo(db, trabajo_id);
         console.log("geValueOfExamenTeoricoGradeByTrabajoIdController");
         console.log({ trabajo_id, row });
-        res.status(200).json( { grade: row?.puntaje_obtenido ?? null } );
+        res.status(200).json({ grade: row?.puntaje_obtenido ?? null });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -373,6 +403,14 @@ exports.createRubricaEvaluacionExamenTeorico = async (req, res) => {
     const { trabajo_id, docents, students, teoricExamGrade } = req.body;
     const [{ rubrica_id, rubrica_criterio_id }] = await getIdsExamenTeoricoGrade(db);
     const calificaciones = [];
+
+    const connection = await db.getConnection(); // Asegúrate de usar un pool de conexiones
+
+    // Verificar si el miembro del tribunal esta asignado para el trabajo
+    if (!await isThisMiembrotribunalCorrect(connection, trabajo_id, docents[0].id)) {
+        return res.status(400).json({ error: "El docente no esta asignado para el trabajo" });
+    }
+
     for (const docent of docents) {
         for (const student of students) {
             const calificacion = {
@@ -387,7 +425,6 @@ exports.createRubricaEvaluacionExamenTeorico = async (req, res) => {
         }
     }
 
-    const connection = await db.getConnection(); // Asegúrate de usar un pool de conexiones
 
     try {
         await connection.beginTransaction();

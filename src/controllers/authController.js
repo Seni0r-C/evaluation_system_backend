@@ -3,7 +3,7 @@ const db = require('../config/db');
 const axios = require('axios');
 require('dotenv').config();
 const https = require('https');
-const { utmAuth, getOrInsertRol, insertCarreraIfNotExists } = require('../services/authService');
+const { getOrInsertRol, insertCarreraIfNotExists } = require('../services/authService');
 const { externalAuth } = require('../utils/constantes');
 const agent = new https.Agent({
     rejectUnauthorized: false
@@ -71,7 +71,7 @@ exports.loginUser = async (req, res) => {
             }
             await db.query("COMMIT");
             user = {
-                id_personal: apiData.idpersonal,
+                id_personal: result.insertId,
                 usuario: usuario,
             }
         } else {
@@ -80,7 +80,7 @@ exports.loginUser = async (req, res) => {
 
         // Genera el token JWT
         const token = jwt.sign(
-            { userId: user.id_personal, usuario: user.usuario },
+            { userId: user.id, usuario: user.usuario },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRES_IN }
         );
@@ -104,7 +104,7 @@ exports.loginUser = async (req, res) => {
 exports.getUserInfo = async (req, res) => {
     try {
         const { userId } = req.user;
-        const sql = "SELECT * FROM usuario WHERE id_personal = ?";
+        const sql = "SELECT * FROM usuario WHERE id = ?";
         const [user] = await db.query(sql, [userId]);
 
         if (user.length === 0) {
@@ -121,7 +121,7 @@ exports.getUserInfo = async (req, res) => {
         try {
             const photoResponse = await axios.post(
                 "https://app.utm.edu.ec:3000/movil/obtener_foto_carnet",
-                { idpersonal: userId }, {
+                { idpersonal: user[0].id_personal }, {
                 httpsAgent: agent
             }
             );

@@ -67,8 +67,12 @@ exports.obtenerUsuarios = async (req, res) => {
 // Obtener un usuario por su id
 exports.obtenerUsuariosByRol = async (req, res) => {
   const { rol } = req.params;
+
   try {
-    const [usuario] = await db.execute('SELECT * FROM usuario u INNER JOIN usuario_rol r WHERE u.id_personal = 104419 AND r.id_usuario = u.id AND r.id_rol = ?', [rol]);
+    const [usuario] = await db.execute(
+      'SELECT * FROM usuario u INNER JOIN usuario_rol r ON r.id_usuario = u.id WHERE r.id_rol = ?',
+      [rol]
+    );
     if (usuario.length === 0) {
       return res.status(404).json({ message: 'No hay usuarios con ese rol' });
     }
