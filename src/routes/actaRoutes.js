@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const actaDocController = require('../controllers/actaDocController');
 const actaController = require('../controllers/actaController');
+const auth = require('../middlewares/authMiddleware');
 
 router.get('/pdf/:file_name', actaDocController.getActaFile);
 router.get('/pdf-name/:id_trabajo', actaDocController.getActaFileName);
