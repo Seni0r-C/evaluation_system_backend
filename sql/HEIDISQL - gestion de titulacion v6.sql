@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS `acta` (
 
 -- Volcando datos para la tabla gestion_titulacion.acta: ~3 rows (aproximadamente)
 INSERT INTO `acta` (`id`, `year`, `num_year_count`, `trabajo_id`, `secretaria_id`, `vicedecano_id`, `asesor_juridico_id`, `fecha_hora`, `ciudad`, `lugar`) VALUES
-	(6, 2025, 0, 20, 0, 61, 0, '2025-04-24 11:54:00', 'Portoviejo', 'la sala de sesiones del H. Consejo Directivo'),
-	(7, 2025, 1, 19, 0, 61, 0, '2025-04-24 11:56:00', 'Portoviejo', 'la sala de sesiones del H. Consejo Directivo'),
-	(8, 2025, 2, 10, 0, 61, 0, '2025-04-24 11:57:00', 'Portoviejo', 'la sala de sesiones del H. Consejo Directivo');
+	(6, 2025, 1, 20, 0, 61, 0, '2025-04-29 17:00:00', 'Portoviejo', 'la sala de sesiones del H. Consejo Directivo'),
+	(7, 2025, 2, 19, 0, 61, 0, '2025-04-29 16:27:00', 'Portoviejo', 'la sala de sesiones del H. Consejo Directivo'),
+	(8, 2025, 3, 10, 0, 61, 0, '2025-04-29 16:56:00', 'Portoviejo', 'la sala de sesiones del H. Consejo Directivo');
 
 -- Volcando estructura para tabla gestion_titulacion.acta_notas_scheme
 CREATE TABLE IF NOT EXISTS `acta_notas_scheme` (
@@ -96,12 +96,11 @@ CREATE TABLE IF NOT EXISTS `permisos_roles` (
   KEY `id_permiso` (`id_permiso`),
   CONSTRAINT `permisos_roles_ibfk_1` FOREIGN KEY (`id_rol`) REFERENCES `sistema_rol` (`id`) ON DELETE CASCADE,
   CONSTRAINT `permisos_roles_ibfk_2` FOREIGN KEY (`id_permiso`) REFERENCES `sistema_permisos` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
 
--- Volcando datos para la tabla gestion_titulacion.permisos_roles: ~2 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.permisos_roles: ~1 rows (aproximadamente)
 INSERT INTO `permisos_roles` (`id`, `id_rol`, `id_permiso`) VALUES
-	(4, 1, 5),
-	(1, 11, 5);
+	(4, 1, 5);
 
 -- Volcando estructura para tabla gestion_titulacion.registro_accion
 CREATE TABLE IF NOT EXISTS `registro_accion` (
@@ -396,12 +395,12 @@ INSERT INTO `sistema_menu` (`id`, `nombre`, `ruta_id`, `padre_id`, `orden`, `tod
 	(7, 'Registro Trabajo Final', 22, NULL, 4, 0, 'subir'),
 	(8, 'Asignación Tribunal', 8, NULL, 5, 0, 'asignar'),
 	(9, 'Calificación Trabajos', 9, NULL, 6, 0, 'calificar'),
-	(10, 'Documento de acta', 10, NULL, 7, 0, 'reporte'),
+	(10, 'Documento de acta', 10, NULL, 9, 0, 'reporte'),
 	(12, 'Carreras', 15, 2, 1, 0, ''),
 	(14, 'Rutas', 19, 2, 4, 0, ''),
 	(15, 'Menu', 21, 2, 5, 0, ''),
 	(20, 'Manuxi', NULL, NULL, 8, 0, ''),
-	(22, 'Proceso de calificación', 23, NULL, 9, 0, 'items'),
+	(22, 'Proceso de calificación', 23, NULL, 7, 0, 'items'),
 	(23, '', 6, 8, 1, 0, '');
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_modalidad_titulacion
@@ -457,7 +456,7 @@ CREATE TABLE IF NOT EXISTS `sistema_rol` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_rol: ~8 rows (aproximadamente)
 INSERT INTO `sistema_rol` (`id`, `nombre`) VALUES
@@ -693,6 +692,7 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   `usuario` varchar(100) NOT NULL,
   `id_personal` varchar(50) DEFAULT NULL,
   `nombre` varchar(100) NOT NULL,
+  `cedula` char(10) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `usuario` (`usuario`),
   UNIQUE KEY `id_personal` (`id_personal`),
@@ -700,44 +700,44 @@ CREATE TABLE IF NOT EXISTS `usuario` (
 ) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4;
 
 -- Volcando datos para la tabla gestion_titulacion.usuario: ~34 rows (aproximadamente)
-INSERT INTO `usuario` (`id`, `usuario`, `id_personal`, `nombre`) VALUES
-	(2, 'vargas', '235657', 'JUAN SILVO VARGAS VERDES'),
-	(3, 'xd', '104421', 'JOSTON JARZTA HICENBERZ GEORGEOUS'),
-	(4, 'sfdfsdf', '104420', 'DANIELA VICTORIA MENDOZA PEREZ'),
-	(5, 'luis.torres', '542562', 'JOSE LUIS FRANCHEZCO TORRES'),
-	(6, 'sofia.gonzalez', '565425', 'MARIA SOFIA GONZALES BENAVIDES'),
-	(7, 'pablo.fernandez', '232335', 'PABLO MONTALVO MERA ALCIVAR'),
-	(8, 'clara.mendez', '412147', 'CLARA BONELLA DIMATRIZ CUZCO'),
-	(9, 'martin.vega', '787456', 'MARTIN JUDAS VEGA NIKOLO'),
-	(10, 'raul.lopez', '361239', 'RAUL HECTOR REINA DENADA'),
-	(11, 'veronica.castro', '142787', 'VERONICA MANCILLO CASTRO MERA'),
-	(12, 'ricardo.morales', '252568', 'RICARDO FABIAN GUILLEN MORA'),
-	(13, 'patricia.rios', '223302', 'PATRICIA BRIONES DE POGUI'),
-	(14, 'juan.garcia@estudiante.com', '456567', 'JUAN FERNANDO VERLASQUEZ SANTOS'),
-	(15, 'laura.hernandez@estudiante.com', '453767', 'LAURA MARLENE MATINEZ POSLIGUA'),
-	(16, 'carlos.jimenez@estudiante.com', '121988', 'CARLOS JIMENEZ ESTUDI ANTEUTM'),
-	(17, 'ana.morales@estudiante.com', '533223', 'ANA LUCIA FERNANDEZ BERNARDA'),
-	(18, 'jorge.ruiz@estudiante.com', '212543', 'JOGUE AUGUSTO NEVER KRAKEN'),
-	(19, 'elena.martin@estudiante.com', '124343', 'ELENA MARIA SUPLEMACIA ZAMBRANO'),
-	(20, 'felipe.diaz@estudiante.com', '564932', 'FELIPE FILOMENO PERCEDEZ HUAVILIO'),
-	(21, 'beatriz.sanchez@estudiante.com', '354678', 'BEATRIZ SALAZAR FENANDEZ GARCIA'),
-	(22, 'david.torres@estudiante.com', '435878', 'DAVID FERNANDO FILOMENO ALCIVAR'),
-	(23, 'mercedes.jimenez@estudiante.com', '5432256', 'GEMA JULIETA MERCEDES CHAVEZ'),
-	(27, 'carteaga7126', '104419', 'ARTEAGA TORO CARLOS LUIS'),
-	(38, 'mgiler2846', '73146', 'GILER MENENDEZ MARCO TULIO'),
-	(39, 'vicedecano', '12342', 'KATTY GARCIA BARREIRO VERA'),
-	(40, 'tutor', '56709', 'CARLOS MANICHO VENEZUELO MANGIZO'),
-	(41, 'carlos', '19360', 'ANA GABRIELA YUKATAN SLOVAKY'),
-	(43, 'tribunal', '12351', 'PEDRO MANOLO ANESTECIO ONETWO'),
-	(44, 'estudiante', '19351', 'TAMIÑAWI SUMI SUMIWKA MANIKO'),
-	(47, 'alumno', '19359', 'JAIME ENRIQUYE ALMIGUEZ GONZALEZ'),
-	(48, 'cubillus2854', '165344', 'UBILLUS BUSTAMANTE CRISTOPHER ALEXANDER'),
-	(49, 'jrodriguez7603', '106916', 'RODRIGUEZ ZAMBRANO JOSTIN ANDRES'),
-	(54, 'admin', '15390', 'VERGAS ANTONIO RESABALA CHICUNGUNYIA'),
-	(58, 'tutora', '22360', 'ANA GABRIELA YUKATAN SLOVAKY'),
-	(61, 'preside', '12382', 'HAROLD OMAR GARCIA VILLANUEVA'),
-	(62, 'alumna', '19355', 'AGUINALDA GUISELLE VALIVIEZO JILIWE'),
-	(63, 'pupilo', '34351', 'SANTIAGO SEGUNDO PACHECO VEREDICTO');
+INSERT INTO `usuario` (`id`, `usuario`, `id_personal`, `nombre`, `cedula`) VALUES
+	(2, 'vargas', '235657', 'JUAN SILVO VINILO VERDES', NULL),
+	(3, 'xd', '104421', 'JOSTON JARZTA HICENBERZ GEORGEOUS', NULL),
+	(4, 'sfdfsdf', '104420', 'DANIELA VICTORIA MENDOZA PEREZ', NULL),
+	(5, 'luis.torres', '542562', 'JOSE LUIS FRANCHEZCO TORRES', NULL),
+	(6, 'sofia.gonzalez', '565425', 'MARIA SOFIA GONZALES BENAVIDES', NULL),
+	(7, 'pablo.fernandez', '232335', 'PABLO MONTALVO MERA ALCIVAR', NULL),
+	(8, 'clara.mendez', '412147', 'CLARA BONELLA DIMATRIZ CUZCO', NULL),
+	(9, 'martin.vega', '787456', 'MARTIN JUDAS VEGA NIKOLO', NULL),
+	(10, 'raul.lopez', '361239', 'RAUL HECTOR REINA DENADA', NULL),
+	(11, 'veronica.castro', '142787', 'VERONICA MANCILLO CASTRO MERA', NULL),
+	(12, 'ricardo.morales', '252568', 'RICARDO FABIAN GUILLEN MORA', NULL),
+	(13, 'patricia.rios', '223302', 'PATRICIA BRIONES DE POGUI', NULL),
+	(14, 'juan.garcia@estudiante.com', '456567', 'JUAN FERNANDO VERLASQUEZ SANTOS', NULL),
+	(15, 'laura.hernandez@estudiante.com', '453767', 'LAURA MARLENE MATINEZ POSLIGUA', NULL),
+	(16, 'carlos.jimenez@estudiante.com', '121988', 'CARLOS JIMENEZ ESTUDI ANTEUTM', NULL),
+	(17, 'ana.morales@estudiante.com', '533223', 'ANA LUCIA FERNANDEZ BERNARDA', NULL),
+	(18, 'jorge.ruiz@estudiante.com', '212543', 'JOGUE AUGUSTO NEVER KRAKEN', NULL),
+	(19, 'elena.martin@estudiante.com', '124343', 'ELENA MARIA SUPLEMACIA ZAMBRANO', NULL),
+	(20, 'felipe.diaz@estudiante.com', '564932', 'FELIPE FILOMENO PERCEDEZ HUAVILIO', NULL),
+	(21, 'beatriz.sanchez@estudiante.com', '354678', 'BEATRIZ SALAZAR FENANDEZ GARCIA', NULL),
+	(22, 'david.torres@estudiante.com', '435878', 'DAVID FERNANDO FILOMENO ALCIVAR', NULL),
+	(23, 'mercedes.jimenez@estudiante.com', '5432256', 'GEMA JULIETA MERCEDES CHAVEZ', NULL),
+	(27, 'carteaga7126', '104419', 'ARTEAGA TORO CARLOS LUIS', NULL),
+	(38, 'mgiler2846', '73146', 'GILER MENENDEZ MARCO TULIO', NULL),
+	(39, 'vicedecano', '12342', 'KATTY GARCIA BARREIRO VERA', NULL),
+	(40, 'tutor', '56709', 'CARLOS MANICHO VENEZUELO MANGIZO', NULL),
+	(41, 'carlos', '19360', 'ANA GABRIELA YUKATAN SLOVAKY', NULL),
+	(43, 'tribunal', '12351', 'PEDRO MANOLO ANESTECIO ONETWO', NULL),
+	(44, 'estudiante', '19351', 'TAMIÑAWI SUMI SUMIWKA MANIKO', NULL),
+	(47, 'alumno', '19359', 'JAIME ENRIQUYE ALMIGUEZ GONZALEZ', NULL),
+	(48, 'cubillus2854', '165344', 'UBILLUS BUSTAMANTE CRISTOPHER ALEXANDER', NULL),
+	(49, 'jrodriguez7603', '106916', 'RODRIGUEZ ZAMBRANO JOSTIN ANDRES', NULL),
+	(54, 'admin', '15390', 'VERNACIO ANTONIO RESABALA CHICUNGUNYIA', NULL),
+	(58, 'tutora', '22360', 'ANA GABRIELA YUKATAN SLOVAKY', NULL),
+	(61, 'preside', '12382', 'HAROLD OMAR GARCIA VILLANUEVA', NULL),
+	(62, 'alumna', '19355', 'AGUINALDA GUISELLE VALIVIEZO JILIWE', NULL),
+	(63, 'pupilo', '34351', 'SANTIAGO SEGUNDO PACHECO VEREDICTO', NULL);
 
 -- Volcando estructura para tabla gestion_titulacion.usuario_carrera
 CREATE TABLE IF NOT EXISTS `usuario_carrera` (
