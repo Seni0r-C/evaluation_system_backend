@@ -1,8 +1,17 @@
 const db = require('../config/db');// Importar conexión a la base de datos
 
+
 /**
- * Middleware para verificar si el usuario tiene los roles requeridos.
- * @param {Array<number>} requiredRoles - Array de IDs de roles requeridos.
+ * Verifica que el usuario autenticado tenga al menos uno de los roles
+ * especificados en `requiredRoles`. Si no tiene acceso, devuelve un
+ * 403 con un mensaje de "Acceso denegado: rol no autorizado". Si
+ * hay un error al consultar la base de datos, devuelve un 500 con un
+ * mensaje de "Error interno del servidor". De lo contrario, permite
+ * que el flujo contin e con el siguiente middleware.
+ *
+ * @param {number[]} requiredRoles Arreglo de IDs de roles
+ * @returns {import('express').RequestHandler} Middleware que verifica
+ *          los roles del usuario autenticado
  */
 function verifyRoles(requiredRoles) {
     return async (req, res, next) => {

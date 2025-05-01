@@ -7,14 +7,14 @@ const roles = [1, 10, 11];
 
 // Rutas para tipos de evaluación
 router.post('/tipo-evaluacion', auth, onlyRoles(roles), controller.createTipoEvaluacion);
-router.get('/tipo-evaluacion', controller.getTiposEvaluacion);
-router.get('/tipo-evaluacion/:id', controller.getTipoEvaluacionByModalidadId);
+router.get('/tipo-evaluacion', auth, controller.getTiposEvaluacion);
+router.get('/tipo-evaluacion/:id', auth, controller.getTipoEvaluacionByModalidadId);
 router.put('/tipo-evaluacion/:id', auth, onlyRoles(roles), controller.updateTipoEvaluacion);
 router.delete('/tipo-evaluacion/:id', auth, onlyRoles(roles), controller.deleteTipoEvaluacion);
 
 //jerarquia de tipos de evaluación
 router.post('/tipo-evaluacion-jerarquia', auth, onlyRoles(roles), controller.createJerarquia);
-router.get('/tipo-evaluacion-jerarquia', controller.getJerarquias);
+router.get('/tipo-evaluacion-jerarquia', auth, controller.getJerarquias);
 router.put('/tipo-evaluacion-jerarquia/:id', auth, onlyRoles(roles), controller.updateJerarquia);
 router.delete('/tipo-evaluacion-jerarquia/:id', auth, onlyRoles(roles), controller.deleteJerarquia);
 
