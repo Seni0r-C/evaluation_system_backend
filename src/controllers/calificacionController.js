@@ -252,9 +252,9 @@ const isThisMiembrotribunalCorrect = async (connection, trabajo_id, docente_id) 
     return result.length !== 0;
 }
 
-const createRubricaEvaluacionesService = async (connection, calificaciones) => {
+const createRubricaEvaluacionesService = async (connection, calificaciones, req) => {
     if (!Array.isArray(calificaciones) || calificaciones.length === 0) {
-        return res.status(400).json({ error: "El array de calificaciones es inválido o está vacío." });
+        return { error: "El array de calificaciones es inválido o está vacío.", status: 400 };
     }
 
     const trabajo_id = calificaciones[0].trabajo_id;
@@ -263,19 +263,19 @@ const createRubricaEvaluacionesService = async (connection, calificaciones) => {
     //verificar si el docente es el mismo que esta enviado la solicitud
     const { userId } = req.user;
     if (userId !== docente_id) {
-        return res.status(403).json({ error: "No tienes permiso para realizar esta acción" });
+        return { error: "Su id no coincide con el de la solicitud. No puede calificar por otro docente", status: 403 };
     }
 
     // Verificar si el docente esta asignado para el trabajo
     if (!await isThisMiembrotribunalCorrect(connection, trabajo_id, docente_id)) {
-        return res.status(400).json({ error: "El docente no esta asignado para el trabajo" });
+        return { error: "El docente no esta asignado para el trabajo", status: 400 };
     }
 
     // Verificar si el trabajo de tesis ha sido calificado por todos los docentes (3)
     const isComplete = await isCompleteThesis(docente_id, trabajo_id, connection);
 
     if (!isComplete) {
-        return res.status(400).json({ error: "El trabajo de tesis no ha sido calificado por todos los docentes" });
+        return { error: "El trabajo de tesis no ha sido calificado por todos los docentes", status: 400 };
     }
 
     const updateOrInsertPromises = calificaciones.map(async ({ trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido }) => {
@@ -289,20 +289,24 @@ const createRubricaEvaluacionesService = async (connection, calificaciones) => {
 
         if (existingRecord.length > 0) {
             // Si ya existe, actualizar el puntaje
-            return connection.query(
+            await connection.query(
                 `UPDATE rubrica_evaluacion 
                      SET puntaje_obtenido = ? 
                      WHERE id = ?`,
                 [puntaje_obtenido, existingRecord[0].id]
             );
+
+            return {error: null};
         } else {
             // Si no existe, insertar una nueva calificación
-            return connection.query(
+            await connection.query(
                 `INSERT INTO rubrica_evaluacion 
                      (trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido) 
                      VALUES (?, ?, ?, ?, ?, ?)`,
                 [trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido]
             );
+
+            return {error: null};
         }
     });
 
@@ -328,7 +332,11 @@ exports.createRubricaEvaluaciones = async (req, res) => {
     const connection = await db.getConnection(); // Asegúrate de usar un pool de conexiones
     try {
         await connection.beginTransaction();
-        await createRubricaEvaluacionesService(connection, calificaciones);
+        const result = await createRubricaEvaluacionesService(connection, calificaciones, req);
+        if (result.error) {
+            await connection.rollback();
+            return res.status(result.status).json({ error: result.error });
+        }
         res.status(201).json({ message: "Calificaciones guardadas o actualizadas exitosamente." });
     } catch (error) {
         await connection.rollback();
@@ -428,7 +436,11 @@ exports.createRubricaEvaluacionExamenTeorico = async (req, res) => {
 
     try {
         await connection.beginTransaction();
-        await createRubricaEvaluacionesService(connection, calificaciones);
+        const result = await createRubricaEvaluacionesService(connection, calificaciones, req);
+        if (result.error) {
+            await connection.rollback();
+            return res.status(result.status).json({ error: result.error });
+        }
         res.status(200).json({ message: "Calificacion de EXAMEN TEORICO guardada exitosamente." });
     } catch (error) {
         await connection.rollback();

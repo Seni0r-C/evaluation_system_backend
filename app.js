@@ -18,7 +18,7 @@ const logger = (req, res, next) => {
     }
     if (req.params) {
         console.log('Params:', req.params);
-    }    
+    }
     next();
 }
 
@@ -93,5 +93,6 @@ app.use('/reportes', reportesRoutes);
 app.get('/', (req, res) => res.json({ gretting: "Hello world!" }));
 app.listen(PORT, () => {
     console.log(`Servidor en puerto ${PORT}`);
+    console.log("Link: http://localhost:" + PORT);
     console.log(`/api-docs`);
 });
