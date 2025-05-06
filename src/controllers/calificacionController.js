@@ -263,7 +263,7 @@ const createRubricaEvaluacionesService = async (connection, calificaciones, req)
     //verificar si el docente es el mismo que esta enviado la solicitud
     const { userId } = req.user;
     if (userId !== docente_id) {
-        return { error: "Su id no coincide con el de la solicitud. No puede calificar por otro docente", status: 403 };
+        return { error: "No puede calificar por otro docente", status: 403 };
     }
 
     // Verificar si el docente esta asignado para el trabajo
