@@ -277,14 +277,14 @@ const createRubricaEvaluacionesService = async (connection, calificaciones, req)
         return { error, status };
     }
 
-    // Verificar si el trabajo de tesis ha sido calificado por todos los docentes (3)
-    const isComplete = await isCompleteThesis(docente_id, trabajo_id, connection);
+    // // Verificar si el trabajo de tesis ha sido calificado por todos los docentes (3)
+    // const isComplete = await isCompleteThesis(docente_id, trabajo_id, connection);
 
-    if (isComplete) {
-        error = "El trabajo de tesis ya ha sido calificado por todos los docentes";
-        status = 400;
-        return { error, status };
-    }
+    // if (isComplete) {
+    //     error = "El trabajo de tesis ya ha sido calificado por todos los docentes";
+    //     status = 400;
+    //     return { error, status };
+    // }
 
     const updateOrInsertPromises = calificaciones.map(async ({ trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido }) => {
         // Verificar si la calificación ya existe
