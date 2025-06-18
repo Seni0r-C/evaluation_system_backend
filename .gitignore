@@ -41,5 +41,3 @@ Dockerfile
 
 .env.dev
 .env.prod
-
-temp/
