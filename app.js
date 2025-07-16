@@ -27,12 +27,10 @@ const logger = (req, res, next) => {
 // setupSwaggerDocs(app);
 
 const corsOptions = {
-    // origin: FRONT_URL,
+    origin: FRONT_URL,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    // allowedHeaders: ['Content-Type', 'Authorization']
 };
 app.use(cors(corsOptions));
-// app.use(cors());
 app.use(express.json());
 app.use(logger);
 app.use((req, res, next) => {
