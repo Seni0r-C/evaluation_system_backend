@@ -112,3 +112,8 @@ Este proyecto utiliza las siguientes dependencias principales:
 *   **Swagger-JSDoc & Swagger-UI-Express:** Para la documentación de la API
 
 Puedes encontrar la lista completa de dependencias en el archivo `package.json`.
+
+## Autores
+
+- Arteaga Toro Carlos Luis
+- Rodriguez Zambrano Jostin Andres
