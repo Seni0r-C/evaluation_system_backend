@@ -9,7 +9,7 @@ const roles = [1, 10, 11];
 router.post('/crear', auth, onlyRoles(roles), rutasController.createRuta);  // Crear una nueva ruta
 router.get('/listar', auth, rutasController.getRutas);    // Obtener todas las rutas
 router.get('/rutas_rol', auth, rutasController.getRutasRol);    // Obtener todas las rutas
-router.post('/hasAccess', auth, onlyRoles(roles), rutasController.hasAccess);      // Obtener una ruta específica
+router.post('/hasAccess', auth, rutasController.hasAccess);      // Obtener una ruta específica
 router.put('/actualizar/:id', auth, onlyRoles(roles), rutasController.updateRuta);  // Actualizar una ruta
 router.delete('/eliminar/:id', auth, onlyRoles(roles), rutasController.deleteRuta);  // Eliminar una ruta
 

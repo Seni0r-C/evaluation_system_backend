@@ -93,6 +93,14 @@ const usuariosSimulados = {
         datos_estudio: JSON.stringify([
             { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
         ])
+    },
+    'juan': {
+        nombres: 'JUAN FERNANDO VERLASQUEZ SANTOS',
+        tipo_usuario: 'DOCENTE',
+        idpersonal: 456567,
+        datos_estudio: JSON.stringify([
+            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+        ])
     }
 
     // Otros usuarios pueden ser añadidos aquí para la simulación
