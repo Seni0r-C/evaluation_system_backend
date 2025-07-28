@@ -1,5 +1,6 @@
 const { utmAuth } = require("../services/authService");
 const https = require('https');
+require('dotenv').config();
 
 // Simulamos un conjunto de usuarios con sus contraseñas
 //LA VERDAD NOS E SI ESTO FUNCIONE CORRECTAMENTE  :) pero es loq ue esatba antes xd
@@ -125,8 +126,10 @@ const agent = new https.Agent({
     rejectUnauthorized: false
 });
 
-exports.externalAuth = async function (body, truchaMode = false, res) {
-    if (truchaMode) {
+exports.externalAuth = async function (body, res) {
+    DEV_AUTH = process.env.DEV_AUTH ?? 'false';
+    
+    if (DEV_AUTH === 'true') {
         return await truchaAuth(body);
     }
     return await utmAuth(body, agent, res);
