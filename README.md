@@ -24,11 +24,7 @@ Sigue estas instrucciones para tener una copia del proyecto corriendo en tu máq
 
 ### Instalación
 
-1.  **Clona el repositorio:**
-    ```bash
-    git clone https://github.com/Seni0r-C/evaluation_system_backend.git
-    ```
-2.  **Instala las dependencias:**
+*  **Instala las dependencias:**
     ```bash
     npm install
     ```
