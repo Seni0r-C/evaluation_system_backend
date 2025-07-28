@@ -26,7 +26,7 @@ Sigue estas instrucciones para tener una copia del proyecto corriendo en tu máq
 
 1.  **Clona el repositorio:**
     ```bash
-    git clone <URL_DEL_REPOSITORIO>
+    git clone https://github.com/Seni0r-C/evaluation_system_backend.git
     ```
 2.  **Instala las dependencias:**
     ```bash
