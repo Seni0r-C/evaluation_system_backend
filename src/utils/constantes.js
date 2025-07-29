@@ -111,6 +111,14 @@ const usuariosSimulados = {
             { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
         ])
     },
+    'carteaga7126': {
+        nombres: 'ARTEAGA TORO CARLOS LUIS',
+        tipo_usuario: 'DOCENTE',
+        idpersonal: 412147,
+        datos_estudio: JSON.stringify([
+            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+        ])
+    },
     // Otros usuarios pueden ser añadidos aquí para la simulación
 };
 
