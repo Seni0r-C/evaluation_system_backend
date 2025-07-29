@@ -31,7 +31,7 @@ exports.utmAuth = async (body, agent, res) => {
             if (response.data.error && response.data.error.includes("accesos fallidos")) {
                 mensajeUsuario = "Se detectaron varios intentos de acceso fallidos en tu cuenta. Por favor, cambia tu contraseña. Si eres estudiante, solicita un reinicio de clave en la secretaría de tu escuela.";
             } else {
-                mensajeUsuario = "Error en la autenticación externa. Por favor, intenta nuevamente más tarde.";
+                mensajeUsuario = "Error al autenticar el usuario. Por favor, verifica tus credenciales e intenta nuevamente.";
             }
 
             // Devolver un mensaje claro al usuario
