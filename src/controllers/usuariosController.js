@@ -149,3 +149,45 @@ exports.obtenerFotoUsuario = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener la foto', message: error.message });
   }
 };
+
+exports.obtenerRolesDeUsuario = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await db.query(
+      `SELECT r.id, r.nombre FROM sistema_rol r
+       JOIN usuario_rol ur ON r.id = ur.id_rol
+       WHERE ur.id_usuario = ?`,
+      [id]
+    );
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener los roles del usuario' });
+  }
+};
+
+exports.actualizarRolesDeUsuario = async (req, res) => {
+  const { id } = req.params;
+  const { roles } = req.body; // Se espera un array de IDs de roles
+
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    // Eliminar roles actuales
+    await connection.execute('DELETE FROM usuario_rol WHERE id_usuario = ?', [id]);
+
+    // Insertar nuevos roles
+    if (roles && roles.length > 0) {
+      const values = roles.map(rolId => [id, rolId]);
+      await connection.query('INSERT INTO usuario_rol (id_usuario, id_rol) VALUES ?', [values]);
+    }
+
+    await connection.commit();
+    res.json({ message: 'Roles actualizados correctamente' });
+  } catch (error) {
+    await connection.rollback();
+    res.status(500).json({ error: 'Error al actualizar los roles del usuario' });
+  } finally {
+    connection.release();
+  }
+};

@@ -27,4 +27,10 @@ router.put('/:id', auth, onlyRoles(roles), usuariosController.actualizarUsuario)
 // Eliminar usuario
 router.delete('/:id', auth, onlyRoles(roles), usuariosController.eliminarUsuario);
 
+// Obtener roles de un usuario
+router.get('/:id/roles', auth, onlyRoles(roles), usuariosController.obtenerRolesDeUsuario);
+
+// Actualizar roles de un usuario
+router.put('/:id/roles', auth, onlyRoles(roles), usuariosController.actualizarRolesDeUsuario);
+
 module.exports = router;
