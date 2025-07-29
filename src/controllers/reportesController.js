@@ -60,11 +60,19 @@ exports.getTrabajosPendientes = async (req, res) => {
 exports.getCalificacionesPromedio = async (req, res) => {
     try {
         const query = `
-            SELECT smt.nombre AS modalidad, AVG(re.puntaje_obtenido) AS promedio_calificacion
-            FROM rubrica_evaluacion re
-            JOIN trabajo_titulacion tt ON re.trabajo_id = tt.id
-            JOIN sistema_modalidad_titulacion smt ON tt.modalidad_id = smt.id
-            GROUP BY smt.nombre
+            SELECT
+                smt.nombre AS modalidad,
+                (SUM(re.puntaje_obtenido) / SUM(rc.puntaje_maximo)) * 100 AS promedio_calificacion_porcentaje
+            FROM
+                rubrica_evaluacion re
+            JOIN
+                rubrica_criterio rc ON re.rubrica_criterio_id = rc.id
+            JOIN
+                rubrica r ON re.rubrica_id = r.id
+            JOIN
+                sistema_modalidad_titulacion smt ON r.modalidad_id = smt.id
+            GROUP BY
+                smt.nombre
         `;
         const [rows] = await db.query(query);
 
@@ -72,6 +80,78 @@ exports.getCalificacionesPromedio = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al obtener el reporte de calificaciones promedio' });
+    }
+};
+
+exports.generarReporteCalificacionesPromedio = async (req, res) => {
+    try {
+        const query = `
+            SELECT
+                smt.nombre AS modalidad,
+                (SUM(re.puntaje_obtenido) / SUM(rc.puntaje_maximo)) * 100 AS promedio_calificacion_porcentaje
+            FROM
+                rubrica_evaluacion re
+            JOIN
+                rubrica_criterio rc ON re.rubrica_criterio_id = rc.id
+            JOIN
+                rubrica r ON re.rubrica_id = r.id
+            JOIN
+                sistema_modalidad_titulacion smt ON r.modalidad_id = smt.id
+            GROUP BY
+                smt.nombre
+        `;
+        const [rows] = await db.query(query);
+
+        const columns = [
+            { header: 'Modalidad', key: 'modalidad' },
+            { header: 'Promedio Calificación (%)', key: 'promedio_calificacion_porcentaje' },
+        ];
+
+        const buffer = await crearExcel(rows, columns, 'Reporte de Calificaciones Promedio');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=reporte_calificaciones_promedio.xlsx');
+        res.send(buffer);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al generar el reporte de calificaciones promedio' });
+    }
+};
+
+exports.generarReporteTendenciasRendimiento = async (req, res) => {
+    try {
+        const query = `
+            SELECT
+                YEAR(tt.fecha_defensa) AS anio,
+                MONTH(tt.fecha_defensa) AS mes,
+                smt.nombre AS modalidad,
+                AVG(re.puntaje_obtenido) AS promedio_calificacion
+            FROM
+                rubrica_evaluacion re
+            JOIN
+                trabajo_titulacion tt ON re.trabajo_id = tt.id
+            JOIN
+                sistema_modalidad_titulacion smt ON tt.modalidad_id = smt.id
+            GROUP BY
+                anio, mes, modalidad
+            ORDER BY
+                anio, mes, modalidad
+        `;
+        const [rows] = await db.query(query);
+
+        const columns = [
+            { header: 'Año', key: 'anio' },
+            { header: 'Mes', key: 'mes' },
+            { header: 'Modalidad', key: 'modalidad' },
+            { header: 'Promedio Calificación', key: 'promedio_calificacion' },
+        ];
+
+        const buffer = await crearExcel(rows, columns, 'Reporte de Tendencias de Rendimiento Académico');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=reporte_tendencias_rendimiento_academico.xlsx');
+        res.send(buffer);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al generar el reporte de tendencias de rendimiento académico' });
     }
 };
 
@@ -124,11 +204,21 @@ exports.getSolicitudesExcepcion = async (req, res) => {
 exports.getTendenciasRendimiento = async (req, res) => {
     try {
         const query = `
-            SELECT YEAR(tt.fecha_defensa) AS anio, MONTH(tt.fecha_defensa) AS mes, AVG(re.puntaje_obtenido) AS promedio_calificacion
-            FROM rubrica_evaluacion re
-            JOIN trabajo_titulacion tt ON re.trabajo_id = tt.id
-            GROUP BY YEAR(tt.fecha_defensa), MONTH(tt.fecha_defensa)
-            ORDER BY anio, mes
+            SELECT
+                YEAR(tt.fecha_defensa) AS anio,
+                MONTH(tt.fecha_defensa) AS mes,
+                smt.nombre AS modalidad,
+                AVG(re.puntaje_obtenido) AS promedio_calificacion
+            FROM
+                rubrica_evaluacion re
+            JOIN
+                trabajo_titulacion tt ON re.trabajo_id = tt.id
+            JOIN
+                sistema_modalidad_titulacion smt ON tt.modalidad_id = smt.id
+            GROUP BY
+                anio, mes, modalidad
+            ORDER BY
+                anio, mes, modalidad
         `;
         const [rows] = await db.query(query);
 
@@ -240,11 +330,11 @@ exports.generarReporteTrabajosPendientes = async (req, res) => {
     const { estadoId } = req.query;
     try {
         const query = `
-            SELECT tt.id, tt.titulo, te.nombre AS estado, u.nombre AS estudiante_nombre
+            SELECT tt.id, tt.titulo, ts.nombre AS estado, u.nombre AS estudiante_nombre
             FROM trabajo_titulacion tt
             LEFT JOIN trabajo_estudiante te ON tt.id = te.trabajo_id
             LEFT JOIN usuario u ON te.estudiante_id = u.id
-            JOIN trabajo_estado te ON tt.estado_id = te.id
+            JOIN trabajo_estado ts ON tt.estado_id = ts.id
             WHERE tt.estado_id = ?
         `;
         const [rows] = await db.query(query, [estadoId]);

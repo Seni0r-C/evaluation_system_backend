@@ -27,5 +27,8 @@ router.get('/dashboard-summary', auth, reportesController.getDashboardSummary);
 // 8. Reporte de estudiantes graduados en un rango de fechas
 router.get('/graduados/excel', auth, reportesController.generarReporteGraduados);
 router.get('/carga-tutores/excel', auth, reportesController.generarReporteCargaTutores);
+router.get('/trabajos-pendientes/excel', auth, reportesController.generarReporteTrabajosPendientes);
+router.get('/calificaciones-promedio/excel', auth, reportesController.generarReporteCalificacionesPromedio);
+router.get('/tendencias-rendimiento/excel', auth, reportesController.generarReporteTendenciasRendimiento);
 
 module.exports = router;
