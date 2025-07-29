@@ -137,3 +137,46 @@ exports.getTendenciasRendimiento = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener el reporte de tendencias de rendimiento' });
     }
 };
+
+exports.getDashboardSummary = async (req, res) => {
+    try {
+        const [estadoGeneral] = await db.query(`
+            SELECT te.nombre, COUNT(tt.id) AS total
+            FROM trabajo_estado te
+            LEFT JOIN trabajo_titulacion tt ON te.id = tt.estado_id
+            GROUP BY te.nombre
+        `);
+
+        const [distribucionModalidad] = await db.query(`
+            SELECT smt.nombre, COUNT(tt.id) AS total
+            FROM sistema_modalidad_titulacion smt
+            LEFT JOIN trabajo_titulacion tt ON smt.id = tt.modalidad_id
+            GROUP BY smt.nombre
+        `);
+
+        const [graduadosPorMes] = await db.query(`
+            SELECT MONTH(fecha_defensa) AS mes, COUNT(id) AS total
+            FROM trabajo_titulacion
+            WHERE estado_id = 4 AND YEAR(fecha_defensa) = YEAR(CURDATE())
+            GROUP BY MONTH(fecha_defensa)
+        `);
+
+        const [cargaTutores] = await db.query(`
+            SELECT u.nombre AS tutor, COUNT(tt.id) AS total
+            FROM usuario u
+            LEFT JOIN trabajo_titulacion tt ON u.id = tt.tutor_id
+            WHERE u.id IN (SELECT DISTINCT tutor_id FROM trabajo_titulacion)
+            GROUP BY u.nombre
+        `);
+
+        res.json({
+            estadoGeneral,
+            distribucionModalidad,
+            graduadosPorMes,
+            cargaTutores
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener el resumen del dashboard' });
+    }
+};

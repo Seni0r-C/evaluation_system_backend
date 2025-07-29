@@ -21,4 +21,7 @@ router.get('/solicitudes-excepcion', auth, reportesController.getSolicitudesExce
 // 6. Reporte de tendencias de rendimiento académico
 router.get('/tendencias-rendimiento', auth, reportesController.getTendenciasRendimiento);
 
+// 7. Resumen para el dashboard del decanato
+router.get('/dashboard-summary', auth, reportesController.getDashboardSummary);
+
 module.exports = router;
