@@ -259,32 +259,33 @@ const createRubricaEvaluacionesService = async (connection, calificaciones, req)
 
     const trabajo_id = calificaciones[0].trabajo_id;
     const docente_id = calificaciones[0].docente_id;
+    let es_vicedecano = false;
     let error = "";
     let status = 201;
+    const { userId } = req.user;
+
+    //verificar si es userId es el vicedecano
+    const [rows] = await connection.query(
+        `SELECT * FROM usuario_rol WHERE id_usuario = ? AND id_rol = 10`,
+        [userId]
+    )
+    if (rows.length > 0) {
+        es_vicedecano = true;
+    }
 
     //verificar si el docente es el mismo que esta enviado la solicitud
-    const { userId } = req.user;
-    if (userId !== docente_id) {
+    if (userId !== docente_id && !es_vicedecano) {
         error = "No puede calificar por otro docente";
         status = 403;
         return { error, status };
     }
 
     // Verificar si el docente esta asignado para el trabajo
-    if (!await isThisMiembrotribunalCorrect(connection, trabajo_id, docente_id)) {
+    if (!await isThisMiembrotribunalCorrect(connection, trabajo_id, docente_id) && !es_vicedecano) {
         error = "El docente no esta asignado para el trabajo";
         status = 400;
         return { error, status };
     }
-
-    // // Verificar si el trabajo de tesis ha sido calificado por todos los docentes (3)
-    // const isComplete = await isCompleteThesis(docente_id, trabajo_id, connection);
-
-    // if (isComplete) {
-    //     error = "El trabajo de tesis ya ha sido calificado por todos los docentes";
-    //     status = 400;
-    //     return { error, status };
-    // }
 
     const updateOrInsertPromises = calificaciones.map(async ({ trabajo_id, rubrica_id, rubrica_criterio_id, docente_id, estudiante_id, puntaje_obtenido }) => {
         // Verificar si la calificación ya existe

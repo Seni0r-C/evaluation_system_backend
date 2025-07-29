@@ -7,7 +7,7 @@ require('dotenv').config();
 const usuariosSimulados = {
     'vicedecano': {
         nombres: 'KATTY GARCIA BARREIRO VERA',
-        tipo_usuario: 'VICEDECANO',
+        tipo_usuario: 'VICEDECANATO',
         idpersonal: 12342,
         datos_estudio: JSON.stringify([
             { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
@@ -102,13 +102,20 @@ const usuariosSimulados = {
         datos_estudio: JSON.stringify([
             { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
         ])
-    }
-
+    },
+    'clara.mendez': {
+        nombres: 'CLARA BONELLA DIMATRIZ CUZCO',
+        tipo_usuario: 'DOCENTE',
+        idpersonal: 412147,
+        datos_estudio: JSON.stringify([
+            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+        ])
+    },
     // Otros usuarios pueden ser añadidos aquí para la simulación
 };
 
-// La función `truchaAuth` emula una llamada a la API externa
-const truchaAuth = async ({ usuario, clave }) => {
+// La función `fakeAuth` emula una llamada a la API externa
+const fakeAuth = async ({ usuario, clave }) => {
     // Simulamos un retraso en la respuesta como si fuera una llamada externa
     await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -128,9 +135,9 @@ const agent = new https.Agent({
 
 exports.externalAuth = async function (body, res) {
     DEV_AUTH = process.env.DEV_AUTH ?? 'false';
-    
+
     if (DEV_AUTH === 'true') {
-        return await truchaAuth(body);
+        return await fakeAuth(body);
     }
     return await utmAuth(body, agent, res);
 }
