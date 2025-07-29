@@ -24,4 +24,8 @@ router.get('/tendencias-rendimiento', auth, reportesController.getTendenciasRend
 // 7. Resumen para el dashboard del decanato
 router.get('/dashboard-summary', auth, reportesController.getDashboardSummary);
 
+// 8. Reporte de estudiantes graduados en un rango de fechas
+router.get('/graduados/excel', auth, reportesController.generarReporteGraduados);
+router.get('/carga-tutores/excel', auth, reportesController.generarReporteCargaTutores);
+
 module.exports = router;

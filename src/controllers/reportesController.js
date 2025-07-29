@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { crearExcel } = require('../services/reportesService');
 
 // 1. Reporte de estudiantes graduados en un rango de fechas
 exports.getGraduados = async (req, res) => {
@@ -178,5 +179,89 @@ exports.getDashboardSummary = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al obtener el resumen del dashboard' });
+    }
+};
+
+exports.generarReporteGraduados = async (req, res) => {
+    const { fechaInicio, fechaFin } = req.query;
+    try {
+        const [rows] = await db.query(`
+            SELECT u.nombre AS estudiante, u.cedula, tt.titulo, tt.fecha_defensa, t.nombre AS tutor
+            FROM trabajo_estudiante te
+            JOIN trabajo_titulacion tt ON te.trabajo_id = tt.id
+            JOIN usuario u ON te.estudiante_id = u.id
+            JOIN usuario t ON tt.tutor_id = t.id
+            WHERE tt.estado_id = 4 AND tt.fecha_defensa BETWEEN ? AND ?
+        `, [fechaInicio, fechaFin]);
+
+        const columns = [
+            { header: 'Estudiante', key: 'estudiante' },
+            { header: 'Cédula', key: 'cedula' },
+            { header: 'Título del Trabajo', key: 'titulo' },
+            { header: 'Fecha de Defensa', key: 'fecha_defensa' },
+            { header: 'Tutor', key: 'tutor' },
+        ];
+
+        const buffer = await crearExcel(rows, columns, 'Reporte de Graduados');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=reporte_graduados.xlsx');
+        res.send(buffer);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al generar el reporte de graduados' });
+    }
+};
+
+exports.generarReporteCargaTutores = async (req, res) => {
+    try {
+        const [rows] = await db.query(`
+            SELECT u.nombre AS tutor, COUNT(tt.id) AS total
+            FROM usuario u
+            LEFT JOIN trabajo_titulacion tt ON u.id = tt.tutor_id
+            WHERE u.id IN (SELECT DISTINCT tutor_id FROM trabajo_titulacion)
+            GROUP BY u.nombre
+        `);
+
+        const columns = [
+            { header: 'Tutor', key: 'tutor' },
+            { header: 'Trabajos Asignados', key: 'total' },
+        ];
+
+        const buffer = await crearExcel(rows, columns, 'Reporte de Carga de Tutores');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=reporte_carga_tutores.xlsx');
+        res.send(buffer);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al generar el reporte de carga de tutores' });
+    }
+};
+
+exports.generarReporteTrabajosPendientes = async (req, res) => {
+    const { estadoId } = req.query;
+    try {
+        const query = `
+            SELECT tt.id, tt.titulo, te.nombre AS estado, u.nombre AS estudiante_nombre
+            FROM trabajo_titulacion tt
+            LEFT JOIN trabajo_estudiante te ON tt.id = te.trabajo_id
+            LEFT JOIN usuario u ON te.estudiante_id = u.id
+            JOIN trabajo_estado te ON tt.estado_id = te.id
+            WHERE tt.estado_id = ?
+        `;
+        const [rows] = await db.query(query, [estadoId]);
+
+        const columns = [
+            { header: 'ID Trabajo', key: 'id' },
+            { header: 'Título', key: 'titulo' },
+            { header: 'Estado', key: 'estado' },
+            { header: 'Estudiante', key: 'estudiante_nombre' },
+        ];
+
+        const buffer = await crearExcel(rows, columns, 'Reporte de Trabajos Pendientes');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=reporte_trabajos_pendientes.xlsx');
+        res.send(buffer);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al generar el reporte de trabajos pendientes' });
     }
 };
