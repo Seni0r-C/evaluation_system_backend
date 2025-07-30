@@ -74,7 +74,7 @@ La API provee varios endpoints para gestionar los recursos de la aplicación. La
 *   `/calificaciones`: Gestión de calificaciones
 *   `/actas`: Generación de actas
 
-Para una documentación detallada de la API, puedes revisar el código en `src/routes` y `src/controllers`. La aplicación también utiliza Swagger para la documentación de la API, que puedes encontrar en la ruta `/api-docs` cuando la aplicación está corriendo.
+Para una documentación detallada de la API, puedes revisar el código en `src/routes` y `src/controllers`.
 
 ## Estructura del Proyecto
 
@@ -105,7 +105,6 @@ Este proyecto utiliza las siguientes dependencias principales:
 *   **JSONWebToken:** Para la autenticación basada en tokens
 *   **Bcryptjs:** Para el hasheo de contraseñas
 *   **Puppeteer:** Para la generación de PDFs a partir de HTML
-*   **Swagger-JSDoc & Swagger-UI-Express:** Para la documentación de la API
 
 Puedes encontrar la lista completa de dependencias en el archivo `package.json`.
 

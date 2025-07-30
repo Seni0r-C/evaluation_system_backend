@@ -23,10 +23,6 @@ const logger = (req, res, next) => {
     next();
 }
 
-// Swagger
-// const setupSwaggerDocs = require('./src/config/swagger.js');
-// setupSwaggerDocs(app);
-
 const corsOptions = {
     origin: FRONT_URL,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
@@ -93,7 +89,6 @@ const startServer = () => {
     app.listen(PORT, () => {
         console.log(`Servidor en puerto ${PORT}`);
         console.log("Link: http://localhost:" + PORT);
-        console.log(`/api-docs`);
     });
 };
 
