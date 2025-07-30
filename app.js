@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-const morgan = require('morgan');  // Importar morgan
+const morgan = require('morgan');
 const { PORT, FRONT_URL } = require('./src/config/env.js');
+const pool = require('./src/config/db.js');
 
 const app = express();
 
@@ -87,8 +88,25 @@ app.use('/notas', notasRoutes);
 app.use('/rubrica', rubricaRoutes);
 app.use('/reportes', reportesRoutes);
 app.get('/', (req, res) => res.json({ gretting: "Hello world!" }));
-app.listen(PORT, () => {
-    console.log(`Servidor en puerto ${PORT}`);
-    console.log("Link: http://localhost:" + PORT);
-    console.log(`/api-docs`);
-});
+
+const startServer = () => {
+    app.listen(PORT, () => {
+        console.log(`Servidor en puerto ${PORT}`);
+        console.log("Link: http://localhost:" + PORT);
+        console.log(`/api-docs`);
+    });
+};
+
+const init = async () => {
+    try {
+        const connection = await pool.getConnection();
+        console.log('Conexión a la base de datos establecida correctamente.');
+        connection.release();
+        startServer();
+    } catch (error) {
+        console.error('No se pudo conectar a la base de datos:', error);
+        process.exit(1);
+    }
+};
+
+init();
