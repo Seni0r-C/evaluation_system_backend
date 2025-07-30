@@ -62,7 +62,18 @@ app.use('/acta', actaRoutes);
 app.use('/notas', notasRoutes);
 app.use('/rubrica', rubricaRoutes);
 app.use('/reportes', reportesRoutes);
-app.get('/', (req, res) => res.json({ greeting: "API Servidor Activo" }));
+app.get('/', (req, res) => {
+  res.type('text/plain');
+  res.send(`
+    ///////////////////////////////////
+   //          API ONLINE           //
+  ///////////////////////////////////
+  
+  STATUS  : ACTIVE
+  UPTIME  : ${(process.uptime()/60).toFixed(2)} minutes
+  TIME    : ${new Date().toISOString().replace('T', ' ').replace(/\.\d+Z$/, '')}
+  `);
+});
 
 const startServer = () => {
     app.listen(PORT, () => {
