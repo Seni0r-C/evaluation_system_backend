@@ -152,7 +152,8 @@ exports.obtenerTiposEvaluacionPorModalidad = async (req, res) => {
                 ELSE te.nombre
             END AS nombre,
             smt.nombre AS modaliad,
-            te.pos_evaluation
+            te.pos_evaluation,
+            te.calificacion_global
         FROM sistema_tipo_evaluacion te
         JOIN rubrica r ON te.id = r.tipo_evaluacion_id
         LEFT JOIN acta_notas_scheme ans ON te.id = ans.comp_id
