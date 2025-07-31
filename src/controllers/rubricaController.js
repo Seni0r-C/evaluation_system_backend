@@ -150,7 +150,9 @@ exports.obtenerTiposEvaluacionPorModalidad = async (req, res) => {
             te_padre.id AS padre_id,
             smt.nombre AS modaliad,
             te.pos_evaluation,
-            te.calificacion_global
+            te.calificacion_global,
+            te.modificador,
+            te.valor_base
         FROM sistema_tipo_evaluacion te
         JOIN rubrica r ON te.id = r.tipo_evaluacion_id
         LEFT JOIN acta_notas_scheme ans ON te.id = ans.comp_id

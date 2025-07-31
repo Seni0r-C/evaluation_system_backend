@@ -107,7 +107,7 @@ exports.listarTrabajos = async (req, res) => {
         `;
         // Consulta para obtener los trabajos de titulación con filtros y paginación
         const [rows] = await db.execute(`
-            SELECT tt.*, tte.nombre AS estado, c.nombre AS carrera, mt.nombre AS modalidad
+            SELECT tt.*, tte.nombre AS estado, c.nombre AS carrera, mt.nombre AS modalidad, mt.puntaje_final_promedio
             FROM trabajo_titulacion tt
             ${innerJoins}
             ${whereQuery}
