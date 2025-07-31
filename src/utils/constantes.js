@@ -142,20 +142,20 @@ const agent = new https.Agent({
 });
 
 exports.externalAuth = async function (body, res) {
-    let fakeAuth;
+    let is_fake_auth;
 
     try {
-        fakeAuth = JSON.parse(FAKE_AUTH.toLowerCase());
+        is_fake_auth = JSON.parse(FAKE_AUTH.toLowerCase());
     } catch (error) {
-        fakeAuth = true; // Valor por defecto si el parsing falla
+        is_fake_auth = true; // Valor por defecto si el parsing falla
     }
 
     // Verifica que sea estrictamente un booleano (true o false)
-    if (typeof fakeAuth !== 'boolean') {
+    if (typeof is_fake_auth !== 'boolean') {
         throw new Error('FAKE_AUTH debe ser un booleano (true/false)');
     }
 
-    if (fakeAuth) {
+    if (is_fake_auth) {
         return await fakeAuth(body);
     }
     return await utmAuth(body, agent, res);
