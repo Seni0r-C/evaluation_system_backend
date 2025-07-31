@@ -146,11 +146,8 @@ exports.obtenerTiposEvaluacionPorModalidad = async (req, res) => {
     try {
         const [tiposEvaluacion] = await db.execute(`
         SELECT te.id,
-            CASE
-                WHEN te_padre.nombre IS NOT NULL
-                          AND ans.trabajo_modalidad_id=r.modalidad_id THEN te.nombre
-                ELSE te.nombre
-            END AS nombre,
+            te.nombre,
+            te_padre.id AS padre_id,
             smt.nombre AS modaliad,
             te.pos_evaluation,
             te.calificacion_global
@@ -160,10 +157,7 @@ exports.obtenerTiposEvaluacionPorModalidad = async (req, res) => {
         LEFT JOIN sistema_tipo_evaluacion te_padre ON ans.comp_parent_id = te_padre.id
         LEFT JOIN sistema_modalidad_titulacion smt ON smt.id = r.modalidad_id
         WHERE r.modalidad_id = ?
-        AND te.id NOT IN
-            (SELECT DISTINCT comp_parent_id
-            FROM acta_notas_scheme
-            WHERE comp_parent_id IS NOT NULL)
+        AND smt.id = ans.trabajo_modalidad_id
         GROUP BY te.id
     `,
             [modalidad_id]
