@@ -1,6 +1,6 @@
 const db = require('../config/db');
 const axios = require('axios');
-require('dotenv').config();
+const { UTM_API_KEY } = require('../config/env');
 
 /**
  * Autentica al usuario con un servicio externo y retorna los datos.
@@ -17,7 +17,7 @@ exports.utmAuth = async (body, agent, res) => {
 
         const headers = {
             'Content-Type': 'application/json',
-            'X-Api-Key': process.env.UTM_API_KEY
+            'X-Api-Key': UTM_API_KEY
         };
 
         const response = await axios.post(apiUrl, body, {

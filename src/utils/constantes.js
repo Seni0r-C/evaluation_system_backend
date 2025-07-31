@@ -1,6 +1,6 @@
+const { FAKE_AUTH } = require("../config/env");
 const { utmAuth } = require("../services/authService");
 const https = require('https');
-require('dotenv').config();
 
 // Simulamos un conjunto de usuarios con sus contraseñas
 //LA VERDAD NOS E SI ESTO FUNCIONE CORRECTAMENTE  :) pero es loq ue esatba antes xd
@@ -142,9 +142,20 @@ const agent = new https.Agent({
 });
 
 exports.externalAuth = async function (body, res) {
-    DEV_AUTH = process.env.DEV_AUTH ?? 'false';
+    let fakeAuth;
 
-    if (DEV_AUTH === 'true') {
+    try {
+        fakeAuth = JSON.parse(FAKE_AUTH.toLowerCase());
+    } catch (error) {
+        fakeAuth = true; // Valor por defecto si el parsing falla
+    }
+
+    // Verifica que sea estrictamente un booleano (true o false)
+    if (typeof fakeAuth !== 'boolean') {
+        throw new Error('FAKE_AUTH debe ser un booleano (true/false)');
+    }
+
+    if (fakeAuth) {
         return await fakeAuth(body);
     }
     return await utmAuth(body, agent, res);

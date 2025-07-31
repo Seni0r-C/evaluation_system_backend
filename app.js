@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-const { PORT, FRONT_URL } = require('./src/config/env.js');
+const { PORT, FRONTEND_URL } = require('./src/config/env.js');
 const pool = require('./src/config/db.js');
 const app = express();
 const constantes = require('./src/utils/constantes.js');
@@ -9,7 +9,7 @@ const logger = require('./src/config/logger.js');
 
 const LogColors = constantes.LogColors;
 const corsOptions = {
-    origin: FRONT_URL,
+    origin: FRONTEND_URL,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
 };
 
@@ -63,14 +63,14 @@ app.use('/notas', notasRoutes);
 app.use('/rubrica', rubricaRoutes);
 app.use('/reportes', reportesRoutes);
 app.get('/', (req, res) => {
-  res.type('text/plain');
-  res.send(`
+    res.type('text/plain');
+    res.send(`
     ///////////////////////////////////
    //          API ONLINE           //
   ///////////////////////////////////
   
   STATUS  : ACTIVE
-  UPTIME  : ${(process.uptime()/60).toFixed(2)} minutes
+  UPTIME  : ${(process.uptime() / 60).toFixed(2)} minutes
   TIME    : ${new Date().toISOString().replace('T', ' ').replace(/\.\d+Z$/, '')}
   `);
 });

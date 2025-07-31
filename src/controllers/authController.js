@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 const axios = require('axios');
-require('dotenv').config();
 const https = require('https');
 const { getOrInsertRol, insertCarreraIfNotExists } = require('../services/authService');
 const { externalAuth } = require('../utils/constantes');
+const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/env');
 const agent = new https.Agent({
     rejectUnauthorized: false
 });
@@ -86,8 +86,8 @@ exports.loginUser = async (req, res) => {
         // Genera el token JWT
         const token = jwt.sign(
             { userId: user.id, usuario: user.usuario },
-            process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES_IN }
+            JWT_SECRET,
+            { expiresIn: JWT_EXPIRES_IN }
         );
 
         res.status(200).json({

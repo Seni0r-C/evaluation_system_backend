@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config/env');
 
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization']; // Obtener el token del encabezado Authorization
@@ -9,7 +10,7 @@ const verifyToken = (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verificar el token con la clave secreta
+        const decoded = jwt.verify(token, JWT_SECRET); // Verificar el token con la clave secreta
         req.user = decoded; // Almacenar los datos decodificados en la solicitud
         next(); // Continuar con la siguiente función middleware
     } catch (err) {
