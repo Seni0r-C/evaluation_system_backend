@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Versión del servidor:         10.4.21-MariaDB - mariadb.org binary distribution
+-- Versión del servidor:         10.4.32-MariaDB - mariadb.org binary distribution
 -- SO del servidor:              Win64
--- HeidiSQL Versión:             12.10.0.7000
+-- HeidiSQL Versión:             12.11.0.7065
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -16,7 +16,7 @@
 
 
 -- Volcando estructura de base de datos para gestion_titulacion
-CREATE DATABASE IF NOT EXISTS `gestion_titulacion` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+CREATE DATABASE IF NOT EXISTS `gestion_titulacion` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
 USE `gestion_titulacion`;
 
 -- Volcando estructura para tabla gestion_titulacion.acta
@@ -38,11 +38,9 @@ CREATE TABLE IF NOT EXISTS `acta` (
   KEY `asesor_juridico_id` (`asesor_juridico_id`),
   CONSTRAINT `FK_acta_trabajo_titulacion` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`),
   CONSTRAINT `acta_ibfk_3` FOREIGN KEY (`vicedecano_id`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.acta: ~1 rows (aproximadamente)
-INSERT INTO `acta` (`id`, `year`, `num_year_count`, `trabajo_id`, `secretaria_id`, `vicedecano_id`, `asesor_juridico_id`, `fecha_hora`, `ciudad`, `lugar`) VALUES
-	(1, 2025, 1, 3, 0, 14, 0, '2025-07-28 23:16:00', 'Portoviejo', 'la sala de sesiones del H. Consejo Directivo');
+-- Volcando datos para la tabla gestion_titulacion.acta: ~0 rows (aproximadamente)
 
 -- Volcando estructura para tabla gestion_titulacion.acta_notas_scheme
 CREATE TABLE IF NOT EXISTS `acta_notas_scheme` (
@@ -57,7 +55,7 @@ CREATE TABLE IF NOT EXISTS `acta_notas_scheme` (
   CONSTRAINT `acta_notas_scheme_ibfk_1` FOREIGN KEY (`comp_id`) REFERENCES `sistema_tipo_evaluacion` (`id`),
   CONSTRAINT `acta_notas_scheme_ibfk_2` FOREIGN KEY (`comp_parent_id`) REFERENCES `sistema_tipo_evaluacion` (`id`),
   CONSTRAINT `acta_notas_scheme_ibfk_3` FOREIGN KEY (`trabajo_modalidad_id`) REFERENCES `sistema_modalidad_titulacion` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.acta_notas_scheme: ~8 rows (aproximadamente)
 INSERT INTO `acta_notas_scheme` (`id`, `comp_id`, `comp_parent_id`, `trabajo_modalidad_id`) VALUES
@@ -77,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `indexacion_revista` (
   `value` int(11) NOT NULL,
   `porcentaje` decimal(5,2) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.indexacion_revista: ~2 rows (aproximadamente)
 INSERT INTO `indexacion_revista` (`id`, `name`, `value`, `porcentaje`) VALUES
@@ -93,7 +91,7 @@ CREATE TABLE IF NOT EXISTS `registro_accion` (
   PRIMARY KEY (`id`),
   KEY `usuario_id` (`usuario_id`),
   CONSTRAINT `registro_accion_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.registro_accion: ~0 rows (aproximadamente)
 
@@ -107,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `rubrica` (
   KEY `FK_tipo_evaluacion_id` (`tipo_evaluacion_id`),
   CONSTRAINT `FK_tipo_evaluacion_id` FOREIGN KEY (`tipo_evaluacion_id`) REFERENCES `sistema_tipo_evaluacion` (`id`),
   CONSTRAINT `rubrica_ibfk_1` FOREIGN KEY (`modalidad_id`) REFERENCES `sistema_modalidad_titulacion` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.rubrica: ~8 rows (aproximadamente)
 INSERT INTO `rubrica` (`id`, `tipo_evaluacion_id`, `modalidad_id`) VALUES
@@ -129,9 +127,9 @@ CREATE TABLE IF NOT EXISTS `rubrica_criterio` (
   PRIMARY KEY (`id`),
   KEY `rubrica_id` (`rubrica_id`),
   CONSTRAINT `rubrica_criterio_ibfk_1` FOREIGN KEY (`rubrica_id`) REFERENCES `rubrica` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.rubrica_criterio: ~30 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.rubrica_criterio: ~29 rows (aproximadamente)
 INSERT INTO `rubrica_criterio` (`id`, `rubrica_id`, `nombre`, `puntaje_maximo`) VALUES
 	(21, 7, 'Puntaje de prueba evirtual', 100.00),
 	(22, 1, 'APLICACIÓN DEL MÉTODO CIENTIFICO EN EL ANÁLISIS Y SOLUCIÓN DEL PROBLEMA (El método es idóneo para atender la necesidad detectada', 40.00),
@@ -183,88 +181,16 @@ CREATE TABLE IF NOT EXISTS `rubrica_evaluacion` (
   CONSTRAINT `FK_rubrica_criterio_id` FOREIGN KEY (`rubrica_criterio_id`) REFERENCES `rubrica_criterio` (`id`),
   CONSTRAINT `FK_rubrica_id` FOREIGN KEY (`rubrica_id`) REFERENCES `rubrica` (`id`),
   CONSTRAINT `FK_trabajo_evaluacion_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.rubrica_evaluacion: ~71 rows (aproximadamente)
-INSERT INTO `rubrica_evaluacion` (`id`, `trabajo_id`, `rubrica_id`, `rubrica_criterio_id`, `docente_id`, `estudiante_id`, `puntaje_obtenido`) VALUES
-	(1, 3, 9, 44, 8, 63, 1.00),
-	(2, 3, 9, 45, 8, 63, 10.00),
-	(3, 3, 9, 46, 8, 63, 10.00),
-	(4, 3, 9, 47, 8, 63, 8.00),
-	(5, 3, 9, 48, 8, 63, 7.00),
-	(6, 3, 9, 49, 8, 63, 9.00),
-	(7, 3, 8, 50, 8, 63, 30.00),
-	(8, 3, 8, 51, 8, 63, 20.00),
-	(9, 3, 8, 52, 8, 63, 8.00),
-	(10, 3, 8, 53, 8, 63, 5.00),
-	(11, 3, 8, 54, 8, 63, 30.00),
-	(12, 3, 9, 44, 27, 63, 40.00),
-	(13, 3, 9, 45, 27, 63, 10.00),
-	(14, 3, 9, 46, 27, 63, 10.00),
-	(15, 3, 9, 47, 27, 63, 10.00),
-	(16, 3, 9, 48, 27, 63, 10.00),
-	(17, 3, 9, 49, 27, 63, 20.00),
-	(18, 3, 8, 50, 27, 63, 30.00),
-	(19, 3, 8, 51, 27, 63, 20.00),
-	(20, 3, 8, 52, 27, 63, 10.00),
-	(21, 3, 8, 53, 27, 63, 10.00),
-	(22, 3, 8, 54, 27, 63, 30.00),
-	(23, 1, 1, 22, 14, 40, 40.00),
-	(24, 1, 1, 23, 14, 40, 10.00),
-	(25, 1, 1, 24, 14, 40, 8.00),
-	(26, 1, 1, 25, 14, 40, 10.00),
-	(27, 1, 1, 26, 14, 40, 10.00),
-	(28, 1, 1, 27, 14, 40, 20.00),
-	(29, 1, 2, 28, 14, 40, 30.00),
-	(30, 1, 2, 29, 14, 40, 20.00),
-	(31, 1, 2, 30, 14, 40, 10.00),
-	(32, 1, 2, 31, 14, 40, 10.00),
-	(33, 1, 2, 32, 14, 40, 30.00),
-	(34, 1, 1, 22, 14, 48, 40.00),
-	(35, 1, 1, 23, 14, 48, 10.00),
-	(36, 1, 1, 24, 14, 48, 8.00),
-	(37, 1, 1, 25, 14, 48, 10.00),
-	(38, 1, 1, 26, 14, 48, 10.00),
-	(39, 1, 1, 27, 14, 48, 20.00),
-	(40, 1, 2, 28, 14, 48, 30.00),
-	(41, 1, 2, 29, 14, 48, 20.00),
-	(42, 1, 2, 30, 14, 48, 10.00),
-	(43, 1, 2, 31, 14, 48, 10.00),
-	(44, 1, 2, 32, 14, 48, 30.00),
-	(45, 2, 3, 39, 27, 47, 4.00),
-	(46, 2, 3, 40, 27, 47, 20.00),
-	(47, 2, 3, 41, 27, 47, 10.00),
-	(48, 2, 3, 42, 27, 47, 10.00),
-	(49, 2, 3, 43, 27, 47, 30.00),
-	(50, 1, 1, 22, 27, 40, 40.00),
-	(51, 1, 1, 23, 27, 40, 10.00),
-	(52, 1, 1, 24, 27, 40, 10.00),
-	(53, 1, 1, 25, 27, 40, 10.00),
-	(54, 1, 1, 26, 27, 40, 10.00),
-	(55, 1, 1, 27, 27, 40, 20.00),
-	(56, 1, 2, 28, 27, 40, 30.00),
-	(57, 1, 2, 29, 27, 40, 4.00),
-	(58, 1, 2, 30, 27, 40, 10.00),
-	(59, 1, 2, 31, 27, 40, 4.00),
-	(60, 1, 2, 32, 27, 40, 30.00),
-	(61, 1, 1, 22, 27, 48, 40.00),
-	(62, 1, 1, 23, 27, 48, 10.00),
-	(63, 1, 1, 24, 27, 48, 10.00),
-	(64, 1, 1, 25, 27, 48, 10.00),
-	(65, 1, 1, 26, 27, 48, 10.00),
-	(66, 1, 1, 27, 27, 48, 20.00),
-	(67, 1, 2, 28, 27, 48, 30.00),
-	(68, 1, 2, 29, 27, 48, 20.00),
-	(69, 1, 2, 30, 27, 48, 10.00),
-	(70, 1, 2, 31, 27, 48, 2.00),
-	(71, 1, 2, 32, 27, 48, 30.00);
+-- Volcando datos para la tabla gestion_titulacion.rubrica_evaluacion: ~0 rows (aproximadamente)
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_carrera
 CREATE TABLE IF NOT EXISTS `sistema_carrera` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_carrera: ~2 rows (aproximadamente)
 INSERT INTO `sistema_carrera` (`id`, `nombre`) VALUES
@@ -285,7 +211,7 @@ CREATE TABLE IF NOT EXISTS `sistema_menu` (
   KEY `FK_padre_id` (`padre_id`) USING BTREE,
   CONSTRAINT `FK_id_ruta` FOREIGN KEY (`ruta_id`) REFERENCES `sistema_ruta` (`id`),
   CONSTRAINT `FK_padre_id` FOREIGN KEY (`padre_id`) REFERENCES `sistema_menu` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_menu: ~16 rows (aproximadamente)
 INSERT INTO `sistema_menu` (`id`, `nombre`, `ruta_id`, `padre_id`, `orden`, `todos`, `icon`) VALUES
@@ -313,7 +239,7 @@ CREATE TABLE IF NOT EXISTS `sistema_modalidad_titulacion` (
   `max_participantes` int(11) NOT NULL,
   `puntaje_final_promedio` tinyint(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_modalidad_titulacion: ~3 rows (aproximadamente)
 INSERT INTO `sistema_modalidad_titulacion` (`id`, `nombre`, `max_participantes`, `puntaje_final_promedio`) VALUES
@@ -331,7 +257,7 @@ CREATE TABLE IF NOT EXISTS `sistema_modalidad_titulacion_carrera` (
   KEY `FK_id_modalidad_titulacion` (`id_modalidad_titulacion`),
   CONSTRAINT `FK_id_modalidad_titulacion` FOREIGN KEY (`id_modalidad_titulacion`) REFERENCES `sistema_modalidad_titulacion` (`id`),
   CONSTRAINT `FK_modalidad_titulacion_carrera_sistema_carrera` FOREIGN KEY (`id_carrera`) REFERENCES `sistema_carrera` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_modalidad_titulacion_carrera: ~3 rows (aproximadamente)
 INSERT INTO `sistema_modalidad_titulacion_carrera` (`id`, `id_carrera`, `id_modalidad_titulacion`) VALUES
@@ -344,7 +270,7 @@ CREATE TABLE IF NOT EXISTS `sistema_rol` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_rol: ~8 rows (aproximadamente)
 INSERT INTO `sistema_rol` (`id`, `nombre`) VALUES
@@ -365,12 +291,11 @@ CREATE TABLE IF NOT EXISTS `sistema_rol_ruta` (
   KEY `FK_ruta_id` (`ruta_id`),
   CONSTRAINT `FK_rol_id` FOREIGN KEY (`rol_id`) REFERENCES `sistema_rol` (`id`),
   CONSTRAINT `FK_ruta_id` FOREIGN KEY (`ruta_id`) REFERENCES `sistema_ruta` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_rol_ruta: ~23 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_rol_ruta: ~22 rows (aproximadamente)
 INSERT INTO `sistema_rol_ruta` (`rol_id`, `ruta_id`) VALUES
 	(2, 10),
-	(2, 23),
 	(2, 24),
 	(3, 6),
 	(3, 7),
@@ -398,7 +323,7 @@ CREATE TABLE IF NOT EXISTS `sistema_ruta` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ruta` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_ruta: ~21 rows (aproximadamente)
 INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
@@ -433,7 +358,7 @@ CREATE TABLE IF NOT EXISTS `sistema_tipo_evaluacion` (
   `modificador` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'Si el valor de esta columna es 1 quiere decir que dependiendo de que valor se obtenga por la suma de todos su criterios de la su rubrica, ese será el valor que represente de la calificación en porcentaje.',
   `valor_base` float DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_tipo_evaluacion: ~5 rows (aproximadamente)
 INSERT INTO `sistema_tipo_evaluacion` (`id`, `nombre`, `pos_evaluation`, `calificacion_global`, `modificador`, `valor_base`) VALUES
@@ -453,7 +378,7 @@ CREATE TABLE IF NOT EXISTS `sistema_tipo_evauacion_options` (
   PRIMARY KEY (`id`),
   KEY `ste_fk_id_tipo_evaluacion` (`id_tipo_evaluacion`),
   CONSTRAINT `ste_fk_id_tipo_evaluacion` FOREIGN KEY (`id_tipo_evaluacion`) REFERENCES `sistema_tipo_evaluacion` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.sistema_tipo_evauacion_options: ~2 rows (aproximadamente)
 INSERT INTO `sistema_tipo_evauacion_options` (`id`, `nombre_option`, `id_tipo_evaluacion`, `valor`, `tipo_valor`) VALUES
@@ -474,7 +399,7 @@ CREATE TABLE IF NOT EXISTS `solicitud_excepcion` (
   CONSTRAINT `FK_estudiante_excepcion_id` FOREIGN KEY (`estudiante_id`) REFERENCES `usuario` (`id`),
   CONSTRAINT `FK_trabajo_excepcion_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`),
   CONSTRAINT `FK_vicedecano_is` FOREIGN KEY (`vicedecano_id`) REFERENCES `usuario` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.solicitud_excepcion: ~0 rows (aproximadamente)
 
@@ -483,7 +408,7 @@ CREATE TABLE IF NOT EXISTS `trabajo_estado` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.trabajo_estado: ~4 rows (aproximadamente)
 INSERT INTO `trabajo_estado` (`id`, `nombre`) VALUES
@@ -504,7 +429,7 @@ CREATE TABLE IF NOT EXISTS `trabajo_estudiante` (
   KEY `FK_estudiante_id` (`estudiante_id`),
   CONSTRAINT `FK_estudiante_trabajo_id` FOREIGN KEY (`estudiante_id`) REFERENCES `usuario` (`id`) ON DELETE SET NULL,
   CONSTRAINT `FK_trabajo_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.trabajo_estudiante: ~4 rows (aproximadamente)
 INSERT INTO `trabajo_estudiante` (`id`, `trabajo_id`, `estudiante_id`, `intentos`, `resultado`) VALUES
@@ -540,7 +465,7 @@ CREATE TABLE IF NOT EXISTS `trabajo_titulacion` (
   CONSTRAINT `FK_suplente_id` FOREIGN KEY (`suplente_id`) REFERENCES `usuario` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_trabajo_titulacion_sistema_carrera` FOREIGN KEY (`carrera_id`) REFERENCES `sistema_carrera` (`id`),
   CONSTRAINT `FK_tutor_id` FOREIGN KEY (`tutor_id`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.trabajo_titulacion: ~3 rows (aproximadamente)
 INSERT INTO `trabajo_titulacion` (`id`, `carrera_id`, `modalidad_id`, `tutor_id`, `cotutor_id`, `estado_id`, `fecha_defensa`, `titulo`, `link_anteproyecto`, `link_final`, `suplente_id`, `indexacion_id`) VALUES
@@ -561,7 +486,7 @@ CREATE TABLE IF NOT EXISTS `trabajo_tribunal` (
   CONSTRAINT `FK_docente_tribunal_id` FOREIGN KEY (`docente_id`) REFERENCES `usuario` (`id`),
   CONSTRAINT `FK_trabajo_tribunal_id` FOREIGN KEY (`trabajo_id`) REFERENCES `trabajo_titulacion` (`id`),
   CONSTRAINT `FK_tribunal_rol_id` FOREIGN KEY (`tribunal_rol_id`) REFERENCES `tribunal_rol` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.trabajo_tribunal: ~9 rows (aproximadamente)
 INSERT INTO `trabajo_tribunal` (`id`, `trabajo_id`, `docente_id`, `tribunal_rol_id`) VALUES
@@ -580,7 +505,7 @@ CREATE TABLE IF NOT EXISTS `tribunal_rol` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(80) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.tribunal_rol: ~5 rows (aproximadamente)
 INSERT INTO `tribunal_rol` (`id`, `nombre`) VALUES
@@ -601,7 +526,7 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   UNIQUE KEY `usuario` (`usuario`),
   UNIQUE KEY `id_personal` (`id_personal`),
   KEY `idx_nombre` (`nombre`)
-) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.usuario: ~37 rows (aproximadamente)
 INSERT INTO `usuario` (`id`, `usuario`, `id_personal`, `nombre`, `cedula`) VALUES
@@ -651,7 +576,7 @@ CREATE TABLE IF NOT EXISTS `usuario_carrera` (
   KEY `id_carrera_FK` (`id_carrera`),
   CONSTRAINT `id_carrera_FK` FOREIGN KEY (`id_carrera`) REFERENCES `sistema_carrera` (`id`),
   CONSTRAINT `id_usuario_FK` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.usuario_carrera: ~15 rows (aproximadamente)
 INSERT INTO `usuario_carrera` (`id_usuario`, `id_carrera`) VALUES
@@ -680,7 +605,7 @@ CREATE TABLE IF NOT EXISTS `usuario_rol` (
   KEY `FK_id_rol` (`id_rol`),
   CONSTRAINT `FK_id_rol` FOREIGN KEY (`id_rol`) REFERENCES `sistema_rol` (`id`),
   CONSTRAINT `FK_id_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla gestion_titulacion.usuario_rol: ~29 rows (aproximadamente)
 INSERT INTO `usuario_rol` (`id_usuario`, `id_rol`) VALUES
@@ -726,7 +651,7 @@ CREATE TABLE `vista_menu_rol` (
 	`padre` INT(11) NULL,
 	`orden` INT(11) NULL,
 	`todos` TINYINT(4) NOT NULL
-) ENGINE=MyISAM;
+);
 
 -- Volcando estructura para vista gestion_titulacion.vista_roles_usuario
 -- Creando tabla temporal para superar errores de dependencia de VIEW
@@ -734,7 +659,7 @@ CREATE TABLE `vista_roles_usuario` (
 	`id_usuario` INT(11) NOT NULL,
 	`id` INT(11) NOT NULL,
 	`nombre` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_general_ci'
-) ENGINE=MyISAM;
+);
 
 -- Volcando estructura para vista gestion_titulacion.vista_rubricas_detalle
 -- Creando tabla temporal para superar errores de dependencia de VIEW
@@ -746,14 +671,14 @@ CREATE TABLE `vista_rubricas_detalle` (
 	`modalidad_nombre` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`criterio_nombre` VARCHAR(1) NULL COLLATE 'utf8mb4_general_ci',
 	`puntaje_maximo` DECIMAL(5,2) NULL
-) ENGINE=MyISAM;
+);
 
 -- Volcando estructura para vista gestion_titulacion.vista_rutas_rol
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `vista_rutas_rol` (
 	`rol` INT(11) NULL,
 	`ruta` VARCHAR(1) NULL COLLATE 'utf8mb4_general_ci'
-) ENGINE=MyISAM;
+);
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `vista_menu_rol`;
