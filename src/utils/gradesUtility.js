@@ -26,19 +26,31 @@ const calcAverageGrades = (data, estudiante) => {
 }
 
 const newGradesStudentDataComplexivo = (grades) => {
-    const examenPractico = grades.filter((nota) => nota.base !== 40);
-    const examenTeorico = grades.filter((nota) => nota.base === 40);
+    //aquí aplicamos la de Jostin :) xd
+    const examenPractico = grades.filter((nota) => nota.nombre !== 'EXAMEN TEORICO');
+    const examenTeorico = grades.filter((nota) => nota.nombre === 'EXAMEN TEORICO')[0];
     const examenPracticoAvg = (examenPractico.reduce((a, b) => a + b.valor, 0) / examenPractico.length) * 0.6;
     const baseExamenPractico = 60;
+    const baseExamenTeorico = 40;
+
+    const examenTeoricoAvg = (examenTeorico.valor * 0.4);
+
+
     return [
-        ...examenTeorico,
         {
             nombre: "EXAMEN PRACTICO",
             sum: examenPractico.reduce((a, b) => a + b.valor, 0),
             mean: examenPracticoAvg,
             valor: customRound(examenPracticoAvg),
             base: baseExamenPractico
-        }
+        },
+        {
+            nombre: "EXAMEN TEORICO",
+            sum: examenTeoricoAvg,
+            mean: examenTeoricoAvg,
+            valor: customRound(examenTeoricoAvg),
+            base: baseExamenTeorico
+        },
     ]
 }
 

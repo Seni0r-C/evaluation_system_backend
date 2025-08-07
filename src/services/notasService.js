@@ -116,11 +116,7 @@ exports.GetNotasService = async (trabajo_id) => {
     try {
         const data = await GetNotasTrabajoService(trabajo_id);
         const modalidad = await GetModalidadTrabajoService(trabajo_id);
-        // const modalidad_id = modalidad?.id;
-        // Obtener el esquema de notas
-        // const esquema = await GetNotasSchemeActaService(modalidad_id);
-        // console.log("esquema");
-        // console.log(esquema);
+
         // const result = groupsBy(data, 'estudiante.docente.tipo_evaluacion', true, (item)=>{
         const result = groupsBy(data, 'estudiante.tipo_evaluacion', true, (item)=>{
             item.nota = parseInt(item.nota);
