@@ -170,3 +170,17 @@ exports.obtenerTiposEvaluacionPorModalidad = async (req, res) => {
         res.status(500).json({ message: "Error al obtener tipos de evaluación." });
     }
 };
+
+exports.getTipoEvaluacionOptions = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [options] = await db.execute(
+            'SELECT * FROM sistema_tipo_evauacion_options WHERE id_tipo_evaluacion = ?',
+            [id]
+        );
+        res.json(options);
+    } catch (error) {
+        console.error(`Error obteniendo opciones para el tipo de evaluación ${id}:`, error);
+        res.status(500).json({ error: 'Error obteniendo opciones del tipo de evaluación' });
+    }
+};

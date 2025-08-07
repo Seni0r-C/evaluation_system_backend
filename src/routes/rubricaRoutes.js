@@ -16,4 +16,6 @@ router.post("/criterios/crear", auth, onlyRoles(roles), rubricaController.crearC
 router.put("/criterios/:id", auth, onlyRoles(roles), rubricaController.actualizarCriterioRubrica2);
 router.delete("/criterios/:id", auth, onlyRoles(roles), rubricaController.eliminarCriterioRubrica);
 
+router.get("/tipo_evaluacion/:id/options", auth, rubricaController.getTipoEvaluacionOptions);
+
 module.exports = router;
