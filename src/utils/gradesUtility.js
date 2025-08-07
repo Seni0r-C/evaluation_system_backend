@@ -43,7 +43,7 @@ const newGradesStudentDataComplexivo = (grades) => {
 }
 
 const newGradesStudentDataArticuloAcademico = (grades) => {
-    const informeFinal = grades.filter((nota) => nota.nombre === "INFORME FINAL")?.[0];
+    const informeFinal = grades.filter((nota) => nota.nombre === "INDEXACIÓN")?.[0];
     if (!informeFinal) {
         return "INFORME FINAL no encontrado";
     }

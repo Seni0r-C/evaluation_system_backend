@@ -148,9 +148,6 @@ exports.GetFullActaService = async (trabajo_id) => {
     actaInfoFull.docenteDeArea = tribunal.docenteDeArea;
     // Datos del trabajo de titulación y carrera
     actaInfoFull.modalidadTrabajoTitulacion = tesisData.modalidad?.toUpperCase();
-    const isComplexivo = actaInfoFull.modalidadTrabajoTitulacion === "EXAMEN COMPLEXIVO" ||
-        actaInfoFull.modalidadTrabajoTitulacion === "EXÁMEN COMPLEXIVO";
-    // actaInfoFull.temaTrabajoTitulacion = isComplexivo ? null : tesisData.titulo?.toUpperCase();
     actaInfoFull.temaTrabajoTitulacion = tesisData.titulo?.toUpperCase();
     actaInfoFull.carrera = tesisData.carrera ?? "CARRERA SIN ESPECIFICAR";
     const carreraInfo = carreraMap[tesisData.carrera];
