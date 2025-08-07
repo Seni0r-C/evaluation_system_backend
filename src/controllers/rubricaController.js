@@ -78,7 +78,7 @@ exports.crearCriterioRubrica = async (req, res) => {
         console.log([rubrica_id, nombre, puntaje_maximo]);
         await db.execute(
             `INSERT INTO rubrica_criterio (rubrica_id, nombre, puntaje_maximo) 
-             VALUES (?, ?, ?)`,
+             VALUES (?, ?, ?)`, 
             [rubrica_id, nombre, puntaje_maximo]
         );
         res.json({ message: "Criterio creado con éxito." });
