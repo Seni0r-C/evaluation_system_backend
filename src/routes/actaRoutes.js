@@ -9,7 +9,6 @@ router.get('/pdf-name/:id_trabajo', auth, actaDocController.getActaFileName);
 
 router.get('/notas-scheme/:trabajo_modalidad_id', auth, actaController.getNotasSchemeActa);
 router.get('/last-info', auth, actaController.getLastInfoActa);
-// router.post('/info', actaController.postInfoActa); //PostInfoActaService no existe por eso la comenté
 router.get('/:trabajo_id', auth, actaController.getActa);
 router.get('/full/:trabajo_id', auth, actaController.getActaFull);
 
