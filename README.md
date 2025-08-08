@@ -128,6 +128,14 @@ Este proyecto utiliza las siguientes dependencias principales:
 
 Puedes encontrar la lista completa de dependencias en el archivo `package.json`.
 
+## Base de Datos
+
+En la carpeta `sql`, encontrarás los scripts de la base de datos necesarios para el funcionamiento del sistema.
+
+Estos scripts han sido exportados utilizando herramientas como **HeidiSQL** y **phpMyAdmin**. Deberás desplegar la base de datos manualmente utilizando alguna de estas herramientas o una de tu preferencia.
+
+Se recomienda instalar la última versión del script de la base de datos para asegurar que tienes el esquema más reciente y todos los datos necesarios. La última versión disponible es la `v9` (por ejemplo, `HEIDISQL - gestion de titulacion v9.sql` o `phpMyAdmin - gestion_titulacion v9.sql`).
+
 ## Autores
 
 - Arteaga Toro Carlos Luis
