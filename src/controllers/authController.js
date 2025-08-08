@@ -9,6 +9,83 @@ const agent = new https.Agent({
     rejectUnauthorized: false
 });
 
+exports.registerUser = async (req, res) => {
+    try {
+        const { cedula, usuario, password } = req.body;
+
+        // 1. Validar con servicio externo
+        const body = { usuario, clave: password };
+        const apiData = await externalAuth(body, res);
+
+        if (apiData.statusCode === 400) {
+            return; // La respuesta de error ya fue enviada por externalAuth
+        }
+
+        // 2. Verificar si el usuario o la cédula ya existen
+        const [existingUser] = await db.query(
+            "SELECT * FROM usuario WHERE usuario = ? OR cedula = ?",
+            [usuario, cedula]
+        );
+
+        if (existingUser.length > 0) {
+            return res.status(409).json({
+                exito: false,
+                mensaje: 'El usuario o la cédula ya están registrados.'
+            });
+        }
+
+        // 3. Insertar nuevo usuario
+        await db.query("BEGIN");
+
+        const insertUserSql = `
+            INSERT INTO usuario (id_personal, nombre, usuario, cedula) 
+            VALUES (?, ?, ?, ?)
+        `;
+        const { nombres, idpersonal, tipo_usuario, datos_estudio } = apiData;
+        const [result] = await db.query(insertUserSql, [idpersonal, nombres, usuario, cedula]);
+        const newUserId = result.insertId;
+
+        // 4. Asignar rol
+        const rolId = await getOrInsertRol(tipo_usuario);
+        await db.query("INSERT INTO usuario_rol (id_usuario, id_rol) VALUES (?, ?)", [newUserId, rolId]);
+
+        // 5. Asignar carreras
+        if (datos_estudio) {
+            const carreras = JSON.parse(datos_estudio);
+            // Filtra carreras únicas por nombre
+            const carrerasUnicas = Array.from(
+                new Set(
+                    carreras
+                        .filter(c => c.facultad.includes('CIENCIAS INFORMÁTICAS'))
+                        .map(c => c.carrera)
+                )
+            );
+            for (const nombreCarrera of carrerasUnicas) {
+                const idCarrera = await insertCarreraIfNotExists(nombreCarrera);
+                await db.query(
+                    "INSERT INTO usuario_carrera (id_usuario, id_carrera) VALUES (?, ?)",
+                    [newUserId, idCarrera]
+                );
+            }
+        }
+
+        await db.query("COMMIT");
+
+        res.status(201).json({
+            exito: true,
+            mensaje: 'Usuario registrado exitosamente.'
+        });
+
+    } catch (error) {
+        await db.query("ROLLBACK");
+        res.status(500).json({
+            exito: false,
+            mensaje: 'Error del servidor al registrar el usuario.',
+            error: error.message
+        });
+    }
+};
+
 exports.loginUser = async (req, res) => {
     try {
         const { usuario, password } = req.body;
