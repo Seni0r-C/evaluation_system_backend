@@ -3,6 +3,8 @@ const { GetNotasService } = require("../services/notasService");
 const db = require('../config/db');
 const fs = require("fs-extra");
 const { GetFullActaService } = require("./actaService");
+const { updateStudentStatusByTrabajoId } = require("./trabajoTitulacionService");
+const { CALIFICACION_MINIMA } = require("../config/env");
 
 function crearEstudianteNotas(estudiante, index = null) {
     const promedioTotal = estudiante.promedioTotal;
@@ -153,6 +155,16 @@ exports.GenerateActaService = async (trabajoId) => {
     const trabajoData = await GetFullActaService(trabajoId);
     
     const estudiantesNotasData = await GetNotasService(trabajoId);
+
+    // Actualizar estado de estudiantes
+    if (estudiantesNotasData && estudiantesNotasData.length > 0) {
+        for (const estudiante of estudiantesNotasData) {
+            const promedioTotal = estudiante.promedioTotal.valor;
+            const estado = promedioTotal >= CALIFICACION_MINIMA ? 'Aprobado' : 'Reprobado';
+            await updateStudentStatusByTrabajoId(trabajoId, estado);
+        }
+    }
+
     console.log("-----------------------------estudiantesNotasData-----------------------------");
     console.log(estudiantesNotasData);
     const actaComplexivoData = await buildDataActaComplexivo(estudiantesNotasData, trabajoData);

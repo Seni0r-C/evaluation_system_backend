@@ -163,3 +163,106 @@ exports.GetModalidadTrabajoService = async (trabajo_id) => {
     const [rows] = await db.query(query, [trabajo_id]);
     return rows[0];
 };
+
+
+exports.GetEstudiantesTrabajoService = async (trabajo_id) => {
+    const query = `
+        SELECT 
+            u.id, u.nombre, u.cedula
+        FROM 
+            usuario u
+        INNER JOIN trabajo_estudiante te ON u.id = te.estudiante_id
+        WHERE te.trabajo_id = ?
+        `;
+
+    const [rows] = await db.query(query, [trabajo_id]);
+    return rows;
+};
+
+exports.GetEstadoTrabajoService = async (trabajo_id) => {
+    const query = `
+        SELECT 
+            te.id, te.nombre
+        FROM 
+            trabajo_estado te
+        INNER JOIN trabajo_titulacion tt ON te.id = tt.estado_id
+        WHERE tt.id = ?
+        `;
+
+    const [rows] = await db.query(query, [trabajo_id]);
+    return rows[0];
+};
+
+exports.GetTribunalTrabajoService = async (trabajo_id) => {
+    const query = `
+        SELECT 
+            u.id, u.nombre, u.cedula
+        FROM 
+            usuario u
+        INNER JOIN trabajo_tribunal tt ON u.id = tt.docente_id
+        WHERE tt.trabajo_id = ?
+        `;
+
+    const [rows] = await db.query(query, [trabajo_id]);
+    return rows;
+};
+
+exports.GetTutorTrabajoService = async (trabajo_id) => {
+    const query = `
+        SELECT 
+            u.id, u.nombre, u.cedula
+        FROM 
+            usuario u
+        INNER JOIN trabajo_titulacion tt ON u.id = tt.tutor_id
+        WHERE tt.id = ?
+        `;
+
+    const [rows] = await db.query(query, [trabajo_id]);
+    return rows[0];
+};
+
+exports.GetCoTutorTrabajoService = async (trabajo_id) => {
+    const query = `
+        SELECT 
+            u.id, u.nombre, u.cedula
+        FROM 
+            usuario u
+        INNER JOIN trabajo_titulacion tt ON u.id = tt.cotutor_id
+        WHERE tt.id = ?
+        `;
+
+    const [rows] = await db.query(query, [trabajo_id]);
+    return rows[0];
+};
+
+exports.GetFullInfoTrabajoService = async (trabajo_id) => {
+    const trabajo = await this.GetByIdTrabajoService(trabajo_id, true);
+    const modalidad = await this.GetModalidadTrabajoService(trabajo_id);
+    const estudiantes = await this.GetEstudiantesTrabajoService(trabajo_id);
+    const estado = await this.GetEstadoTrabajoService(trabajo_id);
+    const tribunal = await this.GetTribunalTrabajoService(trabajo_id);
+    const tutor = await this.GetTutorTrabajoService(trabajo_id);
+    const cotutor = await this.GetCoTutorTrabajoService(trabajo_id);
+    const notas = await this.GetNotasTrabajoService(trabajo_id);
+
+    return {
+        ...trabajo,
+        modalidad,
+        estudiantes,
+        estado,
+        tribunal,
+        tutor,
+        cotutor,
+        notas
+    };
+};
+
+exports.updateStudentStatusByTrabajoId = async (trabajo_id, status) => {
+    const query = `
+        UPDATE trabajo_estudiante
+        SET resultado = ?
+        WHERE trabajo_id = ?
+    `;
+    const [result] = await db.query(query, [status, trabajo_id]);
+    return result;
+};
