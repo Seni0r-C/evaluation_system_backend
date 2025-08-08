@@ -43,8 +43,15 @@ Asegúrate de llenar las siguientes variables en tu archivo `.env`:
 *   `DB_USER`: Usuario de la base de datos
 *   `DB_PASSWORD`: Contraseña de la base de datos
 *   `DB_NAME`: Nombre de la base de datos
-*   `DB_PORT`: Puerto de la base de datos
 *   `JWT_SECRET`: Un secreto para la generación de JSON Web Tokens
+*   `PORT`: El puerto en el que correrá la aplicación (por defecto 3000)
+*   `FRONTEND_URL`: La URL del frontend de la aplicación
+*   `FAKE_AUTH`: Si se debe usar autenticación falsa (para pruebas)
+*   `UTM_API_KEY`: Clave de API para UTM (necesario para el inicio de sesión con las credenciales de UTM)
+*   `CALIFICACION_MINIMA`: Calificación mínima para aprobar un trabajo de titulación
+*   `ADMIN_USERNAME`: Nombre de usuario del administrador
+*   `ADMIN_PASSWORD`: Contraseña del administrador
+
 
 ## Corriendo la Aplicación
 
@@ -73,6 +80,11 @@ La API provee varios endpoints para gestionar los recursos de la aplicación. La
 *   `/rubricas`: Gestión de rúbricas
 *   `/calificaciones`: Gestión de calificaciones
 *   `/actas`: Generación de actas
+*   `/carrera`: Gestión de carreras
+*   `/modalidad-titulacion`: Gestión de modalidades de titulación
+*   `/notas`: Gestión de notas
+*   `/reportes`: Gestión de reportes
+*   `/rutas`: Gestión de rutas
 
 Para una documentación detallada de la API, puedes revisar el código en `src/routes` y `src/controllers`.
 
@@ -105,6 +117,14 @@ Este proyecto utiliza las siguientes dependencias principales:
 *   **JSONWebToken:** Para la autenticación basada en tokens
 *   **Bcryptjs:** Para el hasheo de contraseñas
 *   **Puppeteer:** Para la generación de PDFs a partir de HTML
+*   **Axios:** Cliente HTTP basado en promesas
+*   **CORS:** Para habilitar CORS
+*   **Dotenv:** Para cargar variables de entorno desde un archivo .env
+*   **ExcelJS:** Para leer y escribir archivos de Excel
+*   **Express-validator:** Un conjunto de middlewares de express para la validación de datos
+*   **fs-extra:** Métodos adicionales para el sistema de archivos
+*   **helmet:** Ayuda a securizar aplicaciones de Express
+*   **morgan:** Logger de peticiones HTTP
 
 Puedes encontrar la lista completa de dependencias en el archivo `package.json`.
 

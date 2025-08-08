@@ -25,9 +25,7 @@
     "morgan": "^1.10.0",
     "mysql2": "^3.11.4",
     "puppeteer": "^24.1.1",
-    "sequelize": "^6.37.5",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "sequelize": "^6.37.5"
   },
   "devDependencies": {
     "jest": "^30.0.5"
