@@ -20,3 +20,7 @@ exports.UTM_API_KEY = process.env.UTM_API_KEY ?? '';
 
 // CALIFICACIONES
 exports.CALIFICACION_MINIMA = process.env.CALIFICACION_MINIMA ?? '70'; // Calificación mínima para aprobar
+
+// ADMIN
+exports.ADMIN_USERNAME = process.env.ADMIN_USERNAME ?? 'admin';
+exports.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? '123';

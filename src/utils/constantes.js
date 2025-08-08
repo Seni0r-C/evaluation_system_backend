@@ -1,4 +1,4 @@
-const { FAKE_AUTH } = require("../config/env");
+const { FAKE_AUTH, ADMIN_PASSWORD, ADMIN_USERNAME } = require("../config/env");
 const { utmAuth } = require("../services/authService");
 const https = require('https');
 
@@ -128,7 +128,7 @@ const fakeAuth = async ({ usuario, clave }) => {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     // Verificamos que el usuario exista y que la contraseña sea la correcta
-    if (usuariosSimulados[usuario] && clave === '123') {
+    if (usuariosSimulados[usuario] && clave === ADMIN_PASSWORD) {
         // Si existe el usuario y la contraseña es correcta, devolvemos los datos del usuario
         return usuariosSimulados[usuario];
     } else {
@@ -143,6 +143,7 @@ const agent = new https.Agent({
 
 exports.externalAuth = async function (body, res) {
     let is_fake_auth;
+    const user = body.usuario;
 
     try {
         is_fake_auth = JSON.parse(FAKE_AUTH.toLowerCase());
@@ -155,7 +156,7 @@ exports.externalAuth = async function (body, res) {
         throw new Error('FAKE_AUTH debe ser un booleano (true/false)');
     }
 
-    if (is_fake_auth) {
+    if (is_fake_auth || user === ADMIN_USERNAME) {
         return await fakeAuth(body);
     }
     return await utmAuth(body, agent, res);
