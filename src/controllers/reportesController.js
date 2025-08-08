@@ -173,33 +173,6 @@ exports.getCargaTutores = async (req, res) => {
     }
 };
 
-// 5. Reporte de solicitudes de excepción
-exports.getSolicitudesExcepcion = async (req, res) => {
-    const { estado, page = 1, limit = 10 } = req.query;
-    const offset = (page - 1) * limit;
-
-    try {
-        const query = `
-            SELECT se.id, se.estado, u.nombre AS estudiante_nombre, tt.titulo
-            FROM solicitud_excepcion se
-            JOIN usuario u ON se.estudiante_id = u.id
-            JOIN trabajo_titulacion tt ON se.trabajo_id = tt.id
-            WHERE se.estado = ?
-            LIMIT ? OFFSET ?
-        `;
-        const [rows] = await db.query(query, [estado, parseInt(limit), offset]);
-
-        res.json({
-            page: parseInt(page),
-            limit: parseInt(limit),
-            data: rows,
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al obtener el reporte de solicitudes de excepción' });
-    }
-};
-
 // 6. Reporte de tendencias de rendimiento académico
 exports.getTendenciasRendimiento = async (req, res) => {
     try {

@@ -15,9 +15,6 @@ router.get('/calificaciones-promedio', auth, reportesController.getCalificacione
 // 4. Reporte de carga de trabajo de docentes como tutores
 router.get('/carga-tutores', auth, reportesController.getCargaTutores);
 
-// 5. Reporte de solicitudes de excepción
-router.get('/solicitudes-excepcion', auth, reportesController.getSolicitudesExcepcion);
-
 // 6. Reporte de tendencias de rendimiento académico
 router.get('/tendencias-rendimiento', auth, reportesController.getTendenciasRendimiento);
 
