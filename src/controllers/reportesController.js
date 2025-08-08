@@ -257,6 +257,7 @@ exports.getDashboardSummary = async (req, res) => {
             FROM usuario u
             LEFT JOIN trabajo_titulacion tt ON u.id = tt.tutor_id
             WHERE u.id IN (SELECT DISTINCT tutor_id FROM trabajo_titulacion)
+            AND tt.estado_id != 4
             GROUP BY u.nombre
         `);
 
@@ -282,6 +283,7 @@ exports.generarReporteGraduados = async (req, res) => {
             JOIN usuario u ON te.estudiante_id = u.id
             JOIN usuario t ON tt.tutor_id = t.id
             WHERE tt.estado_id = 4 AND tt.fecha_defensa BETWEEN ? AND ?
+            AND te.resultado = 'Aprobado'
         `, [fechaInicio, fechaFin]);
 
         const columns = [
@@ -309,6 +311,7 @@ exports.generarReporteCargaTutores = async (req, res) => {
             FROM usuario u
             LEFT JOIN trabajo_titulacion tt ON u.id = tt.tutor_id
             WHERE u.id IN (SELECT DISTINCT tutor_id FROM trabajo_titulacion)
+            AND tt.estado_id != 4
             GROUP BY u.nombre
         `);
 
