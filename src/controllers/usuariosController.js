@@ -29,20 +29,17 @@ exports.crearUsuario = async (req, res) => {
  * @returns {Promise<void>} Responde con un array de usuarios o un mensaje de error.
  */
 exports.obtenerUsuarios = async (req, res) => {
-  const { nombre, email, rol } = req.query; // Obtener parámetros de búsqueda de la query string
+  const { nombre: searchParms, rol } = req.query; // Obtener parámetros de búsqueda de la query string
 
   try {
     // Construir condiciones dinámicas
     const condiciones = [];
     const valores = [];
 
-    if (nombre) {
-      condiciones.push("u.nombre LIKE ? ");
-      valores.push(`%${nombre}%`);  // Asegúrate de que se agreguen dos valores para nombre y apellido
-    }
-    if (email) {
-      condiciones.push("u.usuario LIKE ?");
-      valores.push(`%${email}%`);
+    if (searchParms) {
+      condiciones.push("u.nombre LIKE ? OR u.usuario LIKE ? OR u.cedula LIKE ?");
+      const searchValue = `%${searchParms}%`;
+      valores.push(searchValue, searchValue, searchValue);
     }
 
     if (rol) {
