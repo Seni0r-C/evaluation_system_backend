@@ -40,7 +40,7 @@ exports.utmAuth = async (body, agent, res) => {
 
         const apiData = response.data.value;
 
-        // Inserta las carreras asociadas si no existen
+        // Verificar si el usuario pertenece a la facultad de CIENCIAS INFORMÁTICAS
         if (apiData.datos_estudio) {
             const datos = JSON.parse(apiData.datos_estudio);
             let isCienciasInformticas = false;

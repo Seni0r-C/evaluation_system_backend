@@ -103,7 +103,13 @@ exports.loginUser = async (req, res) => {
         }
 
         // Verifica si el usuario existe en la base de datos
-        const sql = "SELECT * FROM usuario WHERE usuario = ?";
+        const sql =
+            `
+        SELECT u.*, sr.nombre AS rol FROM usuario u
+        LEFT JOIN usuario_rol ur ON ur.id_usuario = u.id
+        LEFT JOIN sistema_rol sr ON sr.id = ur.id_rol
+        WHERE u.usuario = ?
+        `;
         const [usuarioExiste] = await db.query(sql, [usuario]);
 
         let user = null;
@@ -156,8 +162,13 @@ exports.loginUser = async (req, res) => {
                 id_personal: result.insertId,
                 usuario: usuario,
             }
-        } else {
+        }
+
+        //no dejar que los estudiantes inicien sesión
+        if (usuarioExiste.length > 0 && !usuarioExiste.find(u => u.rol === 'ESTUDIANTE')) {
             user = usuarioExiste[0];
+        } else {
+            return res.status(400).json({ exito: false, mensaje: 'Los estudiantes no pueden iniciar sesión' });
         }
 
         // Genera el token JWT
