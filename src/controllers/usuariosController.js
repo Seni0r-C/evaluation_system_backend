@@ -2,6 +2,7 @@
 const db = require('../config/db'); // Importa la conexión a la base de datos
 const axios = require('axios');
 const https = require('https');
+const { UTM_API_TOKEN } = require('../config/env');
 
 const agent = new https.Agent({
   rejectUnauthorized: false
@@ -29,16 +30,16 @@ exports.crearUsuario = async (req, res) => {
  * @returns {Promise<void>} Responde con un array de usuarios o un mensaje de error.
  */
 exports.obtenerUsuarios = async (req, res) => {
-  const { nombre: searchParms, rol } = req.query; // Obtener parámetros de búsqueda de la query string
+  const { nombre: searchParams, rol } = req.query;
 
   try {
-    // Construir condiciones dinámicas
+    // 1. Búsqueda en la base de datos local
     const condiciones = [];
     const valores = [];
 
-    if (searchParms) {
+    if (searchParams) {
       condiciones.push("u.nombre LIKE ? OR u.usuario LIKE ? OR u.cedula LIKE ?");
-      const searchValue = `%${searchParms}%`;
+      const searchValue = `%${searchParams}%`;
       valores.push(searchValue, searchValue, searchValue);
     }
 
@@ -47,17 +48,67 @@ exports.obtenerUsuarios = async (req, res) => {
       valores.push(rol);
     }
 
-    // Generar consulta dinámica
-    const queryBase = "SELECT DISTINCT u.* FROM .usuario u INNER JOIN .usuario_rol r WHERE r.id_usuario = u.id";
+    const queryBase = "SELECT DISTINCT u.* FROM usuario u INNER JOIN usuario_rol r ON r.id_usuario = u.id";
     const queryFinal = condiciones.length
-      ? `${queryBase} AND ${condiciones.join(' AND ')}`  // Se debe unir las condiciones con "AND"
+      ? `${queryBase} AND ${condiciones.join(' AND ')}`
       : queryBase;
 
-    // Ejecutar consulta
     const [usuarios] = await db.execute(queryFinal, valores);
-    res.status(200).json(usuarios);
+
+    // 2. Si encontramos resultados en DB, los devolvemos
+    if (usuarios.length > 0) {
+      return res.status(200).json(usuarios);
+    }
+
+    // 3. Si no hay resultados en DB y tenemos searchParams sin rol
+    if (searchParams) {
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Api-Key': UTM_API_TOKEN
+      };
+
+      // 4. Búsqueda en la API externa
+      const apiResponse = await axios.post(
+        'https://app.utm.edu.ec/becas/api/publico/ObtenerDatosPersona',
+        { datos: searchParams },
+        { headers, httpsAgent: agent }
+      );
+
+      const { state, value } = apiResponse.data;
+
+      // 5. Procesar respuesta de la API
+      if (state === 'success' && value && value.length > 0) {
+        const usuariosAPI = value.map(persona => ({
+          id: null, // No existe en nuestra DB
+          cedula: persona.r_cedula,
+          nombre: persona.r_nombres,
+          email: persona.r_mail_alternativo,
+          usuario: null,
+          // Agrega aquí otros campos necesarios
+          origen: 'API Externa' // Para identificar el origen
+        }));
+
+        return res.status(200).json(usuariosAPI);
+      }
+    }
+
+    // 6. Si no se encontraron resultados en ningún lado
+    res.status(200).json([]);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener los usuarios', message: error.message });
+    console.error('Error en obtenerUsuarios:', error);
+
+    // Manejo específico de errores de API
+    if (error.response) {
+      return res.status(502).json({
+        error: 'Error en API externa',
+        message: `API responded with ${error.response.status}`
+      });
+    }
+
+    res.status(500).json({
+      error: 'Error al obtener los usuarios',
+      message: error.message
+    });
   }
 };
 

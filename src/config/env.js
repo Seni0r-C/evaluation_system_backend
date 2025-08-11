@@ -17,6 +17,7 @@ exports.JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? '1h';
 // API EXTERNA
 exports.FAKE_AUTH = process.env.FAKE_AUTH ?? 'true';
 exports.UTM_API_KEY = process.env.UTM_API_KEY ?? '';
+exports.UTM_API_TOKEN = process.env.UTM_API_TOKEN ?? '';
 
 // CALIFICACIONES
 exports.CALIFICACION_MINIMA = process.env.CALIFICACION_MINIMA ?? '70'; // Calificación mínima para aprobar
