@@ -5,6 +5,14 @@ const https = require('https');
 // Simulamos un conjunto de usuarios con sus contraseñas
 //LA VERDAD NOS E SI ESTO FUNCIONE CORRECTAMENTE  :) pero es loq ue esatba antes xd
 const usuariosSimulados = {
+    'admin': {
+        nombres: 'Administrador',
+        tipo_usuario: 'ADMINISTRACIÓN',
+        idpersonal: 1,
+        datos_estudio: JSON.stringify([
+            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
+        ])
+    },
     'vicedecano': {
         nombres: 'KATTY GARCIA BARREIRO VERA',
         tipo_usuario: 'VICEDECANATO',
@@ -75,14 +83,6 @@ const usuariosSimulados = {
         nombres: 'ANA GABRIELA YUKATAN SLOVAKY',
         tipo_usuario: 'DOCENTE',
         idpersonal: 22360,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    'admin': {
-        nombres: 'VERGAS ANTONIO RESABALA CHICUNGUNYIA',
-        tipo_usuario: 'ADMINISTRACIÓN',
-        idpersonal: 15390,
         datos_estudio: JSON.stringify([
             { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
         ])
