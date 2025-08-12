@@ -108,9 +108,9 @@ exports.loginUser = async (req, res) => {
         SELECT u.*, sr.nombre AS rol FROM usuario u
         LEFT JOIN usuario_rol ur ON ur.id_usuario = u.id
         LEFT JOIN sistema_rol sr ON sr.id = ur.id_rol
-        WHERE u.usuario = ?
+        WHERE u.cedula = ?
         `;
-        const [usuarioExiste] = await db.query(sql, [usuario]);
+        const [usuarioExiste] = await db.query(sql, [apiData.cedula]);
 
         let user = null;
 
@@ -118,8 +118,8 @@ exports.loginUser = async (req, res) => {
             await db.query("BEGIN");
             // Inserta un nuevo usuario en la base de datos
             const insertUserSql = `
-                INSERT INTO usuario (id_personal, nombre, usuario) 
-                VALUES (?, ?, ?)
+                INSERT INTO usuario (id_personal, nombre, usuario, cedula)
+                VALUES (?, ?, ?, ?) 
             `;
             const nombre = apiData.nombres;
             const rolId = await getOrInsertRol(apiData.tipo_usuario);
@@ -127,7 +127,8 @@ exports.loginUser = async (req, res) => {
             const [result] = await db.query(insertUserSql, [
                 idpersonal,
                 nombre,
-                usuario
+                usuario,
+                apiData.cedula
             ]);
 
             const asocialRolSql = "INSERT INTO usuario_rol (id_usuario, id_rol) VALUES (?, ?)";
@@ -162,6 +163,12 @@ exports.loginUser = async (req, res) => {
                 id_personal: result.insertId,
                 usuario: usuario,
             }
+        }
+
+        //registrar nombre de usuario si no esta registrado
+        if(!usuarioExiste.find(u => u.usuario === usuario)) {
+            const updateUserSql = "UPDATE usuario SET usuario = ? WHERE id = ?";
+            await db.query(updateUserSql, [usuario, usuarioExiste[0].id]);
         }
 
         //no dejar que los estudiantes inicien sesión

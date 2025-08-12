@@ -1,140 +1,30 @@
 const { FAKE_AUTH, ADMIN_PASSWORD, ADMIN_USERNAME } = require("../config/env");
 const { utmAuth } = require("../services/authService");
 const https = require('https');
-
-// Simulamos un conjunto de usuarios con sus contraseñas
-//LA VERDAD NOS E SI ESTO FUNCIONE CORRECTAMENTE  :) pero es loq ue esatba antes xd
-const usuariosSimulados = {
-    'admin': {
-        nombres: 'Administrador',
-        tipo_usuario: 'ADMINISTRACIÓN',
-        idpersonal: 1,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    'vicedecano': {
-        nombres: 'KATTY GARCIA BARREIRO VERA',
-        tipo_usuario: 'VICEDECANATO',
-        idpersonal: 12342,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    'preside': {
-        nombres: 'HAROLD OMAR GARCIA VILLANUEVA',
-        tipo_usuario: 'DOCENTE',
-        idpersonal: 12382,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    'tribunal': {
-        nombres: 'PEDRO MANOLO ANESTECIO ONETWO',
-        tipo_usuario: 'DOCENTE',
-        idpersonal: 12351,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    // Estudiantes
-    'pupilo': {
-        nombres: 'SANTIAGO SEGUNDO PACHECO VEREDICTO',
-        tipo_usuario: 'ESTUDIANTE',
-        idpersonal: 34351,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    'alumno': {
-        nombres: 'JAIME ENRIQUYE ALMIGUEZ GONZALEZ',
-        tipo_usuario: 'ESTUDIANTE',
-        idpersonal: 19359,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    'alumna': {
-        nombres: 'AGUINALDA GUISELLE VALIVIEZO JILIWE',
-        tipo_usuario: 'ESTUDIANTE',
-        idpersonal: 19355,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    // Tutores
-    'estudiante': {
-        nombres: 'TAMIÑAWI SUMI SUMIWKA MANIKO',
-        tipo_usuario: 'DOCENTE',
-        idpersonal: 19351,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    'tutor': {
-        nombres: 'CARLOS MANICHO VENEZUELO MANGIZO',
-        tipo_usuario: 'ESTUDIANTE',
-        idpersonal: 56709,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    'tutora': {
-        nombres: 'ANA GABRIELA YUKATAN SLOVAKY',
-        tipo_usuario: 'DOCENTE',
-        idpersonal: 22360,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    'manicho': {
-        nombres: 'MANITA RESABALA DECHAR CALABASA',
-        tipo_usuario: 'ADMINISTRACIÓN',
-        idpersonal: 15620,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    'juan': {
-        nombres: 'JUAN FERNANDO VERLASQUEZ SANTOS',
-        tipo_usuario: 'DOCENTE',
-        idpersonal: 456567,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    'clara.mendez': {
-        nombres: 'CLARA BONELLA DIMATRIZ CUZCO',
-        tipo_usuario: 'DOCENTE',
-        idpersonal: 412147,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    'carteaga7126': {
-        nombres: 'ARTEAGA TORO CARLOS LUIS',
-        tipo_usuario: 'DOCENTE',
-        idpersonal: 412147,
-        datos_estudio: JSON.stringify([
-            { carrera: 'Ingenieria En Sistemas Informaticos', facultad: 'CIENCIAS INFORMÁTICAS' }
-        ])
-    },
-    // Otros usuarios pueden ser añadidos aquí para la simulación
-};
+const db = require('../config/db');
 
 // La función `fakeAuth` emula una llamada a la API externa
 const fakeAuth = async ({ usuario, clave }) => {
-    // Simulamos un retraso en la respuesta como si fuera una llamada externa
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Verificamos que el usuario exista y que la contraseña sea la correcta
-    if (usuariosSimulados[usuario] && clave === ADMIN_PASSWORD) {
-        // Si existe el usuario y la contraseña es correcta, devolvemos los datos del usuario
-        return usuariosSimulados[usuario];
-    } else {
-        // Si no, lanzamos un error indicando que el usuario o la contraseña son incorrectos
-        throw new Error('Usuario o contraseña incorrectos');
+    if (clave !== ADMIN_PASSWORD) {
+        throw new Error('Contraseña incorrecta');
     }
+
+    // Verificamos si el usuario existe en la base de datos
+    const [existingUser] = await db.query(
+        "SELECT * FROM usuario WHERE usuario = ?",
+        [usuario]
+    );
+
+    // Si el usuario no existe, lanzamos un error
+    if (existingUser.length === 0) {
+        throw new Error('Usuario no encontrado');
+    }
+
+    return {
+        cedula: existingUser[0].cedula,
+        nombres: existingUser[0].nombre,
+        idpersonal: existingUser[0].id_personal,
+    };
 };
 
 const agent = new https.Agent({
