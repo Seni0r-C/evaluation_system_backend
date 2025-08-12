@@ -15,6 +15,7 @@ exports.JWT_SECRET = process.env.JWT_SECRET ?? 'secret';
 exports.JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? '1h';
 
 // API EXTERNA
+exports.API_URL = process.env.API_URL ?? 'https://app.utm.edu.ec/becas/api/publico';
 exports.FAKE_AUTH = process.env.FAKE_AUTH ?? 'true';
 exports.UTM_API_KEY = process.env.UTM_API_KEY ?? '';
 exports.UTM_API_TOKEN = process.env.UTM_API_TOKEN ?? '';

@@ -2,7 +2,7 @@
 const db = require('../config/db'); // Importa la conexión a la base de datos
 const axios = require('axios');
 const https = require('https');
-const { UTM_API_TOKEN } = require('../config/env');
+const { UTM_API_TOKEN, API_URL } = require('../config/env');
 
 const agent = new https.Agent({
   rejectUnauthorized: false
@@ -22,23 +22,58 @@ exports.crearUsuario = async (req, res) => {
   }
 };
 
-/**
- * Controlador para obtener los usuarios del sistema, con búsquedas opcionales.
- *
- * @param {Object} req - Objeto de solicitud HTTP.
- * @param {Object} res - Objeto de respuesta HTTP.
- * @returns {Promise<void>} Responde con un array de usuarios o un mensaje de error.
- */
+// Crear un nuevo usuario de la UTM
+exports.crearUsuarioUTM = async (req, res) => {
+  const { usuario, carrera_id, rol_id } = req.body;
+  const connection = await db.getConnection(); // Obtener conexión dedicada
+  try {
+    await connection.beginTransaction(); // Inicia transacción
+
+    const [userResult] = await connection.execute(
+      `INSERT INTO usuario (id_personal, nombre, cedula) VALUES (?, ?, ?)`,
+      [usuario.id_personal, usuario.nombre, usuario.cedula]
+    );
+    const userId = userResult.insertId;
+
+    const [roleResult] = await connection.execute(
+      `INSERT INTO usuario_rol (id_usuario, id_rol) VALUES (?, ?)`,
+      [userId, rol_id]
+    );
+    if (roleResult.affectedRows === 0) {
+      throw new Error('Rol no asignado');
+    }
+
+    const [careerResult] = await connection.execute(
+      `INSERT INTO usuario_carrera (id_usuario, id_carrera) VALUES (?, ?)`,
+      [userId, carrera_id]
+    );
+    if (careerResult.affectedRows === 0) {
+      throw new Error('Carrera no asignada');
+    }
+
+    await connection.commit(); // Confirma cambios
+    res.status(201).json({ message: 'Usuario creado con éxito', id: userId });
+
+  } catch (error) {
+    await connection.rollback(); // Revierte cambios
+    res.status(500).json({ error: 'Error al crear el usuario', message: error.message });
+  } finally {
+    connection.release(); // Libera conexión
+  }
+};
+
+
+// Obtener todos los usuarios con filtros opcionales
 exports.obtenerUsuarios = async (req, res) => {
-  const { nombre: searchParams, rol } = req.query;
+  const { searchParams, rol } = req.query; // Obtener parámetros de búsqueda de la query string
 
   try {
-    // 1. Búsqueda en la base de datos local
+    // Construir condiciones dinámicas
     const condiciones = [];
     const valores = [];
 
     if (searchParams) {
-      condiciones.push("u.nombre LIKE ? OR u.usuario LIKE ? OR u.cedula LIKE ?");
+      condiciones.push("(u.nombre LIKE ? OR u.usuario LIKE ? OR u.cedula LIKE ?)");
       const searchValue = `%${searchParams}%`;
       valores.push(searchValue, searchValue, searchValue);
     }
@@ -48,51 +83,54 @@ exports.obtenerUsuarios = async (req, res) => {
       valores.push(rol);
     }
 
-    const queryBase = "SELECT DISTINCT u.* FROM usuario u INNER JOIN usuario_rol r ON r.id_usuario = u.id";
+    // Generar consulta dinámica
+    const queryBase = "SELECT DISTINCT u.* FROM usuario u INNER JOIN usuario_rol r on r.id_usuario = u.id WHERE 1=1";
     const queryFinal = condiciones.length
-      ? `${queryBase} AND ${condiciones.join(' AND ')}`
+      ? `${queryBase} AND ${condiciones.join(' AND ')}`  // Se debe unir las condiciones con "AND"
       : queryBase;
 
+    // Ejecutar consulta
     const [usuarios] = await db.execute(queryFinal, valores);
+    res.status(200).json(usuarios);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener los usuarios', message: error.message });
+  }
+};
 
-    // 2. Si encontramos resultados en DB, los devolvemos
-    if (usuarios.length > 0) {
-      return res.status(200).json(usuarios);
-    }
+// Obtener todos los usuarios desde la API externa
+exports.obtenerUsuariosUTM = async (req, res) => {
+  const { searchParams } = req.query;
 
-    // 3. Si no hay resultados en DB y tenemos searchParams sin rol
-    if (searchParams) {
+  try {
+    // 1. Validar que se reciban parámetros de búsqueda
+    if (searchParams.length > 0) {
       const headers = {
         'Content-Type': 'application/json',
         'X-Api-Key': UTM_API_TOKEN
       };
 
-      // 4. Búsqueda en la API externa
+      // 2. Búsqueda en la API externa
       const apiResponse = await axios.post(
-        'https://app.utm.edu.ec/becas/api/publico/ObtenerDatosPersona',
+        `${API_URL}/ObtenerDatosPersona`,
         { datos: searchParams },
         { headers, httpsAgent: agent }
       );
 
       const { state, value } = apiResponse.data;
 
-      // 5. Procesar respuesta de la API
+      // 3. Procesar respuesta de la API
       if (state === 'success' && value && value.length > 0) {
         const usuariosAPI = value.map(persona => ({
-          id: null, // No existe en nuestra DB
-          cedula: persona.r_cedula,
+          id_personal: persona.r_idpersonal,
           nombre: persona.r_nombres,
-          email: persona.r_mail_alternativo,
-          usuario: null,
-          // Agrega aquí otros campos necesarios
-          origen: 'API Externa' // Para identificar el origen
+          cedula: persona.r_cedula,
         }));
 
         return res.status(200).json(usuariosAPI);
       }
     }
 
-    // 6. Si no se encontraron resultados en ningún lado
+    // 4. Si no se encontraron resultados en ningún lado
     res.status(200).json([]);
   } catch (error) {
     console.error('Error en obtenerUsuarios:', error);

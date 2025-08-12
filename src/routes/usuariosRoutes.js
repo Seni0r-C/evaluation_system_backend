@@ -9,8 +9,14 @@ const roles = [1, 10, 11, 12];
 // Crear usuario
 router.post('/', auth, onlyRoles(roles), usuariosController.crearUsuario);
 
+// Crear usuario
+router.post('/crear-desde-utm', auth, onlyRoles(roles), usuariosController.crearUsuarioUTM);
+
 // Obtener todos los usuarios
 router.get('/', auth, usuariosController.obtenerUsuarios);
+
+// Obtener usuario por servicio externo
+router.get('/utm', auth, usuariosController.obtenerUsuariosUTM);
 
 // Obtener usuario por ID
 router.get('/:rol', auth, usuariosController.obtenerUsuariosByRol);
