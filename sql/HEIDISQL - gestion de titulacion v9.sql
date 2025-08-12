@@ -265,8 +265,9 @@ CREATE TABLE IF NOT EXISTS `sistema_rol_ruta` (
   CONSTRAINT `FK_ruta_id` FOREIGN KEY (`ruta_id`) REFERENCES `sistema_ruta` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Volcando datos para la tabla gestion_titulacion.sistema_rol_ruta: ~21 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.sistema_rol_ruta: ~22 rows (aproximadamente)
 INSERT INTO `sistema_rol_ruta` (`rol_id`, `ruta_id`) VALUES
+	(2, 6),
 	(2, 10),
 	(2, 24),
 	(3, 6),
@@ -451,20 +452,19 @@ INSERT INTO `tribunal_rol` (`id`, `nombre`) VALUES
 -- Volcando estructura para tabla gestion_titulacion.usuario
 CREATE TABLE IF NOT EXISTS `usuario` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `usuario` varchar(100) NOT NULL,
+  `usuario` varchar(100) DEFAULT NULL,
   `id_personal` varchar(50) DEFAULT NULL,
   `nombre` varchar(100) NOT NULL,
   `cedula` char(10) DEFAULT NULL,
   `activo` tinyint(4) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   UNIQUE KEY `usuario` (`usuario`),
-  UNIQUE KEY `id_personal` (`id_personal`),
   KEY `idx_nombre` (`nombre`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
 -- Volcando datos para la tabla gestion_titulacion.usuario: ~1 rows (aproximadamente)
 INSERT INTO `usuario` (`id`, `usuario`, `id_personal`, `nombre`, `cedula`, `activo`) VALUES
-	(1, 'admin', '1', 'Administrador', '1301234567', 1);
+	(1, 'admin', '1', 'ADMINISTRADOR', '1301234567', 1);
 
 -- Volcando estructura para tabla gestion_titulacion.usuario_carrera
 CREATE TABLE IF NOT EXISTS `usuario_carrera` (
@@ -489,7 +489,9 @@ CREATE TABLE IF NOT EXISTS `usuario_rol` (
   CONSTRAINT `FK_id_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Volcando datos para la tabla gestion_titulacion.usuario_rol: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla gestion_titulacion.usuario_rol: ~1 rows (aproximadamente)
+INSERT INTO `usuario_rol` (`id_usuario`, `id_rol`) VALUES
+	(1, 1);
 
 -- Volcando estructura para vista gestion_titulacion.vista_menu_rol
 -- Creando tabla temporal para superar errores de dependencia de VIEW

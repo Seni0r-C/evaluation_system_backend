@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 08-08-2025 a las 09:52:46
+-- Tiempo de generación: 12-08-2025 a las 13:30:39
 -- Versión del servidor: 10.4.21-MariaDB
 -- Versión de PHP: 8.0.12
 
@@ -297,6 +297,7 @@ CREATE TABLE `sistema_rol_ruta` (
 --
 
 INSERT INTO `sistema_rol_ruta` (`rol_id`, `ruta_id`) VALUES
+(2, 6),
 (2, 10),
 (2, 24),
 (3, 6),
@@ -503,7 +504,7 @@ INSERT INTO `tribunal_rol` (`id`, `nombre`) VALUES
 
 CREATE TABLE `usuario` (
   `id` int(11) NOT NULL,
-  `usuario` varchar(100) NOT NULL,
+  `usuario` varchar(100) DEFAULT NULL,
   `id_personal` varchar(50) DEFAULT NULL,
   `nombre` varchar(100) NOT NULL,
   `cedula` char(10) DEFAULT NULL,
@@ -515,7 +516,7 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id`, `usuario`, `id_personal`, `nombre`, `cedula`, `activo`) VALUES
-(1, 'admin', '1', 'Administrador', '1301234567', 1);
+(1, 'admin', '1', 'ADMINISTRADOR', '1301234567', 1);
 
 -- --------------------------------------------------------
 
@@ -538,6 +539,13 @@ CREATE TABLE `usuario_rol` (
   `id_usuario` int(11) NOT NULL,
   `id_rol` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `usuario_rol`
+--
+
+INSERT INTO `usuario_rol` (`id_usuario`, `id_rol`) VALUES
+(1, 1);
 
 -- --------------------------------------------------------
 
@@ -788,7 +796,6 @@ ALTER TABLE `tribunal_rol`
 ALTER TABLE `usuario`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `usuario` (`usuario`),
-  ADD UNIQUE KEY `id_personal` (`id_personal`),
   ADD KEY `idx_nombre` (`nombre`);
 
 --
