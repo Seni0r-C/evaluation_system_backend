@@ -26,3 +26,6 @@ exports.CALIFICACION_MINIMA = process.env.CALIFICACION_MINIMA ?? '70'; // Califi
 // ADMIN
 exports.ADMIN_USERNAME = process.env.ADMIN_USERNAME ?? 'admin';
 exports.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? '123';
+
+// ID ROL ESTUDIANTE (para saber si un usuario es estudiante) por defecto es 4
+exports.ROL_ESTUDIANTE_ID = process.env.ROL_ESTUDIANTE_ID ?? '4';

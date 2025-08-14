@@ -4,7 +4,7 @@ const axios = require('axios');
 const https = require('https');
 const { getOrInsertRol, insertCarreraIfNotExists } = require('../services/authService');
 const { externalAuth } = require('../utils/constantes');
-const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/env');
+const { JWT_SECRET, JWT_EXPIRES_IN, ROL_ESTUDIANTE_ID } = require('../config/env');
 const agent = new https.Agent({
     rejectUnauthorized: false
 });
@@ -115,68 +115,78 @@ exports.loginUser = async (req, res) => {
         let user = null;
 
         if (usuarioExiste.length === 0) {
-            await db.query("BEGIN");
-            // Inserta un nuevo usuario en la base de datos
-            const insertUserSql = `
+            try {
+                await db.query("BEGIN");
+                // Inserta un nuevo usuario en la base de datos
+                const insertUserSql = `
                 INSERT INTO usuario (id_personal, nombre, usuario, cedula)
                 VALUES (?, ?, ?, ?) 
             `;
-            const nombre = apiData.nombres;
-            const rolId = await getOrInsertRol(apiData.tipo_usuario);
-            const idpersonal = apiData.idpersonal;
-            const [result] = await db.query(insertUserSql, [
-                idpersonal,
-                nombre,
-                usuario,
-                apiData.cedula
-            ]);
+                const nombre = apiData.nombres;
+                const rolId = await getOrInsertRol(apiData.tipo_usuario);
+                const idpersonal = apiData.idpersonal;
+                const [result] = await db.query(insertUserSql, [
+                    idpersonal,
+                    nombre,
+                    usuario,
+                    apiData.cedula
+                ]);
 
-            const asocialRolSql = "INSERT INTO usuario_rol (id_usuario, id_rol) VALUES (?, ?)";
-            const [asocialRol] = await db.query(asocialRolSql, [result.insertId, rolId]);
+                const asocialRolSql = "INSERT INTO usuario_rol (id_usuario, id_rol) VALUES (?, ?)";
+                const [asocialRol] = await db.query(asocialRolSql, [result.insertId, rolId]);
 
-            if (asocialRol.affectedRows === 0) {
-                return res.status(400).json({ exito: false, mensaje: 'Error al asociar el rol' });
-            }
+                if (asocialRol.affectedRows === 0) {
+                    return res.status(400).json({ exito: false, mensaje: 'Error al asociar el rol' });
+                }
 
-            // Inserta las carreras asociadas si no existen
-            if (apiData.datos_estudio) {
-                const carreras = JSON.parse(apiData.datos_estudio);
-                for (const carrera of carreras) {
-                    if (carrera.facultad.includes('CIENCIAS INFORMÁTICAS')) {
-                        const idCarrera = await insertCarreraIfNotExists(carrera.carrera);
-                        // Asocia la carrera al usuario
-                        const [existingCarrera] = await db.query("SELECT * FROM usuario_carrera WHERE id_usuario = ? AND id_carrera = ?", [result.insertId, idCarrera]);
+                // Inserta las carreras asociadas si no existen
+                if (apiData.datos_estudio) {
+                    const carreras = JSON.parse(apiData.datos_estudio);
+                    for (const carrera of carreras) {
+                        if (carrera.facultad.includes('CIENCIAS INFORMÁTICAS')) {
+                            const idCarrera = await insertCarreraIfNotExists(carrera.carrera);
+                            // Asocia la carrera al usuario
+                            const [existingCarrera] = await db.query("SELECT * FROM usuario_carrera WHERE id_usuario = ? AND id_carrera = ?", [result.insertId, idCarrera]);
 
-                        if (existingCarrera.length == 0) {
-                            const asocialCarreraSql = "INSERT INTO usuario_carrera (id_usuario, id_carrera) VALUES (?, ?)";
-                            const [asocialCarrera] = await db.query(asocialCarreraSql, [result.insertId, idCarrera]);
+                            if (existingCarrera.length == 0) {
+                                const asocialCarreraSql = "INSERT INTO usuario_carrera (id_usuario, id_carrera) VALUES (?, ?)";
+                                const [asocialCarrera] = await db.query(asocialCarreraSql, [result.insertId, idCarrera]);
 
-                            if (asocialCarrera.affectedRows === 0) {
-                                return res.status(400).json({ exito: false, mensaje: 'Error al asociar la carrera' });
+                                if (asocialCarrera.affectedRows === 0) {
+                                    return res.status(400).json({ exito: false, mensaje: 'Error al asociar la carrera' });
+                                }
                             }
                         }
                     }
                 }
+                await db.query("COMMIT");
+                user = {
+                    id_personal: result.insertId,
+                    usuario: usuario,
+                }
+                if (rolId == ROL_ESTUDIANTE_ID) {
+                    return res.status(400).json({ exito: false, mensaje: 'Los estudiantes no pueden iniciar sesión :")' });
+                }
+            } catch (err) {
+                await db.query("ROLLBACK");
+                throw err;
             }
-            await db.query("COMMIT");
-            user = {
-                id_personal: result.insertId,
-                usuario: usuario,
-            }
-        }
-
-        //registrar nombre de usuario si no esta registrado
-        if(!usuarioExiste.find(u => u.usuario === usuario)) {
-            const updateUserSql = "UPDATE usuario SET usuario = ? WHERE id = ?";
-            await db.query(updateUserSql, [usuario, usuarioExiste[0].id]);
-        }
-
-        //no dejar que los estudiantes inicien sesión
-        if (usuarioExiste.length > 0 && !usuarioExiste.find(u => u.rol === 'ESTUDIANTE')) {
-            user = usuarioExiste[0];
         } else {
-            return res.status(400).json({ exito: false, mensaje: 'Los estudiantes no pueden iniciar sesión' });
+            if (!usuarioExiste.find(u => u.usuario === usuario)) {
+                //registrar nombre de usuario si no esta registrado
+                const updateUserSql = "UPDATE usuario SET usuario = ? WHERE id = ?";
+                await db.query(updateUserSql, [usuario, usuarioExiste[0].id]);
+            }
+
+            //no dejar que los estudiantes inicien sesión
+            if (usuarioExiste.length > 0 && !usuarioExiste.find(u => u.rol === 'ESTUDIANTE')) {
+                user = usuarioExiste[0];
+            } else {
+                return res.status(400).json({ exito: false, mensaje: 'Los estudiantes no pueden iniciar sesión' });
+            }
         }
+
+
 
         // Genera el token JWT
         const token = jwt.sign(

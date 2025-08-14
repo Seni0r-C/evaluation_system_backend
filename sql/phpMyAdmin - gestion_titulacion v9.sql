@@ -611,7 +611,7 @@ CREATE TABLE `vista_rutas_rol` (
 --
 DROP TABLE IF EXISTS `vista_menu_rol`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_menu_rol`  AS SELECT `r`.`id` AS `rol`, `m`.`id` AS `id`, `m`.`nombre` AS `menu_nombre`, `rt`.`ruta` AS `ruta`, `rt`.`id` AS `ruta_id`, `m`.`icon` AS `icon`, `m`.`padre_id` AS `padre`, `m`.`orden` AS `orden`, `m`.`todos` AS `todos` FROM ((`sistema_menu` `m` left join `sistema_ruta` `rt` on(`m`.`ruta_id` = `rt`.`id`)) join `sistema_rol` `r` on(`m`.`todos` = 1 or `r`.`id` = 1 or `r`.`id` in (select `rr`.`rol_id` from `sistema_rol_ruta` `rr` where `rr`.`ruta_id` = `m`.`ruta_id`))) ORDER BY `m`.`orden` ASC ;
+CREATE ALGORITHM=UNDEFINED  SQL SECURITY DEFINER VIEW `vista_menu_rol`  AS SELECT `r`.`id` AS `rol`, `m`.`id` AS `id`, `m`.`nombre` AS `menu_nombre`, `rt`.`ruta` AS `ruta`, `rt`.`id` AS `ruta_id`, `m`.`icon` AS `icon`, `m`.`padre_id` AS `padre`, `m`.`orden` AS `orden`, `m`.`todos` AS `todos` FROM ((`sistema_menu` `m` left join `sistema_ruta` `rt` on(`m`.`ruta_id` = `rt`.`id`)) join `sistema_rol` `r` on(`m`.`todos` = 1 or `r`.`id` = 1 or `r`.`id` in (select `rr`.`rol_id` from `sistema_rol_ruta` `rr` where `rr`.`ruta_id` = `m`.`ruta_id`))) ORDER BY `m`.`orden` ASC ;
 
 -- --------------------------------------------------------
 
@@ -620,7 +620,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vista_roles_usuario`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_roles_usuario`  AS SELECT `u`.`id` AS `id_usuario`, `sr`.`id` AS `id`, `sr`.`nombre` AS `nombre` FROM ((`usuario` `u` join `usuario_rol` `ur` on(`u`.`id` = `ur`.`id_usuario`)) join `sistema_rol` `sr` on(`ur`.`id_rol` = `sr`.`id`)) ;
+CREATE ALGORITHM=UNDEFINED  SQL SECURITY DEFINER VIEW `vista_roles_usuario`  AS SELECT `u`.`id` AS `id_usuario`, `sr`.`id` AS `id`, `sr`.`nombre` AS `nombre` FROM ((`usuario` `u` join `usuario_rol` `ur` on(`u`.`id` = `ur`.`id_usuario`)) join `sistema_rol` `sr` on(`ur`.`id_rol` = `sr`.`id`)) ;
 
 -- --------------------------------------------------------
 
@@ -629,7 +629,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vista_rubricas_detalle`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_rubricas_detalle`  AS SELECT `r`.`id` AS `rubrica_id`, `r`.`tipo_evaluacion_id` AS `tipo_evaluacion_id`, `te`.`nombre` AS `tipo_evaluacion_nombre`, `r`.`modalidad_id` AS `modalidad_id`, `mt`.`nombre` AS `modalidad_nombre`, `rcr`.`nombre` AS `criterio_nombre`, `rcr`.`puntaje_maximo` AS `puntaje_maximo` FROM (((`rubrica` `r` join `sistema_tipo_evaluacion` `te` on(`r`.`tipo_evaluacion_id` = `te`.`id`)) join `sistema_modalidad_titulacion` `mt` on(`r`.`modalidad_id` = `mt`.`id`)) left join `rubrica_criterio` `rcr` on(`r`.`id` = `rcr`.`rubrica_id`)) ;
+CREATE ALGORITHM=UNDEFINED  SQL SECURITY DEFINER VIEW `vista_rubricas_detalle`  AS SELECT `r`.`id` AS `rubrica_id`, `r`.`tipo_evaluacion_id` AS `tipo_evaluacion_id`, `te`.`nombre` AS `tipo_evaluacion_nombre`, `r`.`modalidad_id` AS `modalidad_id`, `mt`.`nombre` AS `modalidad_nombre`, `rcr`.`nombre` AS `criterio_nombre`, `rcr`.`puntaje_maximo` AS `puntaje_maximo` FROM (((`rubrica` `r` join `sistema_tipo_evaluacion` `te` on(`r`.`tipo_evaluacion_id` = `te`.`id`)) join `sistema_modalidad_titulacion` `mt` on(`r`.`modalidad_id` = `mt`.`id`)) left join `rubrica_criterio` `rcr` on(`r`.`id` = `rcr`.`rubrica_id`)) ;
 
 -- --------------------------------------------------------
 
@@ -638,7 +638,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vista_rutas_rol`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_rutas_rol`  AS SELECT `r`.`id` AS `rol`, `ruta`.`ruta` AS `ruta` FROM ((`sistema_ruta` `ruta` left join `sistema_rol_ruta` `rr` on(`ruta`.`id` = `rr`.`ruta_id`)) left join `sistema_rol` `r` on(`r`.`id` = 1 or `ruta`.`id` = 1 or `ruta`.`id` = 14 or `r`.`id` = `rr`.`rol_id`)) ORDER BY `ruta`.`id` ASC ;
+CREATE ALGORITHM=UNDEFINED  SQL SECURITY DEFINER VIEW `vista_rutas_rol`  AS SELECT `r`.`id` AS `rol`, `ruta`.`ruta` AS `ruta` FROM ((`sistema_ruta` `ruta` left join `sistema_rol_ruta` `rr` on(`ruta`.`id` = `rr`.`ruta_id`)) left join `sistema_rol` `r` on(`r`.`id` = 1 or `ruta`.`id` = 1 or `ruta`.`id` = 14 or `r`.`id` = `rr`.`rol_id`)) ORDER BY `ruta`.`id` ASC ;
 
 --
 -- Índices para tablas volcadas
