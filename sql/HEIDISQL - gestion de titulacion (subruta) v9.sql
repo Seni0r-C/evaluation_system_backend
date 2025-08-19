@@ -319,8 +319,7 @@ INSERT INTO `sistema_ruta` (`id`, `ruta`) VALUES
 	(24, '/gestion-titulacion/ver-calificar'),
 	(25, '/gestion-titulacion/gestion-roles'),
 	(26, '/gestion-titulacion/admin/user-permissions'),
-	(27, '/gestion-titulacion/reportes'),
-	(28, '/gestion-titulacion');
+	(27, '/gestion-titulacion/reportes');
 
 -- Volcando estructura para tabla gestion_titulacion.sistema_tipo_evaluacion
 CREATE TABLE IF NOT EXISTS `sistema_tipo_evaluacion` (
